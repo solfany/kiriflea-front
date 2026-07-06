@@ -47,7 +47,7 @@ export default function GuideDetailPage() {
   if (loading) {
     return (
       <div className="max-w-screen-md mx-auto px-0 sm:px-4 py-0 sm:py-6 min-h-screen bg-white sm:bg-slate-50/50">
-        <div className="flex items-center gap-3 mb-4 sm:mb-6 pb-4 border-b border-gray-50 px-4 sm:px-1 pt-4 sm:pt-0">
+        <div className="flex items-center gap-3 mb-4 sm:mb-6 pb-4 border-b border-gray-50 px-3 sm:px-1 pt-4 sm:pt-0">
           <button 
             onClick={() => router.back()} 
             className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 rounded-full transition-colors"
@@ -67,7 +67,7 @@ export default function GuideDetailPage() {
   if (error || !guide) {
     return (
       <div className="max-w-screen-md mx-auto px-0 sm:px-4 py-0 sm:py-6 min-h-screen bg-white sm:bg-slate-50/50">
-        <div className="flex items-center gap-3 mb-4 sm:mb-6 pb-4 border-b border-gray-50 px-4 sm:px-1 pt-4 sm:pt-0">
+        <div className="flex items-center gap-3 mb-4 sm:mb-6 pb-4 border-b border-gray-50 px-3 sm:px-1 pt-4 sm:pt-0">
           <button 
             onClick={() => router.back()} 
             className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 rounded-full transition-colors"
@@ -93,7 +93,7 @@ export default function GuideDetailPage() {
   return (
     <div className="max-w-screen-md mx-auto px-0 sm:px-4 py-0 sm:py-6 min-h-screen bg-white sm:bg-slate-50/50">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4 sm:mb-6 pb-4 border-b border-gray-50 px-4 sm:px-1 pt-4 sm:pt-0">
+      <div className="flex items-center gap-3 mb-4 sm:mb-6 pb-4 border-b border-gray-50 px-3 sm:px-1 pt-4 sm:pt-0">
         <button 
           onClick={() => router.back()} 
           className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 rounded-full transition-colors"
