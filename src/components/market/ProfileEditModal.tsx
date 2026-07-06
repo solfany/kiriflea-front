@@ -110,16 +110,16 @@ export function ProfileEditModal({ onClose }: ProfileEditModalProps) {
                   id="nickname"
                   value={nickname}
                   onChange={(e) => setNickname(e.target.value)}
-                  className="mt-1 rounded-xl"
+                  className="mt-1.5 h-12 text-base rounded-xl"
                 />
               </div>
             </div>
           </div>
 
           <div className="p-4 border-t border-gray-100 flex gap-2">
-            <Button variant="outline" className="flex-1 rounded-xl text-gray-600 border-gray-200" onClick={onClose}>취소</Button>
+            <Button variant="outline" className="flex-1 h-12 text-base font-semibold rounded-xl text-gray-600 border-gray-200" onClick={onClose}>취소</Button>
             <Button 
-              className="flex-1 rounded-xl bg-orange-500 hover:bg-orange-600 text-white" 
+              className="flex-1 h-12 text-base font-semibold rounded-xl bg-orange-500 hover:bg-orange-600 text-white" 
               onClick={() => updateMutation.mutate()}
               disabled={updateMutation.isPending || isUploading || !nickname}
             >
