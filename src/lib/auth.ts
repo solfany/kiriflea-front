@@ -11,7 +11,7 @@ export async function confirmVerificationCode(email: string, code: string) {
 }
 
 export async function register(data: RegisterRequest): Promise<AuthTokens> {
-  const res = await api.post<AuthTokens>('/api/auth/register', data);
+  const res = await api.post<AuthTokens>('/api/auth/signup', data);
   return res.data;
 }
 
