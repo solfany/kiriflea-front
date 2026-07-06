@@ -33,8 +33,9 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
 
   const handleSendCode = async () => {
-    if (!email.endsWith('@krtranslink.com')) {
-      toast.error('회사 이메일(@krtranslink.com) 계정으로만 가입 가능합니다.');
+    const isAllowedDomain = email.endsWith('@krtranslink.com') || email.endsWith('@nplohs.com');
+    if (!isAllowedDomain) {
+      toast.error('회사 이메일(@krtranslink.com 또는 @nplohs.com) 계정으로만 가입 가능합니다.');
       return;
     }
     setLoading(true);
@@ -114,7 +115,7 @@ export default function RegisterPage() {
               <span className="font-extrabold text-[28px] text-gray-800 ml-[2px]">마켓</span>
             </div>
           </div>
-          <p className="mt-2 text-sm text-gray-500 font-medium">회사 이메일(@krtranslink.com)로만 가입 가능합니다</p>
+          <p className="mt-2 text-sm text-gray-500 font-medium">회사 이메일(@krtranslink.com / @nplohs.com)로만 가입 가능합니다</p>
         </div>
 
         {/* Step indicator */}
