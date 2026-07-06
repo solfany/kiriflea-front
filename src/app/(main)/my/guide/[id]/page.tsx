@@ -46,16 +46,19 @@ export default function GuideDetailPage() {
 
   if (loading) {
     return (
-      <div className="max-w-screen-md mx-auto px-4 py-4 min-h-screen bg-white">
-        <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-400">
-            <ChevronLeft className="w-5 h-5" />
+      <div className="max-w-screen-md mx-auto px-4 py-6 min-h-screen bg-slate-50/50">
+        <div className="flex items-center gap-3 mb-5">
+          <button 
+            onClick={() => router.back()} 
+            className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold text-gray-500 hover:text-gray-700 bg-white border border-gray-200/80 hover:bg-gray-50 rounded-2xl shadow-sm transition-all"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            뒤로가기
           </button>
-          <div className="h-6 w-32 bg-gray-100 rounded-md animate-pulse" />
         </div>
-        <div className="flex flex-col items-center justify-center py-32">
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm/80 px-6 py-32 flex flex-col items-center justify-center">
           <Loader2 className="w-8 h-8 text-orange-500 animate-spin mb-4" />
-          <p className="text-sm text-gray-400">가이드를 로딩하고 있습니다...</p>
+          <p className="text-sm font-semibold text-gray-400">가이드를 로딩하고 있습니다...</p>
         </div>
       </div>
     );
@@ -63,19 +66,22 @@ export default function GuideDetailPage() {
 
   if (error || !guide) {
     return (
-      <div className="max-w-screen-md mx-auto px-4 py-4 min-h-screen bg-white">
-        <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-500">
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <h1 className="text-lg font-bold text-gray-900">오류</h1>
-        </div>
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <AlertCircle className="w-12 h-12 text-red-500 mb-3" />
-          <p className="text-gray-600 font-medium mb-4">{error || '페이지를 불러올 수 없습니다.'}</p>
+      <div className="max-w-screen-md mx-auto px-4 py-6 min-h-screen bg-slate-50/50">
+        <div className="flex items-center gap-3 mb-5">
           <button 
             onClick={() => router.back()} 
-            className="px-5 py-2.5 bg-gray-100 text-gray-700 hover:bg-gray-200 font-semibold rounded-xl text-sm transition-colors"
+            className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold text-gray-500 hover:text-gray-700 bg-white border border-gray-200/80 hover:bg-gray-50 rounded-2xl shadow-sm transition-all"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            뒤로가기
+          </button>
+        </div>
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm/80 px-6 py-20 flex flex-col items-center justify-center text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mb-3" />
+          <p className="text-gray-600 font-semibold mb-6">{error || '페이지를 불러올 수 없습니다.'}</p>
+          <button 
+            onClick={() => router.back()} 
+            className="px-6 py-3 bg-orange-500 text-white hover:bg-orange-600 font-bold rounded-2xl text-sm transition-colors shadow-md"
           >
             이전 화면으로
           </button>
@@ -85,20 +91,21 @@ export default function GuideDetailPage() {
   }
 
   return (
-    <div className="max-w-screen-md mx-auto px-4 py-4 min-h-screen bg-white">
+    <div className="max-w-screen-md mx-auto px-4 py-6 min-h-screen bg-slate-50/50">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+      <div className="flex items-center justify-between mb-5 px-1">
         <button 
           onClick={() => router.back()} 
-          className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 rounded-full transition-colors"
+          className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold text-gray-500 hover:text-gray-700 bg-white border border-gray-200/80 hover:bg-gray-50 rounded-2xl shadow-sm transition-all"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="w-4 h-4" />
+          뒤로가기
         </button>
-        <span className="text-sm font-semibold text-gray-400">가이드 상세보기</span>
+        <span className="text-[11px] font-bold text-orange-500/90 bg-orange-50/80 px-3 py-1 rounded-full border border-orange-100/30">Guide Center</span>
       </div>
 
-      {/* Main Content Area */}
-      <div className="pb-16">
+      {/* Main Content Area in Premium Rounded Card */}
+      <div className="bg-white rounded-[28px] border border-gray-100 shadow-sm px-6 py-8 sm:px-10 sm:py-10 pb-16">
         <MarkdownViewer content={content} />
       </div>
     </div>

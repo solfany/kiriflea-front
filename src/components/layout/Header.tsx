@@ -16,7 +16,7 @@ export default function Header() {
         <Link href="/" className="flex items-center gap-2 group">
           <div className="relative flex items-center justify-center transition-transform group-hover:scale-105">
             <Image
-              src="/images/simple_symbol_4-Photoroom.png"
+              src="/images/symbol_logo4.png"
               alt="우리끼리플리마켓 로고 아이콘"
               width={32}
               height={32}
