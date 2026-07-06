@@ -7,6 +7,12 @@ const nextConfig = {
         hostname: 'localhost',
         port: '8080',
         pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.dicebear.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
