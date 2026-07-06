@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { MessageCircleMore } from 'lucide-react';
+import Image from 'next/image';
 import { login } from '@/lib/auth';
 import { useAuthStore } from '@/store/auth';
 import { Button } from '@/components/ui/button';
@@ -36,9 +36,15 @@ export default function LoginPage() {
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center gap-2 mb-4">
-            <div className="relative flex items-center justify-center text-orange-500 bg-orange-50/80 rounded-[20px] p-2.5 shadow-sm">
-              <MessageCircleMore size={32} strokeWidth={2.5} />
+          <div className="inline-flex items-center justify-center gap-2.5 mb-4">
+            <div className="relative flex items-center justify-center transition-transform hover:scale-105">
+              <Image
+                src="/images/simple_symbol_4-Photoroom.png"
+                alt="우리끼리플리마켓 로고 아이콘"
+                width={48}
+                height={48}
+                className="rounded-2xl object-cover"
+              />
             </div>
             <div className="flex items-baseline tracking-tight">
               <span className="font-extrabold text-[28px] text-gray-800">우리</span>

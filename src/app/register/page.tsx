@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   sendVerificationCode,
   confirmVerificationCode,
@@ -13,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Loader2, RefreshCw, CheckCircle, MessageCircleMore } from 'lucide-react';
+import { Loader2, RefreshCw, CheckCircle } from 'lucide-react';
 
 type Step = 'email' | 'code' | 'profile';
 
@@ -96,15 +97,21 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center gap-2 mb-3">
-            <div className="relative flex items-center justify-center text-orange-500 bg-orange-50/80 rounded-2xl p-2 shadow-sm">
-              <MessageCircleMore size={28} strokeWidth={2.5} />
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center gap-2.5 mb-4">
+            <div className="relative flex items-center justify-center transition-transform hover:scale-105">
+              <Image
+                src="/images/simple_symbol_4-Photoroom.png"
+                alt="우리끼리플리마켓 로고 아이콘"
+                width={48}
+                height={48}
+                className="rounded-2xl object-cover"
+              />
             </div>
             <div className="flex items-baseline tracking-tight">
-              <span className="font-extrabold text-[24px] text-gray-800">우리</span>
-              <span className="font-black text-[26px] text-orange-500 ml-[2px]">끼리플리</span>
-              <span className="font-extrabold text-[24px] text-gray-800 ml-[2px]">마켓</span>
+              <span className="font-extrabold text-[28px] text-gray-800">우리</span>
+              <span className="font-black text-[30px] text-orange-500 ml-[2px]">끼리플리</span>
+              <span className="font-extrabold text-[28px] text-gray-800 ml-[2px]">마켓</span>
             </div>
           </div>
           <p className="mt-2 text-sm text-gray-500 font-medium">회사 이메일로만 가입 가능합니다</p>
@@ -133,9 +140,10 @@ export default function RegisterPage() {
                 placeholder="name@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="h-12 text-base"
               />
             </div>
-            <Button onClick={handleSendCode} className="w-full bg-orange-500 hover:bg-orange-600" disabled={loading}>
+            <Button onClick={handleSendCode} className="w-full bg-orange-500 hover:bg-orange-600 h-12 text-base font-semibold" disabled={loading}>
               {loading ? <Loader2 size={16} className="animate-spin" /> : '인증코드 발송'}
             </Button>
           </div>
@@ -155,10 +163,10 @@ export default function RegisterPage() {
                 maxLength={6}
                 value={code}
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-                className="text-center text-xl tracking-widest"
+                className="h-12 text-center text-xl tracking-widest"
               />
             </div>
-            <Button onClick={handleVerifyCode} className="w-full bg-orange-500 hover:bg-orange-600" disabled={loading || code.length !== 6}>
+            <Button onClick={handleVerifyCode} className="w-full bg-orange-500 hover:bg-orange-600 h-12 text-base font-semibold" disabled={loading || code.length !== 6}>
               {loading ? <Loader2 size={16} className="animate-spin" /> : '인증 확인'}
             </Button>
             <button onClick={() => setStep('email')} className="w-full text-sm text-gray-400 hover:text-gray-600">
@@ -171,30 +179,30 @@ export default function RegisterPage() {
           <form onSubmit={handleRegister} className="space-y-4">
             <div className="space-y-1.5">
               <Label>비밀번호</Label>
-              <Input type="password" placeholder="영문+숫자+특수문자 8자 이상" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <Input type="password" placeholder="영문+숫자+특수문자 8자 이상" value={password} onChange={(e) => setPassword(e.target.value)} required className="h-12 text-base" />
             </div>
             <div className="space-y-1.5">
               <Label>비밀번호 확인</Label>
-              <Input type="password" placeholder="비밀번호 재입력" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} required />
+              <Input type="password" placeholder="비밀번호 재입력" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} required className="h-12 text-base" />
             </div>
             <div className="space-y-1.5">
               <Label>이름 (실명)</Label>
-              <Input type="text" placeholder="홍길동" value={name} onChange={(e) => setName(e.target.value)} minLength={2} maxLength={20} required />
+              <Input type="text" placeholder="홍길동" value={name} onChange={(e) => setName(e.target.value)} minLength={2} maxLength={20} required className="h-12 text-base" />
             </div>
             <div className="space-y-1.5">
               <Label>닉네임</Label>
               <div className="flex gap-2">
-                <Input type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} minLength={2} maxLength={15} required />
-                <Button type="button" variant="outline" size="icon" onClick={handleRandomNickname} title="랜덤 닉네임">
+                <Input type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} minLength={2} maxLength={15} required className="h-12 text-base" />
+                <Button type="button" variant="outline" size="icon" onClick={handleRandomNickname} title="랜덤 닉네임" className="h-12 w-12 flex-shrink-0">
                   <RefreshCw size={14} />
                 </Button>
               </div>
             </div>
             <div className="space-y-1.5">
               <Label>전화번호 <span className="text-gray-400 text-xs">(선택)</span></Label>
-              <Input type="tel" placeholder="010-0000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} />
+              <Input type="tel" placeholder="010-0000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} className="h-12 text-base" />
             </div>
-            <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 mt-2" disabled={loading}>
+            <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 h-12 text-base font-semibold mt-2" disabled={loading}>
               {loading ? <Loader2 size={16} className="animate-spin" /> : '가입 완료'}
             </Button>
           </form>
