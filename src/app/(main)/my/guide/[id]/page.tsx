@@ -46,8 +46,8 @@ export default function GuideDetailPage() {
 
   if (loading) {
     return (
-      <div className="max-w-screen-md mx-auto min-h-screen bg-white -mx-4 -mt-4 -mb-20 sm:mx-auto sm:mt-0 sm:mb-0 px-4 pt-4 pb-20">
-        <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100">
+      <div className="max-w-screen-md mx-auto py-2">
+        <div className="flex items-center gap-3 mb-4.5 px-1">
           <button 
             onClick={() => router.back()} 
             className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 rounded-full transition-colors"
@@ -66,8 +66,8 @@ export default function GuideDetailPage() {
 
   if (error || !guide) {
     return (
-      <div className="max-w-screen-md mx-auto min-h-screen bg-white -mx-4 -mt-4 -mb-20 sm:mx-auto sm:mt-0 sm:mb-0 px-4 pt-4 pb-20">
-        <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100">
+      <div className="max-w-screen-md mx-auto py-2">
+        <div className="flex items-center gap-3 mb-4.5 px-1">
           <button 
             onClick={() => router.back()} 
             className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 rounded-full transition-colors"
@@ -91,12 +91,12 @@ export default function GuideDetailPage() {
   }
 
   return (
-    <div className="max-w-screen-md mx-auto min-h-screen bg-white -mx-4 -mt-4 -mb-20 sm:mx-auto sm:mt-0 sm:mb-0 px-4 pt-4 pb-20">
+    <div className="max-w-screen-md mx-auto py-2">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100">
+      <div className="flex items-center gap-3 mb-4.5 px-1">
         <button 
           onClick={() => router.back()} 
-          className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 rounded-full transition-colors"
+          className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200/50 rounded-full transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
@@ -104,7 +104,7 @@ export default function GuideDetailPage() {
       </div>
 
       {/* Main Content Area */}
-      <div className="bg-white pb-16 animate-fadeIn">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-8 pb-16 animate-fadeIn">
         <MarkdownViewer content={content} />
       </div>
     </div>

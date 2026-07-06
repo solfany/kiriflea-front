@@ -4,32 +4,33 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
 import { GUIDES } from '@/data/guides';
+import { Separator } from '@/components/ui/separator';
 
 export default function GuideListPage() {
   const router = useRouter();
 
   return (
-    <div className="max-w-screen-md mx-auto min-h-screen bg-white -mx-4 -mt-4 -mb-20 sm:mx-auto sm:mt-0 sm:mb-0 px-4 pt-4 pb-20">
+    <div className="max-w-screen-md mx-auto py-2">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100">
+      <div className="flex items-center gap-3 mb-4.5 px-1">
         <button 
           onClick={() => router.back()} 
-          className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 rounded-full transition-colors"
+          className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200/50 rounded-full transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <span className="text-sm font-semibold text-gray-400">서비스 사용 가이드</span>
+        <span className="text-sm font-semibold text-gray-500">서비스 사용 가이드</span>
       </div>
 
-      {/* Guide List (당근마켓 스타일의 Flat한 리스트) */}
-      <div className="divide-y divide-gray-100/80">
-        {GUIDES.map((guide) => (
-          <Link 
-            key={guide.id}
-            href={`/my/guide/${guide.id}`}
-            className="group block py-5 bg-white hover:bg-gray-50/30 transition-colors"
-          >
-            <div className="flex gap-4 items-start">
+      {/* Guide List (마이페이지의 메뉴판처럼 하나의 둥근 흰색 카드 형태로 통합) */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        {GUIDES.map((guide, i) => (
+          <div key={guide.id}>
+            {i > 0 && <Separator className="bg-gray-100/80" />}
+            <Link 
+              href={`/my/guide/${guide.id}`}
+              className="group flex items-center gap-4 px-5 py-4.5 hover:bg-gray-50/50 transition-colors"
+            >
               <div className="w-9 h-9 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center flex-shrink-0 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300">
                 <BookOpen size={18} />
               </div>
@@ -40,12 +41,12 @@ export default function GuideListPage() {
                   </h2>
                   <ChevronRight size={16} className="text-gray-300 group-hover:text-orange-500 group-hover:translate-x-0.5 transition-all" />
                 </div>
-                <p className="text-xs sm:text-sm text-gray-500 leading-relaxed line-clamp-2">
+                <p className="text-xs sm:text-sm text-gray-400 leading-relaxed line-clamp-1">
                   {guide.description}
                 </p>
               </div>
-            </div>
-          </Link>
+            </Link>
+          </div>
         ))}
       </div>
 
