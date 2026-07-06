@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
 import { GUIDES } from '@/data/guides';
-import { Separator } from '@/components/ui/separator';
 
 export default function GuideListPage() {
   const router = useRouter();
@@ -26,20 +25,20 @@ export default function GuideListPage() {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {GUIDES.map((guide, i) => (
           <div key={guide.id}>
-            {i > 0 && <Separator className="bg-gray-100/80" />}
+            {i > 0 && <div className="h-px bg-gray-100/70 w-full" />}
             <Link 
               href={`/my/guide/${guide.id}`}
-              className="group flex items-center gap-4 px-5 py-4.5 hover:bg-gray-50/50 transition-colors"
+              className="group flex gap-4 px-5 py-5.5 hover:bg-gray-50/50 transition-colors items-start"
             >
-              <div className="w-9 h-9 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center flex-shrink-0 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300">
-                <BookOpen size={18} />
+              <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center flex-shrink-0 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300">
+                <BookOpen size={20} />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2 mb-1">
+                <div className="flex items-center justify-between gap-2 mb-1.5">
                   <h2 className="font-bold text-gray-800 text-[15px] sm:text-[16px] group-hover:text-orange-500 transition-colors truncate">
                     {guide.title}
                   </h2>
-                  <ChevronRight size={16} className="text-gray-300 group-hover:text-orange-500 group-hover:translate-x-0.5 transition-all" />
+                  <ChevronRight size={16} className="text-gray-300 group-hover:text-orange-500 group-hover:translate-x-0.5 transition-all self-center" />
                 </div>
                 <p className="text-xs sm:text-sm text-gray-400 leading-relaxed line-clamp-1">
                   {guide.description}
