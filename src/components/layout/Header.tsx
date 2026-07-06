@@ -1,11 +1,11 @@
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Search } from 'lucide-react';
 import { useAuthStore } from '@/store/auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { HeaderChatIcon } from './HeaderChatIcon';
 import { HeaderNotifications } from './HeaderNotifications';
-import { MessageCircleMore } from 'lucide-react';
 
 export default function Header() {
   const user = useAuthStore((s) => s.user);
@@ -14,8 +14,14 @@ export default function Header() {
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
       <div className="max-w-screen-md mx-auto px-4 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="relative flex items-center justify-center text-orange-500 bg-orange-50/80 rounded-xl p-1.5 transition-transform group-hover:scale-105">
-            <MessageCircleMore size={22} strokeWidth={2.5} />
+          <div className="relative flex items-center justify-center transition-transform group-hover:scale-105">
+            <Image
+              src="/images/woori_market_app_icon1.png"
+              alt="우리끼리플리마켓 로고 아이콘"
+              width={32}
+              height={32}
+              className="rounded-xl object-cover"
+            />
           </div>
           <div className="flex items-baseline tracking-tight">
             <span className="font-extrabold text-[19px] text-gray-800">우리</span>
