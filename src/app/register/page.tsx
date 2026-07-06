@@ -27,10 +27,20 @@ export default function RegisterPage() {
   const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [name, setName] = useState('');
   const [nickname, setNickname] = useState('');
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const formatPhoneNumber = (value: string) => {
+    if (!value) return value;
+    const phoneNumber = value.replace(/[^\d]/g, '');
+    const phoneNumberLength = phoneNumber.length;
+    if (phoneNumberLength < 4) return phoneNumber;
+    if (phoneNumberLength < 8) {
+      return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
+    }
+    return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 7)}-${phoneNumber.slice(7, 11)}`;
+  };
 
   const handleSendCode = async () => {
     const isAllowedDomain = email.endsWith('@krtranslink.com') || email.endsWith('@nplohs.com');
@@ -84,7 +94,14 @@ export default function RegisterPage() {
     }
     setLoading(true);
     try {
-      const res = await register({ email, verificationCode: code, password, name, nickname, phone: phone || undefined });
+      const res = await register({
+        email,
+        verificationCode: code,
+        password,
+        name: nickname, // 이름 입력을 받지 않으므로 DB NotNull 우회를 위해 nickname 대입
+        nickname,
+        phone: phone || undefined
+      });
       setTokens(res.accessToken, res.refreshToken, res.user);
       toast.success(`환영합니다, ${nickname}님!`);
       router.replace('/');
@@ -186,10 +203,6 @@ export default function RegisterPage() {
               <Input type="password" placeholder="비밀번호 재입력" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} required className="h-12 text-base" />
             </div>
             <div className="space-y-1.5">
-              <Label>이름 (실명)</Label>
-              <Input type="text" placeholder="홍길동" value={name} onChange={(e) => setName(e.target.value)} minLength={2} maxLength={20} required className="h-12 text-base" />
-            </div>
-            <div className="space-y-1.5">
               <Label>닉네임</Label>
               <div className="flex gap-2">
                 <Input type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} minLength={2} maxLength={15} required className="h-12 text-base" />
@@ -200,7 +213,14 @@ export default function RegisterPage() {
             </div>
             <div className="space-y-1.5">
               <Label>전화번호 <span className="text-gray-400 text-xs">(선택)</span></Label>
-              <Input type="tel" placeholder="010-0000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} className="h-12 text-base" />
+              <Input
+                type="tel"
+                placeholder="010-0000-0000"
+                maxLength={13}
+                value={phone}
+                onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
+                className="h-12 text-base"
+              />
             </div>
             <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 h-12 text-base font-semibold mt-2" disabled={loading}>
               {loading ? <Loader2 size={16} className="animate-spin" /> : '가입 완료'}
