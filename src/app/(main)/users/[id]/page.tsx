@@ -15,7 +15,7 @@ import { useState } from 'react';
 interface UserProfile {
   id: number;
   nickname: string;
-  profileImageUrl: string;
+  profileImage: string | null;
   createdAt: string;
   mannerScore: number;
   listingCount: number;
@@ -100,7 +100,7 @@ export default function UserProfilePage() {
         <div className="flex items-center gap-4">
           <div className="relative w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center text-2xl font-bold text-orange-500 flex-shrink-0 overflow-hidden border border-gray-100">
             <Image
-              src={profile.profileImageUrl || `https://api.dicebear.com/7.x/notionists/svg?seed=${profile.nickname}`}
+              src={profile.profileImage || `https://api.dicebear.com/7.x/notionists/svg?seed=${profile.nickname}`}
               alt={profile.nickname}
               fill
               className="object-cover"
