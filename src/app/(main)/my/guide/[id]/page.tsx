@@ -46,17 +46,17 @@ export default function GuideDetailPage() {
 
   if (loading) {
     return (
-      <div className="max-w-screen-md mx-auto px-4 py-4 min-h-screen bg-white">
-        <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100">
+      <div className="max-w-screen-md mx-auto py-2">
+        <div className="flex items-center gap-3 mb-4.5 px-1">
           <button 
             onClick={() => router.back()} 
-            className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 rounded-full transition-colors"
+            className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200/50 rounded-full transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <div className="h-6 w-32 bg-gray-100 rounded-md animate-pulse" />
+          <div className="h-6 w-32 bg-gray-100/70 rounded-md animate-pulse" />
         </div>
-        <div className="bg-white py-32 flex flex-col items-center justify-center">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm py-32 flex flex-col items-center justify-center">
           <Loader2 className="w-8 h-8 text-orange-500 animate-spin mb-4" />
           <p className="text-sm font-semibold text-gray-400">가이드를 로딩하고 있습니다...</p>
         </div>
@@ -66,17 +66,17 @@ export default function GuideDetailPage() {
 
   if (error || !guide) {
     return (
-      <div className="max-w-screen-md mx-auto px-4 py-4 min-h-screen bg-white">
-        <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100">
+      <div className="max-w-screen-md mx-auto py-2">
+        <div className="flex items-center gap-3 mb-4.5 px-1">
           <button 
             onClick={() => router.back()} 
-            className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 rounded-full transition-colors"
+            className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200/50 rounded-full transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <h1 className="text-lg font-bold text-gray-900">오류</h1>
         </div>
-        <div className="bg-white py-20 flex flex-col items-center justify-center text-center">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm py-20 flex flex-col items-center justify-center text-center">
           <AlertCircle className="w-12 h-12 text-red-500 mb-3" />
           <p className="text-gray-600 font-semibold mb-6">{error || '페이지를 불러올 수 없습니다.'}</p>
           <button 
@@ -91,20 +91,20 @@ export default function GuideDetailPage() {
   }
 
   return (
-    <div className="max-w-screen-md mx-auto px-4 py-4 min-h-screen bg-white">
+    <div className="max-w-screen-md mx-auto py-2">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100">
+      <div className="flex items-center gap-3 mb-4.5 px-1">
         <button 
           onClick={() => router.back()} 
-          className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 rounded-full transition-colors"
+          className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200/50 rounded-full transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <span className="text-sm font-semibold text-gray-400">가이드 상세보기</span>
+        <span className="text-sm font-semibold text-gray-500">가이드 상세보기</span>
       </div>
 
       {/* Main Content Area */}
-      <div className="bg-white pb-16">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-8 pb-16">
         <MarkdownViewer content={content} />
       </div>
     </div>

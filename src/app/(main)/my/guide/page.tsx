@@ -9,32 +9,32 @@ export default function GuideListPage() {
   const router = useRouter();
 
   return (
-    <div className="max-w-screen-md mx-auto px-4 py-4 min-h-screen bg-white">
+    <div className="max-w-screen-md mx-auto py-2">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100">
+      <div className="flex items-center gap-3 mb-4.5 px-1">
         <button 
           onClick={() => router.back()} 
-          className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 rounded-full transition-colors"
+          className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200/50 rounded-full transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <span className="text-sm font-semibold text-gray-400">서비스 사용 가이드</span>
+        <span className="text-sm font-semibold text-gray-500">서비스 사용 가이드</span>
       </div>
 
-      {/* Guide List (당근마켓 스타일의 Flat한 리스트) */}
-      <div className="divide-y divide-gray-100/80">
+      {/* Guide Card List */}
+      <div className="space-y-3.5">
         {GUIDES.map((guide) => (
           <Link 
             key={guide.id}
             href={`/my/guide/${guide.id}`}
-            className="group block py-5 bg-white hover:bg-gray-50/30 transition-colors"
+            className="group block bg-white rounded-2xl p-5 border border-gray-100/90 shadow-sm hover:shadow-md hover:border-orange-100 transition-all duration-300 transform hover:-translate-y-[1px]"
           >
             <div className="flex gap-4 items-start">
               <div className="w-9 h-9 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center flex-shrink-0 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300">
                 <BookOpen size={18} />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2 mb-1">
+                <div className="flex items-center justify-between gap-2 mb-1.5">
                   <h2 className="font-bold text-gray-800 text-[15px] sm:text-[16px] group-hover:text-orange-500 transition-colors truncate">
                     {guide.title}
                   </h2>
