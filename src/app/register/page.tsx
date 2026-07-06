@@ -35,7 +35,7 @@ export default function RegisterPage() {
   const handleSendCode = async () => {
     const isAllowedDomain = email.endsWith('@krtranslink.com') || email.endsWith('@nplohs.com');
     if (!isAllowedDomain) {
-      toast.error('회사 이메일(@krtranslink.com 또는 @nplohs.com) 계정으로만 가입 가능합니다.');
+      toast.error('회사 이메일 계정으로만 가입 가능합니다.');
       return;
     }
     setLoading(true);
@@ -115,17 +115,16 @@ export default function RegisterPage() {
               <span className="font-extrabold text-[28px] text-gray-800 ml-[2px]">마켓</span>
             </div>
           </div>
-          <p className="mt-2 text-sm text-gray-500 font-medium">회사 이메일(@krtranslink.com / @nplohs.com)로만 가입 가능합니다</p>
+          <p className="mt-2 text-sm text-gray-500 font-medium">회사 이메일로만 가입 가능합니다</p>
         </div>
 
         {/* Step indicator */}
         <div className="flex items-center justify-center gap-2 mb-8">
           {(['email', 'code', 'profile'] as Step[]).map((s, i) => (
             <div key={s} className="flex items-center gap-2">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                step === s ? 'bg-orange-500 text-white' : i < (['email','code','profile'] as Step[]).indexOf(step) ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'
-              }`}>
-                {i < (['email','code','profile'] as Step[]).indexOf(step) ? <CheckCircle size={14} /> : i + 1}
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${step === s ? 'bg-orange-500 text-white' : i < (['email', 'code', 'profile'] as Step[]).indexOf(step) ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'
+                }`}>
+                {i < (['email', 'code', 'profile'] as Step[]).indexOf(step) ? <CheckCircle size={14} /> : i + 1}
               </div>
               {i < 2 && <div className="w-8 h-0.5 bg-gray-200" />}
             </div>
@@ -138,7 +137,7 @@ export default function RegisterPage() {
               <Label>회사 이메일</Label>
               <Input
                 type="email"
-                placeholder="name@krtranslink.com"
+                placeholder="name@nplohs.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-12 text-base"
