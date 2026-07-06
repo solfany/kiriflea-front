@@ -9,16 +9,13 @@ export default function GuideListPage() {
   const router = useRouter();
 
   return (
-    <div className="max-w-screen-md mx-auto py-2">
+    <div className="pb-4">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4.5 px-1">
-        <button 
-          onClick={() => router.back()} 
-          className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200/50 rounded-full transition-colors"
-        >
+      <div className="flex items-center gap-3 mb-4">
+        <button onClick={() => router.back()} className="text-gray-500 hover:text-gray-700">
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <span className="text-sm font-semibold text-gray-500">서비스 사용 가이드</span>
+        <h1 className="text-lg font-bold text-gray-900">서비스 사용 가이드</h1>
       </div>
 
       {/* Guide List (마이페이지의 메뉴판처럼 하나의 둥근 흰색 카드 형태로 통합) */}
