@@ -1,0 +1,92 @@
+'use client';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { fetchProducts, toggleLike } from '@/lib/products';
+import ProductCard from '@/components/market/ProductCard';
+import ProductSkeleton from '@/components/market/ProductSkeleton';
+import TrendingScroll from '@/components/market/TrendingScroll';
+import CategoryFilter from '@/components/market/CategoryFilter';
+import { useRef, useState } from 'react';
+import { Loader2 } from 'lucide-react';
+import type { Category, ProductCursor, ProductListItem } from '@/types';
+
+export default function HomePage() {
+  const [category, setCategory] = useState<Category | undefined>();
+  const qc = useQueryClient();
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery<ProductCursor>({
+    queryKey: ['products', category],
+    queryFn: ({ pageParam }) =>
+      fetchProducts({ cursor: pageParam as string | undefined, limit: 20, category, sort: 'LATEST' }),
+    initialPageParam: undefined,
+    getNextPageParam: (last) => last.nextCursor ?? undefined,
+  });
+
+  useIntersectionObserver(bottomRef, () => {
+    if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+  });
+
+  const likeMutation = useMutation({
+    mutationFn: toggleLike,
+    onMutate: async (productId) => {
+      await qc.cancelQueries({ queryKey: ['products', category] });
+      qc.setQueryData(['products', category], (old: { pages: ProductCursor[] } | undefined) => {
+        if (!old) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page) => ({
+            ...page,
+            items: page.items.map((p: ProductListItem) =>
+              p.id === productId
+                ? { ...p, isLiked: !p.isLiked, wishCount: p.isLiked ? p.wishCount - 1 : p.wishCount + 1 }
+                : p,
+            ),
+          })),
+        };
+      });
+    },
+  });
+
+  const products = data?.pages.flatMap((p) => p.items) ?? [];
+
+  return (
+    <div>
+      <TrendingScroll />
+      <CategoryFilter value={category} onChange={setCategory} />
+
+      <div>
+        {isLoading ? (
+          [1, 2, 3, 4, 5].map((i) => <ProductSkeleton key={i} />)
+        ) : (
+          products.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              onLikeToggle={(id) => likeMutation.mutate(id)}
+            />
+          ))
+        )}
+      </div>
+
+      <div ref={bottomRef} className="h-4" />
+
+      {isFetchingNextPage && (
+        <div className="flex justify-center py-6">
+          <Loader2 size={20} className="animate-spin text-gray-400" />
+        </div>
+      )}
+
+      {!hasNextPage && products.length > 0 && (
+        <p className="text-center text-xs text-gray-400 py-8">모든 상품을 확인했습니다</p>
+      )}
+
+      {products.length === 0 && !isFetchingNextPage && (
+        <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+          <span className="text-4xl mb-3">🛍️</span>
+          <p className="text-sm">등록된 상품이 없습니다</p>
+        </div>
+      )}
+    </div>
+  );
+}
