@@ -141,7 +141,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
 
   const extendAuctionMutation = useMutation({
     mutationFn: (days: number) => {
-      const currentEndAt = product?.endAt ? new Date(product.endAt).getTime() : Date.now();
+      const currentEndAt = product?.auctionEndAt ? new Date(product.auctionEndAt).getTime() : Date.now();
       const newEndAt = new Date(currentEndAt + days * 24 * 60 * 60 * 1000);
       const isoString = newEndAt.toISOString().slice(0, 19);
       return extendAuction(productId, isoString);
@@ -169,7 +169,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
   const completeTradeMutation = useMutation({
     mutationFn: () => api.post('/api/trades', {
       productId: product?.id,
-      buyerId: product?.highestBidderId
+      buyerId: product?.buyerId
     }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['product', productId] });

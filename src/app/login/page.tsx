@@ -39,7 +39,7 @@ export default function LoginPage() {
           <div className="inline-flex items-center justify-center gap-2.5 mb-4">
             <div className="relative flex items-center justify-center transition-transform hover:scale-105">
               <Image
-                src="/images/simple_symbol_4-Photoroom.png"
+                src="/images/symbol_icon_2_3d.png"
                 alt="우리끼리플리마켓 로고 아이콘"
                 width={48}
                 height={48}

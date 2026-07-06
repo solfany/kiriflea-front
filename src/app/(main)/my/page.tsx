@@ -7,7 +7,7 @@ import { logout } from '@/lib/auth';
 import { api } from '@/lib/api';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { ChevronRight, Heart, ShoppingBag, MessageCircle, LogOut, Gavel, Info } from 'lucide-react';
+import { ChevronRight, Heart, ShoppingBag, MessageCircle, LogOut, Gavel, Info, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ProfileEditModal } from '@/components/market/ProfileEditModal';
@@ -130,8 +130,16 @@ export default function MyPage() {
         ))}
       </div>
 
-      {/* 고객지원 메뉴 */}
+      {/* 사용 가이드 및 고객지원 메뉴 */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-4">
+        <Link
+          href="/my/guide"
+          className="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 transition-colors border-b border-gray-50"
+        >
+          <BookOpen size={18} className="text-gray-500" />
+          <span className="flex-1 text-sm font-medium text-gray-800">서비스 사용 가이드</span>
+          <ChevronRight size={16} className="text-gray-300" />
+        </Link>
         <button
           onClick={() => setIsContactModalOpen(true)}
           className="w-full flex items-center gap-3 px-5 py-4 hover:bg-gray-50 transition-colors"

@@ -41,6 +41,7 @@ export interface Seller {
   nickname: string;
   mannerScore: number;
   listingCount: number;
+  profileImage?: string;
 }
 
 export interface Product {
@@ -86,6 +87,7 @@ export interface ProductListItem {
   tradeId?: number;
   partnerNickname?: string;
   isReviewed?: boolean;
+  bidCount?: number;
 }
 
 export interface ProductCursor {
@@ -108,7 +110,7 @@ export interface CreateProductRequest {
 // ── Comment ───────────────────────────────────────────────────
 export interface Comment {
   id: number;
-  author: { id: number; nickname: string };
+  author: { id: number; nickname: string; profileImage?: string };
   content: string;
   isPrivate: boolean;
   parentId?: number;
@@ -163,7 +165,7 @@ export interface ChatRoom {
 export interface ChatMessage {
   id: number;
   roomId: number;
-  sender: { id: number; nickname: string };
+  sender: { id: number; nickname: string; profileImage?: string };
   content: string;
   type: 'TEXT' | 'IMAGE';
   isRead?: boolean;

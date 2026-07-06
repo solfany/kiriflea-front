@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useEffect, useRef, useState } from 'react';
+import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
@@ -291,7 +291,7 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
 
         <div className="flex items-center z-10">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger>
               <button className="p-1.5 -mr-1.5 rounded-full hover:bg-gray-100 text-gray-700">
                 <MoreVertical size={20} />
               </button>
