@@ -8,7 +8,9 @@ import { useAuthStore } from '@/store/auth';
 import { toast } from 'sonner';
 import type { ChatMessage } from '@/types';
 
-const WS_HTTP_URL = process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:8080/ws';
+import { getWebSocketHttpUrl } from '@/lib/utils';
+
+const WS_HTTP_URL = getWebSocketHttpUrl();
 
 export function GlobalNotification() {
   const user = useAuthStore((s) => s.user);
@@ -24,6 +26,8 @@ export function GlobalNotification() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       webSocketFactory: () => new (SockJS as any)(token ? `${WS_HTTP_URL}?token=${token}` : WS_HTTP_URL),
       reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
       onConnect: () => {
         client.subscribe(`/topic/user/${user.id}/chats`, (frame) => {
           const msg: ChatMessage = JSON.parse(frame.body);
@@ -51,6 +55,32 @@ export function GlobalNotification() {
                 </div>
               </div>
             ), { duration: 5000 });
+          }
+          
+          // 헤더 아이콘 즉시 갱신을 위해 전역 이벤트 발생
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('chatMessageReceived'));
+          }
+        });
+        
+        // 시스템 일반 알림 (좋아요, 입찰, 상태 변경 등)
+        client.subscribe(`/topic/user/${user.id}/notifications`, (frame) => {
+          const noti = JSON.parse(frame.body);
+          toast.custom((t) => (
+            <div className="bg-white rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-gray-100 p-4 w-[356px] flex flex-col gap-2 cursor-pointer" onClick={() => toast.dismiss(t)}>
+              <div className="flex justify-between items-start">
+                <div className="flex flex-col flex-1 pr-4">
+                  <span className="font-bold text-gray-900 text-sm">새로운 알림</span>
+                  <span className="text-gray-600 text-sm mt-0.5 line-clamp-2">{noti.message}</span>
+                </div>
+                <div className="w-2 h-2 rounded-full bg-orange-500 shrink-0 mt-1" />
+              </div>
+            </div>
+          ), { duration: 5000 });
+
+          // 헤더 종 아이콘 즉시 갱신을 위해 전역 이벤트 발생
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('notificationReceived'));
           }
         });
       },

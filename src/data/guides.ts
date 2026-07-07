@@ -14,7 +14,7 @@ export const GUIDES: GuideItem[] = [
   },
   {
     id: 'trading',
-    title: '🤝 우리끼리플리마켓 안전 거래 수칙',
+    title: '🤝 끼리플리 안전 거래 수칙',
     description: '사내 동료와의 쾌적하고 신뢰할 수 있는 직거래 규칙과 거래 금지 품목을 안내합니다.',
     file: '/guides/trading.md',
   },

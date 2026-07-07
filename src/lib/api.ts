@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
+// 상대경로 사용 → Next.js rewrites가 /api/* → localhost:8080 으로 프록시
+// 덕분에 핸드폰 등 외부기기에서도 localhost:8080 직접 호출 없이 동작
+const BASE_URL = '';
 
 export const api = axios.create({
   baseURL: BASE_URL,
@@ -45,7 +47,7 @@ api.interceptors.response.use(
       original._retry = true;
       try {
         const refreshToken = localStorage.getItem('refresh_token');
-        const res = await axios.post(`${BASE_URL}/api/auth/refresh`, { refreshToken });
+        const res = await axios.post('/api/auth/refresh', { refreshToken });
         const { accessToken } = res.data;
         localStorage.setItem('access_token', accessToken);
         original.headers.Authorization = `Bearer ${accessToken}`;

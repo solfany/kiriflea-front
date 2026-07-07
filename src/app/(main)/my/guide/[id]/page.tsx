@@ -85,17 +85,17 @@ export default function GuideDetailPage() {
   }
 
   return (
-    <div className="pb-4">
+    <div className="bg-white min-h-[calc(100vh-3.5rem)] -mx-4 px-4 pt-4 pb-12 -mt-4 sm:mt-0 sm:bg-transparent sm:min-h-0 sm:mx-0 sm:px-0 sm:pt-0">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
-        <button onClick={() => router.back()} className="text-gray-500 hover:text-gray-700">
-          <ChevronLeft className="w-5 h-5" />
+      <div className="flex items-center gap-3 mb-5 py-1">
+        <button onClick={() => router.back()} className="text-gray-500 hover:text-gray-700 transition-colors p-1 -ml-1 rounded-full hover:bg-gray-100">
+          <ChevronLeft className="w-6 h-6" />
         </button>
         <h1 className="text-lg font-bold text-gray-900">가이드 상세보기</h1>
       </div>
 
-      {/* Main Content Area */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-8 pb-16 animate-fadeIn">
+      {/* Main Content Area (모바일에서는 테두리 없는 풀블리드, PC에서는 둥근 카드 형태) */}
+      <div className="bg-white rounded-none sm:rounded-2xl border-y sm:border border-gray-100 shadow-none sm:shadow-sm px-4 py-6 sm:p-8 pb-16 animate-fadeIn -mx-4 sm:mx-0">
         <MarkdownViewer content={content} />
       </div>
     </div>

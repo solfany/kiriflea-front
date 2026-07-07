@@ -10,6 +10,8 @@ import { useAuthStore } from '@/store/auth';
 import type { MyBid } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 const STATUS_LABELS: Record<string, string> = {
   SALE: '판매중', AUCTION: '경매중', RESERVED: '예약중', SOLD: '판매완료',
@@ -27,81 +29,88 @@ function BidCard({ bid }: { bid: MyBid }) {
   const isEnded = endAt ? endAt < new Date() : false;
 
   return (
-    <button
-      onClick={() => router.push(`/products/${bid.product.id}`)}
-      className="w-full flex gap-3 py-4 border-b border-gray-100 last:border-0 text-left hover:bg-gray-50 transition-colors"
-    >
-      {/* Thumbnail */}
-      <div className="relative w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-gray-100">
-        {bid.product.isDeleted ? (
-          <div className="w-full h-full flex items-center justify-center bg-gray-100">
-            <span className="text-xl">🚫</span>
-          </div>
-        ) : bid.product.thumbnailUrl ? (
-          <Image src={bid.product.thumbnailUrl} alt={bid.product.title} fill className="object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <Gavel className="w-6 h-6 text-gray-300" />
-          </div>
-        )}
-        {bid.isWinning && !isEnded && !bid.product.isDeleted && (
-          <div className="absolute top-1 left-1 bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
-            최고가
-          </div>
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2 mb-1">
+    <div className="relative border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
+      <button
+        onClick={() => router.push(`/products/${bid.product.id}`)}
+        className="w-full flex gap-4 py-4 text-left"
+      >
+        {/* Thumbnail */}
+        <div className="relative w-[110px] h-[110px] rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 border border-black/5">
           {bid.product.isDeleted ? (
-            <p className="text-sm font-semibold text-gray-500 truncate">삭제된 상품입니다.</p>
+            <div className="w-full h-full flex items-center justify-center bg-gray-100">
+              <span className="text-xl">🚫</span>
+            </div>
+          ) : bid.product.thumbnailUrl ? (
+            <Image src={bid.product.thumbnailUrl} alt={bid.product.title} fill className="object-cover group-hover:scale-[1.02] transition-transform duration-200" sizes="110px" />
           ) : (
-            <p className="text-sm font-medium text-gray-900 truncate">{bid.product.title}</p>
+            <div className="w-full h-full flex items-center justify-center">
+              <Gavel className="w-6 h-6 text-gray-300" />
+            </div>
           )}
-          <span className={`shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${bid.product.isDeleted ? 'bg-gray-500 text-white' : STATUS_COLORS[bid.product.status] ?? 'text-gray-500 bg-gray-100'}`}>
-            {bid.product.isDeleted ? '삭제됨' : STATUS_LABELS[bid.product.status] ?? bid.product.status}
-          </span>
+          {bid.isWinning && !isEnded && !bid.product.isDeleted && (
+            <div className="absolute top-1.5 left-1.5 bg-orange-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm">
+              최고가
+            </div>
+          )}
         </div>
 
-        {/* My bid vs current */}
-        <div className="flex items-center gap-3 text-xs mt-1.5">
-          <span className="text-gray-500">내 입찰가</span>
-          <span className="font-semibold text-gray-900">{bid.amount.toLocaleString()}원</span>
-        </div>
-        <div className="flex items-center gap-3 text-xs mt-0.5">
-          <span className="text-gray-500">현재 최고가</span>
-          <span className={`font-semibold ${bid.isWinning ? 'text-orange-500' : 'text-gray-700'}`}>
-            {bid.currentHighestBid.toLocaleString()}원
-          </span>
-          {bid.product.status === 'SOLD' ? (
-            bid.isWinning ? (
-              <span className="flex items-center gap-0.5 text-blue-500 font-medium">
-                <Trophy className="w-3 h-3" /> 낙찰 성공!
-              </span>
+        {/* Info */}
+        <div className="flex-1 min-w-0 py-0.5 flex flex-col relative">
+          <div className="flex items-start justify-between gap-2 mb-1">
+            {bid.product.isDeleted ? (
+              <p className="text-[16px] leading-snug font-semibold text-gray-500 line-clamp-2">삭제된 상품입니다.</p>
             ) : (
-              <span className="text-gray-400 font-medium">낙찰 실패</span>
-            )
-          ) : bid.isWinning ? (
-            <span className="flex items-center gap-0.5 text-orange-500 font-medium">
-              <Trophy className="w-3 h-3" /> 최고 입찰자
+              <p className="text-[16px] leading-snug text-gray-900 line-clamp-2">{bid.product.title}</p>
+            )}
+            <span className={cn('shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm', bid.product.isDeleted ? 'bg-gray-500 text-white' : STATUS_COLORS[bid.product.status] ?? 'text-gray-500 bg-gray-100')}>
+              {bid.product.isDeleted ? '삭제됨' : STATUS_LABELS[bid.product.status] ?? bid.product.status}
             </span>
-          ) : (
-            <span className="text-red-400 font-medium">경쟁 중</span>
+          </div>
+
+          <div className="flex-1 flex flex-col justify-center gap-1.5 mt-1">
+            {/* My bid vs current */}
+            <div className="flex items-center gap-2 text-[13px]">
+              <span className="text-gray-500">내 입찰가</span>
+              <span className="font-semibold text-gray-900">{bid.amount.toLocaleString()}원</span>
+            </div>
+            <div className="flex items-center gap-2 text-[13px]">
+              <span className="text-gray-500">현재 최고가</span>
+              <span className={cn('font-bold', bid.isWinning ? 'text-orange-500' : 'text-gray-700')}>
+                {bid.currentHighestBid.toLocaleString()}원
+              </span>
+              
+              <div className="ml-1 flex items-center">
+                {bid.product.status === 'SOLD' ? (
+                  bid.isWinning ? (
+                    <span className="flex items-center gap-0.5 text-blue-500 font-medium text-[12px]">
+                      <Trophy className="w-3 h-3" /> 낙찰 성공!
+                    </span>
+                  ) : (
+                    <span className="text-gray-400 font-medium text-[12px]">낙찰 실패</span>
+                  )
+                ) : bid.isWinning ? (
+                  <span className="flex items-center gap-0.5 text-orange-500 font-medium text-[12px]">
+                    <Trophy className="w-3 h-3" /> 최고 입찰자
+                  </span>
+                ) : (
+                  <span className="text-red-400 font-medium text-[12px]">경쟁 중</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* End time */}
+          {endAt && (
+            <div className="absolute bottom-0 right-0 flex items-center gap-1 text-[12px] text-gray-400">
+              <Clock className="w-3 h-3" />
+              <span suppressHydrationWarning>
+                {isEnded ? '경매 종료' : `${formatDistanceToNow(endAt, { addSuffix: true, locale: ko })} 마감`}
+              </span>
+            </div>
           )}
         </div>
-
-        {/* End time */}
-        {endAt && (
-          <div className="flex items-center gap-1 text-[10px] text-gray-400 mt-1.5">
-            <Clock className="w-3 h-3" />
-            {isEnded
-              ? '경매 종료'
-              : `${formatDistanceToNow(endAt, { addSuffix: true, locale: ko })} 마감`}
-          </div>
-        )}
-      </div>
-    </button>
+      </button>
+    </div>
   );
 }
 
@@ -173,7 +182,7 @@ export default function MyBidsPage() {
 
       <div ref={bottomRef} className="h-8 flex items-center justify-center">
         {isFetchingNextPage && (
-          <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+          <LoadingSpinner size="sm" />
         )}
       </div>
     </div>

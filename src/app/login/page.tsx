@@ -1,14 +1,13 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { login } from '@/lib/auth';
 import { useAuthStore } from '@/store/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { Loader2, MessageCircleHeart } from 'lucide-react';
 
 export default function LoginPage() {
   const setTokens = useAuthStore((s) => s.setTokens);
@@ -37,13 +36,11 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center gap-2.5 mb-4">
-            <div className="relative flex items-center justify-center transition-transform hover:scale-105">
-              <Image
-                src="/images/symbol_logo4.png"
-                alt="우리끼리플리마켓 로고 아이콘"
-                width={48}
-                height={48}
-                className="rounded-2xl object-cover"
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-orange-50">
+              <MessageCircleHeart
+                size={34}
+                className="text-orange-500"
+                strokeWidth={1.9}
               />
             </div>
             <div className="flex items-baseline tracking-tight">

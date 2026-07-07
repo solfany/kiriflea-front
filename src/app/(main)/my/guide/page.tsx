@@ -9,23 +9,23 @@ export default function GuideListPage() {
   const router = useRouter();
 
   return (
-    <div className="pb-4">
+    <div className="bg-white min-h-[calc(100vh-3.5rem)] -mx-4 px-4 pt-4 pb-12 -mt-4 sm:mt-0 sm:bg-transparent sm:min-h-0 sm:mx-0 sm:px-0 sm:pt-0">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
-        <button onClick={() => router.back()} className="text-gray-500 hover:text-gray-700">
-          <ChevronLeft className="w-5 h-5" />
+      <div className="flex items-center gap-3 mb-5 py-1">
+        <button onClick={() => router.back()} className="text-gray-500 hover:text-gray-700 transition-colors p-1 -ml-1 rounded-full hover:bg-gray-100">
+          <ChevronLeft className="w-6 h-6" />
         </button>
         <h1 className="text-lg font-bold text-gray-900">서비스 사용 가이드</h1>
       </div>
 
-      {/* Guide List (마이페이지의 메뉴판처럼 하나의 둥근 흰색 카드 형태로 통합) */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      {/* Guide List (모바일에서는 테두리 없는 풀블리드 리스트, PC에서는 둥근 카드 형태) */}
+      <div className="bg-white rounded-none sm:rounded-2xl border-y sm:border border-gray-100 shadow-none sm:shadow-sm overflow-hidden -mx-4 sm:mx-0">
         {GUIDES.map((guide, i) => (
           <div key={guide.id}>
             {i > 0 && <div className="h-px bg-gray-100/70 w-full" />}
             <Link 
               href={`/my/guide/${guide.id}`}
-              className="group flex gap-4 px-5 py-5.5 hover:bg-gray-50/50 transition-colors items-start"
+              className="group flex gap-4 px-4 sm:px-5 py-5 hover:bg-gray-50/50 transition-colors items-start"
             >
               <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center flex-shrink-0 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300">
                 <BookOpen size={20} />
@@ -47,7 +47,7 @@ export default function GuideListPage() {
       </div>
 
       <div className="mt-12 text-center text-xs text-gray-400">
-        우리끼리플리마켓은 임직원 간의 건전하고 따뜻한 거래 환경을 지원합니다.
+        끼리플리는 임직원 간의 건전하고 따뜻한 거래 환경을 지원합니다.
       </div>
     </div>
   );

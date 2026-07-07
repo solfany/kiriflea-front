@@ -13,10 +13,10 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ChevronLeft, Send, Loader2, Handshake, Plus, MoreVertical } from 'lucide-react';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
+import { cn, getWebSocketHttpUrl } from '@/lib/utils';
 import type { ChatMessage, ChatRoom, PageResponse } from '@/types';
 
-const WS_HTTP_URL = process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:8080/ws';
+const WS_HTTP_URL = getWebSocketHttpUrl();
 
 async function fetchMessages(roomId: number, pageParam: number = 0): Promise<PageResponse<ChatMessage>> {
   const res = await api.get<PageResponse<ChatMessage>>(`/api/chat/rooms/${roomId}/messages?page=${pageParam}&size=20`);
@@ -98,12 +98,16 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
   }, [historyData, newMessages]);
 
   useEffect(() => {
+    qc.invalidateQueries({ queryKey: ['chatMessages', roomIdNum] });
+    qc.invalidateQueries({ queryKey: ['chatRooms'] });
+    window.dispatchEvent(new Event('chatRead'));
+    
     if (scrollRef.current && prevScrollHeight > 0) {
       const newScrollHeight = scrollRef.current.scrollHeight;
       scrollRef.current.scrollTop = newScrollHeight - prevScrollHeight;
       setPrevScrollHeight(0);
     }
-  }, [messages, prevScrollHeight]);
+  }, [messages, prevScrollHeight, qc, roomIdNum]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight } = e.currentTarget;
@@ -165,9 +169,10 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
     const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
     const client = new Client({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       webSocketFactory: () => new (SockJS as any)(token ? `${WS_HTTP_URL}?token=${token}` : WS_HTTP_URL),
       reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
       onConnect: () => {
         setConnected(true);
         
@@ -240,6 +245,7 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.nativeEvent.isComposing) return;
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -291,10 +297,8 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
 
         <div className="flex items-center z-10">
           <DropdownMenu>
-            <DropdownMenuTrigger>
-              <button className="p-1.5 -mr-1.5 rounded-full hover:bg-gray-100 text-gray-700">
-                <MoreVertical size={20} />
-              </button>
+            <DropdownMenuTrigger className="p-1.5 -mr-1.5 rounded-full hover:bg-gray-100 text-gray-700 outline-none">
+              <MoreVertical size={20} />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40 bg-white rounded-xl shadow-lg border border-gray-100 p-1">
               <DropdownMenuItem 
@@ -427,7 +431,7 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
             <div key={msg.id} className="flex flex-col gap-3">
               {showDateSeparator && (
                 <div className="flex justify-center my-4">
-                  <span className="bg-gray-100 text-gray-500 text-xs px-3 py-1 rounded-full">
+                  <span suppressHydrationWarning className="bg-gray-100 text-gray-500 text-xs px-3 py-1 rounded-full">
                     {new Date(msg.createdAt).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}
                   </span>
                 </div>
@@ -470,7 +474,7 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
                     {isMine && !msg.isRead && (
                       <span className="text-[10px] font-bold text-orange-500">1</span>
                     )}
-                    <span className="text-[10px] text-gray-400">{formatTime(msg.createdAt)}</span>
+                    <span suppressHydrationWarning className="text-[10px] text-gray-400">{formatTime(msg.createdAt)}</span>
                   </div>
                 </div>
               </div>

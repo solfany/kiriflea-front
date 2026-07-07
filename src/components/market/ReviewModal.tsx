@@ -35,7 +35,7 @@ export function ReviewModal({ tradeId, partnerNickname, onClose, onSuccess }: Re
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
       <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <h3 className="font-bold text-gray-900">거래 후기 남기기</h3>
@@ -76,9 +76,9 @@ export function ReviewModal({ tradeId, partnerNickname, onClose, onSuccess }: Re
           />
         </div>
         <div className="p-4 border-t border-gray-50 flex gap-2">
-          <Button variant="outline" className="flex-1" onClick={onClose}>나중에</Button>
+          <Button variant="outline" className="flex-1 h-12 text-[15px] font-semibold" onClick={onClose}>나중에</Button>
           <Button 
-            className="flex-1 bg-orange-500 hover:bg-orange-600" 
+            className="flex-1 bg-orange-500 hover:bg-orange-600 h-12 text-[15px] font-semibold" 
             disabled={score === 0 || reviewMutation.isPending}
             onClick={() => reviewMutation.mutate()}
           >

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { api } from '@/lib/api';
 import type { ChatRoom } from '@/types';
 import { ChevronLeft, MessageCircle, X } from 'lucide-react';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useRouter } from 'next/navigation';
 import BottomNav from '@/components/layout/BottomNav';
 import { toast } from 'sonner';
@@ -35,7 +36,7 @@ export default function ChatListPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+        <LoadingSpinner />
       </div>
     );
   }

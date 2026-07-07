@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, Clock } from 'lucide-react';
+import { Heart, Clock, Eye, MessageSquare } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { ProductListItem } from '@/types';
@@ -31,9 +31,9 @@ export default function ProductCard({ product, onLikeToggle }: Props) {
 
   return (
     <Link href={`/products/${product.id}`} className="block group">
-      <div className="flex gap-4 py-3.5 px-2 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+      <div className="flex gap-4 py-4 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
         {/* Product Image */}
-        <div className="relative w-[108px] h-[108px] rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 border border-gray-100">
+        <div className="relative w-[110px] h-[110px] rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 border border-black/5">
           {product.isDeleted ? (
             <>
               {product.imageUrls?.[0] ? (
@@ -42,7 +42,7 @@ export default function ProductCard({ product, onLikeToggle }: Props) {
                   alt="삭제됨"
                   fill
                   className="object-cover"
-                  sizes="108px"
+                  sizes="110px"
                 />
               ) : (
                 <div className="w-full h-full bg-gray-200" />
@@ -56,8 +56,8 @@ export default function ProductCard({ product, onLikeToggle }: Props) {
               src={product.imageUrls[0]}
               alt={product.title}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-200"
-              sizes="108px"
+              className="object-cover group-hover:scale-[1.02] transition-transform duration-200"
+              sizes="110px"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-300 text-2xl">📦</div>
@@ -78,24 +78,21 @@ export default function ProductCard({ product, onLikeToggle }: Props) {
 
         {/* Content Area */}
         <div className="flex-1 min-w-0 py-0.5 flex flex-col relative">
-          <p className={cn('text-[15px] leading-snug text-gray-900 line-clamp-2 mb-1', (product.status === 'SOLD' || product.isDeleted) && 'text-gray-400')}>
+          <p className={cn('text-[16px] leading-snug text-gray-900 line-clamp-2', (product.status === 'SOLD' || product.isDeleted) && 'text-gray-400')}>
             {product.title}
           </p>
 
-          <div className="text-[12px] text-gray-400 mb-1.5 flex items-center gap-1">
-            <span className="flex items-center gap-0.5">
-              <Clock size={12} className="opacity-70" />
+          <div className="text-[13px] text-gray-500 mt-1 mb-1 flex items-center gap-1">
+            <span suppressHydrationWarning>
               {relativeTime(product.createdAt)}
             </span>
           </div>
 
-          <div className="flex-1 flex flex-col justify-end">
+          <div className="flex-1 flex flex-col justify-start mt-0.5">
             {product.isDeleted ? (
-              <div className="flex items-center gap-1.5">
-                <p className="font-bold text-[16px] tracking-tight text-gray-400">
-                  삭제된 상품입니다
-                </p>
-              </div>
+              <p className="font-bold text-[16px] tracking-tight text-gray-400">
+                삭제된 상품입니다
+              </p>
             ) : product.isAuction ? (
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5">
@@ -110,19 +107,17 @@ export default function ProductCard({ product, onLikeToggle }: Props) {
                 )}
               </div>
             ) : (
-              <div className="flex items-center gap-1.5">
-                <p className={cn('font-bold text-[16px] tracking-tight', product.status === 'SOLD' ? 'text-gray-400' : 'text-gray-900')}>
-                  {product.price.toLocaleString()}원
-                </p>
-              </div>
+              <p className={cn('font-bold text-[16px] tracking-tight', product.status === 'SOLD' ? 'text-gray-400' : 'text-gray-900')}>
+                {product.price.toLocaleString()}원
+              </p>
             )}
           </div>
 
           {/* Likes and Views indicator (bottom right) */}
-          <div className="absolute bottom-0 right-0 flex items-center gap-2 text-gray-400">
+          <div className="absolute bottom-0 right-0 flex items-center gap-2.5 text-gray-400">
             {product.viewCount > 0 && (
               <span className="flex items-center gap-1 text-[13px]">
-                조회 {product.viewCount}
+                <Eye size={14} /> {product.viewCount}
               </span>
             )}
             <button
@@ -132,7 +127,7 @@ export default function ProductCard({ product, onLikeToggle }: Props) {
                 product.isLiked ? 'text-red-500' : 'hover:text-red-400',
               )}
             >
-              <Heart size={15} fill={product.isLiked ? 'currentColor' : 'none'} className={cn(product.isLiked && "text-red-500")} />
+              <Heart size={14} fill={product.isLiked ? 'currentColor' : 'none'} className={cn(product.isLiked && "text-red-500")} />
               {product.wishCount > 0 && <span className="text-[13px]">{product.wishCount}</span>}
             </button>
           </div>

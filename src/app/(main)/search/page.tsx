@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Search, X, SlidersHorizontal } from 'lucide-react';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { fetchProducts } from '@/lib/products';
 import ProductCard from '@/components/market/ProductCard';
 import type { Category, ProductStatus } from '@/types';
@@ -256,7 +257,7 @@ function SearchContent() {
 
       <div ref={bottomRef} className="h-8 flex items-center justify-center">
         {isFetchingNextPage && (
-          <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+          <LoadingSpinner size="sm" />
         )}
       </div>
     </div>

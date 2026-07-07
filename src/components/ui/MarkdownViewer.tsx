@@ -12,7 +12,7 @@ export function mdToHtml(md: string): string {
 
   // 2. Blockquotes / Tip Boxes (당근 스타일: 테두리 없이 둥근 배경만)
   html = html.replace(/^> (.*?)$/gm, 
-    '<div class="flex items-start gap-3 bg-orange-50/40 rounded-2xl p-4.5 my-6 text-[14px] text-gray-700 leading-relaxed">' +
+    '<div class="flex items-start gap-3 bg-orange-50/40 rounded-2xl p-5 my-6 text-[14px] text-gray-700 leading-relaxed">' +
       '<span class="text-orange-500 text-base flex-shrink-0 mt-0.5">💡</span>' +
       '<div class="flex-1">$1</div>' +
     '</div>'

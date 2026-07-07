@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Client } from '@stomp/stompjs';
@@ -20,7 +21,7 @@ import {
   Eye, Gavel, Wifi, WifiOff, Timer, Trash2, Lock
 } from 'lucide-react';
 import type { Product, AuctionUpdateMessage } from '@/types';
-import { cn, getMannerRank } from '@/lib/utils';
+import { cn, getMannerRank, getWebSocketHttpUrl } from '@/lib/utils';
 
 const STATUS_LABEL: Record<string, string> = {
   SALE: '판매중', RESERVED: '예약중', SOLD: '판매완료', AUCTION: '경매중',
@@ -250,12 +251,14 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
   useEffect(() => {
     if (!product?.isAuction) return;
     const token = localStorage.getItem('access_token') ?? '';
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:8080/ws';
+    const wsUrl = getWebSocketHttpUrl();
 
     const client = new Client({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      webSocketFactory: () => new (SockJS as any)(`${wsUrl}?token=${token}`),
+      webSocketFactory: () => new (SockJS as any)(token ? `${wsUrl}?token=${token}` : wsUrl),
       reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
       onConnect: () => {
         setStompConnected(true);
         client.subscribe(`/topic/product/${productId}/auction`, (msg) => {
@@ -281,7 +284,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+        <LoadingSpinner />
       </div>
     );
   }

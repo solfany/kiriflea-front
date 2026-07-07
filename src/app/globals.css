@@ -8,6 +8,23 @@
   }
 }
 
+/* 알림 패널 드롭다운 애니메이션 */
+@keyframes notificationSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.notification-panel {
+  animation: notificationSlideIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: top right;
+}
+
+
 @layer base {
   .theme {
     --font-heading: var(--font-sans);

@@ -1,10 +1,8 @@
 'use client';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Search } from 'lucide-react';
+import { Search, MessageCircleHeart } from 'lucide-react';
 import { useAuthStore } from '@/store/auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { HeaderChatIcon } from './HeaderChatIcon';
 import { HeaderNotifications } from './HeaderNotifications';
 
 export default function Header() {
@@ -12,36 +10,45 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-      <div className="max-w-screen-md mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="relative flex items-center justify-center transition-transform group-hover:scale-105">
-            <Image
-              src="/images/symbol_logo4.png"
-              alt="우리끼리플리마켓 로고 아이콘"
-              width={32}
-              height={32}
-              className="rounded-xl object-cover"
+      <div className="max-w-screen-md mx-auto px-4 h-[52px] flex items-center justify-between">
+
+        {/* 로고 */}
+        <Link href="/" className="flex items-center gap-1.5 group">
+          <div className="flex items-center justify-center w-7 h-7 rounded-xl bg-orange-50 transition-transform group-hover:scale-105 shrink-0">
+            <MessageCircleHeart
+              size={19}
+              className="text-orange-500"
+              strokeWidth={2.2}
             />
           </div>
           <div className="flex items-baseline tracking-tight">
-            <span className="font-extrabold text-[19px] text-gray-800">우리</span>
-            <span className="font-black text-[20px] text-orange-500 ml-[1px]">끼리플리</span>
-            <span className="font-extrabold text-[19px] text-gray-800 ml-[2px]">마켓</span>
+            <span className="font-extrabold text-[16px] text-gray-800">우리</span>
+            <span className="font-black text-[17px] text-orange-500 ml-[1px]">끼리플리</span>
+            <span className="font-extrabold text-[16px] text-gray-800 ml-[1px]">마켓</span>
           </div>
         </Link>
 
-        <div className="flex items-center gap-3">
-          <Link href="/search" className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-            <Search size={20} className="text-gray-600" />
+        {/* 우측 액션 */}
+        <div className="flex items-center gap-1">
+          <Link
+            href="/search"
+            className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
+          >
+            <Search size={21} strokeWidth={1.8} className="text-gray-800" />
           </Link>
-          <HeaderChatIcon />
           {user && (
             <>
               <HeaderNotifications />
-              <Link href="/my">
-                <Avatar className="h-8 w-8">
-                  {user.profileImage && <AvatarImage src={user.profileImage} alt={user.nickname} className="object-cover" />}
-                  <AvatarFallback className="bg-orange-100 text-orange-600 text-xs font-semibold">
+              <Link href="/my" className="ml-0.5">
+                <Avatar className="h-7 w-7">
+                  {user.profileImage && (
+                    <AvatarImage
+                      src={user.profileImage}
+                      alt={user.nickname}
+                      className="object-cover"
+                    />
+                  )}
+                  <AvatarFallback className="bg-orange-100 text-orange-600 text-[10px] font-semibold">
                     {user.nickname.slice(0, 2)}
                   </AvatarFallback>
                 </Avatar>
@@ -49,6 +56,7 @@ export default function Header() {
             </>
           )}
         </div>
+
       </div>
     </header>
   );

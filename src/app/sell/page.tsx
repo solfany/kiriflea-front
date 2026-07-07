@@ -1,6 +1,7 @@
 'use client';
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import Image from 'next/image';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createProduct, updateProduct, uploadImage, fetchProduct } from '@/lib/products';
@@ -127,7 +128,7 @@ function SellForm() {
   if (isEditMode && !existingProduct) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+        <LoadingSpinner />
       </div>
     );
   }
@@ -314,7 +315,7 @@ export default function SellPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+        <LoadingSpinner />
       </div>
     }>
       <SellForm />
