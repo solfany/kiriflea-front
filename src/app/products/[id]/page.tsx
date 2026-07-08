@@ -18,8 +18,9 @@ import { ReviewModal } from '@/components/market/ReviewModal';
 import { toast } from 'sonner';
 import {
   Heart, ChevronLeft, ChevronRight, MessageCircle,
-  Eye, Gavel, Wifi, WifiOff, Timer, Trash2, Lock, Share2
+  Eye, Gavel, Wifi, WifiOff, Timer, Trash2, Lock, Share2, MoreHorizontal, Edit2
 } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { Product, AuctionUpdateMessage } from '@/types';
 import { cn, getMannerRank, getWebSocketHttpUrl } from '@/lib/utils';
 import { useConfirmStore } from '@/store/confirm';
@@ -48,6 +49,10 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
   const [showReopenModal, setShowReopenModal] = useState(false);
   const [extendDays, setExtendDays] = useState(1);
   const [reopenDays, setReopenDays] = useState(1);
+  
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
+  const [editContent, setEditContent] = useState('');
+  const [editIsPrivate, setEditIsPrivate] = useState(false);
   const [bidAmount, setBidAmount] = useState('');
 
   // Fun elements state
@@ -116,6 +121,17 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
       toast.success('댓글이 삭제되었습니다.');
     },
     onError: () => toast.error('댓글 삭제에 실패했습니다.'),
+  });
+
+  const editCommentMutation = useMutation({
+    mutationFn: (data: { commentId: number; content: string; isPrivate: boolean }) =>
+      api.patch(`/api/products/${productId}/comments/${data.commentId}`, { content: data.content, isPrivate: data.isPrivate }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['comments', productId] });
+      setEditingCommentId(null);
+      toast.success('댓글이 수정되었습니다.');
+    },
+    onError: () => toast.error('댓글 수정에 실패했습니다.'),
   });
 
   const deleteProductMutation = useMutation({
@@ -344,32 +360,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
           <ChevronLeft size={20} className="text-gray-700" />
         </button>
         <div className="absolute top-4 right-4 flex items-center gap-2">
-          <button
-            onClick={() => {
-              navigator.clipboard.writeText(window.location.href);
-              toast.success('상품 링크가 복사되었습니다.');
-            }}
-            className="p-2 bg-white/80 backdrop-blur rounded-full shadow-sm hover:bg-white transition-colors"
-          >
-            <Share2 size={20} className="text-gray-700" />
-          </button>
-          {isSeller && !(product.isDeleted || (product as any).deleted) && (
-            <button
-              onClick={() => {
-                openConfirm({
-                  title: '이 상품을 정말 삭제하시겠습니까?\n(복구할 수 없습니다)',
-                  confirmText: '삭제하기',
-                  onConfirm: () => {
-                    deleteProductMutation.mutate();
-                  }
-                });
-              }}
-              disabled={deleteProductMutation.isPending}
-              className="p-2 bg-white/80 backdrop-blur rounded-full shadow-sm hover:bg-red-50 text-red-500 transition-colors"
-            >
-              <Trash2 size={20} />
-            </button>
-          )}
+          {/* Menu moved to profile area */}
         </div>
         {images.length > 1 && (
           <>
@@ -392,26 +383,96 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
       </div>
 
       <div className="px-4 pb-32">
-        {/* Profile */}
-        <Link href={isSeller ? '/my' : `/users/${product.seller.id}`} className="flex items-center gap-3 py-3 mt-2 hover:bg-gray-50 transition-colors -mx-4 px-4 rounded-xl cursor-pointer">
-          {product.seller.profileImage ? (
-            <Image src={product.seller.profileImage} alt={product.seller.nickname} width={40} height={40} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
-          ) : (
-            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center font-semibold text-orange-600 flex-shrink-0">
-              {product.seller.nickname.slice(0, 2)}
+        {/* Profile and Menu */}
+        <div className="flex items-center justify-between py-3 mt-2 -mx-4 px-4 rounded-xl hover:bg-gray-50 transition-colors relative">
+          <Link href={isSeller ? '/my' : `/users/${product.seller.id}`} className="flex items-center gap-3 flex-1 cursor-pointer">
+            {product.seller.profileImage ? (
+              <Image src={product.seller.profileImage} alt={product.seller.nickname} width={40} height={40} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center font-semibold text-orange-600 flex-shrink-0">
+                {product.seller.nickname.slice(0, 2)}
+              </div>
+            )}
+            <div>
+              <p className="font-medium text-gray-900">{product.seller.nickname}</p>
+              <div className="flex items-center gap-1 text-xs text-gray-400">
+                <span>
+                  매너 {product.seller.mannerScore.toFixed(1)}점{' '}
+                  <span className="text-orange-500">({getMannerRank(product.seller.mannerScore)})</span>
+                </span>
+                <span>· 판매 {product.seller.listingCount}건</span>
+              </div>
             </div>
-          )}
-          <div>
-            <p className="font-medium text-gray-900">{product.seller.nickname}</p>
-            <div className="flex items-center gap-1 text-xs text-gray-400">
-              <span>
-                매너 {product.seller.mannerScore.toFixed(1)}점{' '}
-                <span className="text-orange-500">({getMannerRank(product.seller.mannerScore)})</span>
-              </span>
-              <span>· 판매 {product.seller.listingCount}건</span>
-            </div>
-          </div>
-        </Link>
+          </Link>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600 outline-none">
+              <MoreHorizontal size={20} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 bg-white border border-gray-100 rounded-xl shadow-lg !ring-0 !outline-none p-1">
+              <DropdownMenuItem
+                className="flex items-center gap-2 p-3 hover:bg-gray-50 cursor-pointer rounded-lg text-sm text-gray-700 font-medium"
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  toast.success('상품 링크가 복사되었습니다.');
+                }}
+              >
+                <Share2 size={16} className="text-gray-500" />
+                공유하기
+              </DropdownMenuItem>
+              {isSeller && !(product.isDeleted || (product as any).deleted) && (
+                <>
+                  <Separator className="my-1 bg-gray-100" />
+                  {!product.isAuction && (
+                    <>
+                      <DropdownMenuItem
+                        className="flex items-center gap-2 p-3 hover:bg-gray-50 cursor-pointer rounded-lg text-sm text-gray-700 font-medium"
+                        onClick={() => statusMutation.mutate('SALE')}
+                      >
+                        상태: 판매중으로 변경
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="flex items-center gap-2 p-3 hover:bg-gray-50 cursor-pointer rounded-lg text-sm text-gray-700 font-medium"
+                        onClick={() => statusMutation.mutate('RESERVED')}
+                      >
+                        상태: 예약중으로 변경
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="flex items-center gap-2 p-3 hover:bg-gray-50 cursor-pointer rounded-lg text-sm text-gray-700 font-medium"
+                        onClick={() => statusMutation.mutate('SOLD')}
+                      >
+                        상태: 판매완료로 변경
+                      </DropdownMenuItem>
+                      <Separator className="my-1 bg-gray-100" />
+                    </>
+                  )}
+                  <DropdownMenuItem
+                    className="flex items-center gap-2 p-3 hover:bg-gray-50 cursor-pointer rounded-lg text-sm text-gray-700 font-medium"
+                    onClick={() => router.push(`/sell?edit=${product.id}`)}
+                  >
+                    <Edit2 size={16} className="text-gray-500" />
+                    수정하기
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="flex items-center gap-2 p-3 hover:bg-red-50 cursor-pointer rounded-lg text-sm text-red-600 font-medium"
+                    onClick={() => {
+                      openConfirm({
+                        title: '이 상품을 정말 삭제하시겠습니까?\n(복구할 수 없습니다)',
+                        confirmText: '삭제하기',
+                        onConfirm: () => {
+                          deleteProductMutation.mutate();
+                        }
+                      });
+                    }}
+                  >
+                    <Trash2 size={16} className="text-red-500" />
+                    삭제하기
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
         <Separator />
         {/* Status + title */}
@@ -604,23 +665,65 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                       )}
                       <span className="text-[10px] text-gray-400">{dateStr}</span>
                     </div>
-                    <p className="text-sm text-gray-700 mt-0.5 pr-8">{c.content}</p>
+                    {editingCommentId === c.id ? (
+                      <div className="mt-2 space-y-2 pr-4">
+                        <div className="flex items-start gap-2">
+                          <label className="flex items-center gap-1.5 text-xs text-gray-500 mt-2.5 flex-shrink-0 cursor-pointer">
+                            <input type="checkbox" checked={editIsPrivate} onChange={(e) => setEditIsPrivate(e.target.checked)} className="w-3 h-3" />
+                            비공개
+                          </label>
+                          <input
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                            className="flex-1 border border-gray-200 rounded-xl px-3 h-10 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                            autoFocus
+                          />
+                        </div>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" size="sm" onClick={() => setEditingCommentId(null)} className="h-8 text-xs">취소</Button>
+                          <Button size="sm" onClick={() => editCommentMutation.mutate({ commentId: c.id, content: editContent, isPrivate: editIsPrivate })} disabled={!editContent.trim() || editCommentMutation.isPending} className="bg-orange-500 hover:bg-orange-600 h-8 text-xs text-white">수정 완료</Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-700 mt-0.5 pr-8">{c.content}</p>
+                    )}
                   </div>
-                  {user && c.author.id === user.id && (
-                    <button
-                      onClick={() => {
-                        openConfirm({
-                          title: '댓글을 삭제하시겠습니까?',
-                          confirmText: '삭제하기',
-                          onConfirm: () => {
-                            deleteCommentMutation.mutate(c.id);
-                          }
-                        });
-                      }}
-                      className="absolute right-0 top-0 p-1 text-gray-300 hover:text-red-500 transition-colors"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                  {user && c.author.id === user.id && editingCommentId !== c.id && (
+                    <div className="absolute right-0 top-0">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="p-1 text-gray-400 hover:bg-gray-100 rounded-full transition-colors outline-none">
+                          <MoreHorizontal size={16} />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-32 bg-white border border-gray-100 rounded-xl shadow-lg !ring-0 !outline-none p-1">
+                          <DropdownMenuItem
+                            className="flex items-center gap-2 p-2 hover:bg-gray-50 cursor-pointer rounded-lg text-sm text-gray-700"
+                            onClick={() => {
+                              setEditingCommentId(c.id);
+                              setEditContent(c.content);
+                              setEditIsPrivate(c.isPrivate);
+                            }}
+                          >
+                            <Edit2 size={14} className="text-gray-500" />
+                            수정하기
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="flex items-center gap-2 p-2 hover:bg-red-50 cursor-pointer rounded-lg text-sm text-red-600"
+                            onClick={() => {
+                              openConfirm({
+                                title: '댓글을 삭제하시겠습니까?',
+                                confirmText: '삭제하기',
+                                onConfirm: () => {
+                                  deleteCommentMutation.mutate(c.id);
+                                }
+                              });
+                            }}
+                          >
+                            <Trash2 size={14} className="text-red-500" />
+                            삭제하기
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   )}
                 </div>
               );
