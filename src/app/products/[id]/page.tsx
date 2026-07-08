@@ -395,12 +395,12 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
             )}
             <div>
               <p className="font-medium text-gray-900">{product.seller.nickname}</p>
-              <div className="flex items-center gap-1 text-xs text-gray-400">
-                <span>
-                  매너 점수 {product.seller.mannerScore.toFixed(1)}점 {' '}
-                  <span className="text-orange-500">{getMannerIcon(product.seller.mannerScore)} {getMannerRank(product.seller.mannerScore)}</span>
-                </span>
-                <span>· 판매 {product.seller.listingCount}건</span>
+              <div className="flex flex-col gap-0.5 text-xs text-gray-400 mt-0.5">
+                <span>매너 점수 {product.seller.mannerScore.toFixed(1)}점</span>
+                <div className="flex items-center gap-1">
+                  <span className="text-orange-500 font-medium">{getMannerIcon(product.seller.mannerScore)} {getMannerRank(product.seller.mannerScore)}</span>
+                  <span>· 판매 {product.seller.listingCount}건</span>
+                </div>
               </div>
             </div>
           </Link>
