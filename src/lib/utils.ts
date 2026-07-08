@@ -6,23 +6,13 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getMannerRank(score: number): string {
-  if (score < 30) return '양아치 끼리';
-  if (score < 36.5) return '껄렁한 끼리';
-  if (score < 40) return '평범한 끼리';
-  if (score < 60) return '성숙한 끼리';
-  if (score < 80) return '신사적인 끼리';
-  if (score < 100) return '존경받는 끼리';
-  return '전설적인 끼리';
-}
-
-export function getMannerIcon(score: number): string {
-  if (score < 30) return '👿';
-  if (score < 36.5) return '😒';
-  if (score < 40) return '🌱';
-  if (score < 60) return '☕';
-  if (score < 80) return '🎩';
-  if (score < 100) return '👑';
-  return '🌟';
+  if (score < 30) return '블랙컨슈머';
+  if (score < 36.5) return '뜨내기 손님';
+  if (score < 40) return '동네 이웃';
+  if (score < 60) return '단골 손님';
+  if (score < 80) return '베테랑 상인';
+  if (score < 100) return '대상인';
+  return '전설의 거상';
 }
 
 export function stripMarkdown(md: string): string {
