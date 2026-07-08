@@ -1,6 +1,6 @@
 'use client';
 import { cn } from '@/lib/utils';
-import { getMannerRank } from '@/lib/utils';
+import { getMannerRank, getMannerIcon } from '@/lib/utils';
 
 interface MannerThermometerProps {
   score: number;
@@ -8,12 +8,17 @@ interface MannerThermometerProps {
 }
 
 export function MannerThermometer({ score, className }: MannerThermometerProps) {
-  // 온도에 따른 색상 결정 (당근마켓과 유사한 로직)
-  // 36.5 기준
+  // 온도에 따른 색상 결정
   let colorClass = 'bg-gray-400 text-gray-500'; // 기본
   let barColorClass = 'bg-gray-400';
   
-  if (score >= 50) {
+  if (score >= 90) {
+    colorClass = 'text-yellow-500';
+    barColorClass = 'bg-yellow-500';
+  } else if (score >= 70) {
+    colorClass = 'text-orange-600';
+    barColorClass = 'bg-orange-600';
+  } else if (score >= 50) {
     colorClass = 'text-orange-500';
     barColorClass = 'bg-orange-500';
   } else if (score >= 40) {
@@ -34,21 +39,19 @@ export function MannerThermometer({ score, className }: MannerThermometerProps) 
   const percentage = Math.min(Math.max((score / 100) * 100, 0), 100);
   
   const rankStr = getMannerRank(score);
+  const iconStr = getMannerIcon(score);
   
-  // 온도계 아이콘 (이모지 대체)
-  const faceEmoji = score >= 50 ? '🥰' : score >= 40 ? '😀' : score >= 36.5 ? '🙂' : score >= 30 ? '🤔' : '😥';
-
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-gray-700 underline decoration-gray-300 underline-offset-4 decoration-dashed cursor-pointer">
-          매너온도
-        </span>
-        <div className="flex items-center gap-1.5">
-          <span className={cn("text-lg font-bold tracking-tight", colorClass)}>
-            {score.toFixed(1)}°C
+        <span className="text-[24px] leading-none drop-shadow-sm">{iconStr}</span>
+        <div className="flex flex-col text-right">
+          <span className="text-[11px] font-medium text-gray-500 mb-0.5">
+            매너 점수
           </span>
-          <span className="text-xl leading-none">{faceEmoji}</span>
+          <span className={cn('text-sm font-bold', colorClass)}>
+            {score.toFixed(1)}점 <span className="text-[12px] font-medium text-gray-500">({rankStr})</span>
+          </span>
         </div>
       </div>
       <div className="h-2.5 w-full bg-gray-100 rounded-full overflow-hidden">
@@ -56,9 +59,6 @@ export function MannerThermometer({ score, className }: MannerThermometerProps) 
           className={cn("h-full rounded-full transition-all duration-1000 ease-out", barColorClass)}
           style={{ width: `${percentage}%` }}
         />
-      </div>
-      <div className="text-[11px] text-gray-400 text-right mt-0.5">
-        현재 등급: <span className="font-medium text-gray-500">{rankStr}</span>
       </div>
     </div>
   );

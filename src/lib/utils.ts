@@ -6,13 +6,39 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getMannerRank(score: number): string {
-  if (score < 30) return '노비';
-  if (score < 36.5) return '천민';
-  if (score < 40) return '평민';
-  if (score < 60) return '양반';
-  if (score < 80) return '귀족';
-  if (score < 100) return '왕족';
-  return '황제';
+  if (score < 30) return '양아치 끼리';
+  if (score < 36.5) return '껄렁한 끼리';
+  if (score < 40) return '평범한 끼리';
+  if (score < 60) return '성숙한 끼리';
+  if (score < 80) return '신사적인 끼리';
+  if (score < 100) return '존경받는 끼리';
+  return '전설적인 끼리';
+}
+
+export function getMannerIcon(score: number): string {
+  if (score < 30) return '👿';
+  if (score < 36.5) return '😒';
+  if (score < 40) return '🌱';
+  if (score < 60) return '☕';
+  if (score < 80) return '🎩';
+  if (score < 100) return '👑';
+  return '🌟';
+}
+
+export function stripMarkdown(md: string): string {
+  if (!md) return '';
+  return md
+    .replace(/(\*\*|__)(.*?)\1/g, '$2') // bold
+    .replace(/(\*|_)(.*?)\1/g, '$2') // italic
+    .replace(/~~(.*?)~~/g, '$1') // strikethrough
+    .replace(/`([^`]+)`/g, '$1') // inline code
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // links
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, '(사진)') // images
+    .replace(/^#+\s+/gm, '') // headings
+    .replace(/^>+\s+/gm, '') // blockquotes
+    .replace(/^[*-]\s+/gm, '') // unordered lists
+    .replace(/^\d+\.\s+/gm, '') // ordered lists
+    .trim();
 }
 
 export function getWebSocketHttpUrl(): string {

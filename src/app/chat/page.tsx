@@ -9,6 +9,7 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useRouter } from 'next/navigation';
 import BottomNav from '@/components/layout/BottomNav';
 import { toast } from 'sonner';
+import { stripMarkdown } from '@/lib/utils';
 
 async function fetchChatRooms(): Promise<ChatRoom[]> {
   const res = await api.get<ChatRoom[]>('/api/chat/rooms');
@@ -98,7 +99,7 @@ export default function ChatListPage() {
                       <span className="text-[11px] text-gray-400 font-medium">{relativeTime(room.lastMessageAt)}</span>
                     </div>
                     <p className={`text-[14px] truncate leading-snug ${isUnread ? 'font-bold text-gray-900' : 'text-gray-500'}`}>
-                      {room.lastMessage ?? (room.product.isDeleted ? '삭제된 상품입니다.' : room.product.title)}
+                      {stripMarkdown(room.lastMessage ?? '') || (room.product.isDeleted ? '삭제된 상품입니다.' : room.product.title)}
                     </p>
                   </div>
 

@@ -33,35 +33,35 @@ export function MannerRankModal({ onClose }: Props) {
               </div>
               <div className="text-sm">
                 <div className="grid grid-cols-2 border-b border-gray-50">
-                  <div className="p-3 text-center border-r border-gray-50 text-gray-600">100점</div>
-                  <div className="p-3 text-center font-bold text-orange-500">황제</div>
+                  <div className="p-3 text-center border-r border-gray-50 text-gray-600">100점 이상</div>
+                  <div className="p-3 text-center font-bold text-orange-500">🌟 전설적인 끼리</div>
                 </div>
                 <div className="grid grid-cols-2 border-b border-gray-50">
                   <div className="p-3 text-center border-r border-gray-50 text-gray-600">80점 ~ 99.9점</div>
-                  <div className="p-3 text-center font-bold text-orange-500">왕족</div>
+                  <div className="p-3 text-center font-bold text-orange-500">👑 존경받는 끼리</div>
                 </div>
                 <div className="grid grid-cols-2 border-b border-gray-50">
                   <div className="p-3 text-center border-r border-gray-50 text-gray-600">60점 ~ 79.9점</div>
-                  <div className="p-3 text-center font-bold text-orange-500">귀족</div>
+                  <div className="p-3 text-center font-bold text-orange-500">🎩 신사적인 끼리</div>
                 </div>
                 <div className="grid grid-cols-2 border-b border-gray-50">
                   <div className="p-3 text-center border-r border-gray-50 text-gray-600">40점 ~ 59.9점</div>
-                  <div className="p-3 text-center font-bold text-orange-500">양반</div>
+                  <div className="p-3 text-center font-bold text-orange-500">☕ 성숙한 끼리</div>
                 </div>
                 <div className="grid grid-cols-2 border-b border-gray-50 bg-orange-50/30">
                   <div className="p-3 text-center border-r border-gray-50 text-gray-600 flex flex-col items-center justify-center gap-1">
                     <span>36.5점 ~ 39.9점</span>
                     <span className="text-[10px] text-orange-500 font-medium bg-orange-100 px-1.5 py-0.5 rounded-sm">시작 점수 (36.5점)</span>
                   </div>
-                  <div className="p-3 text-center font-bold text-orange-500 flex items-center justify-center">평민</div>
+                  <div className="p-3 text-center font-bold text-orange-500 flex items-center justify-center gap-1">🌱 평범한 끼리</div>
                 </div>
                 <div className="grid grid-cols-2 border-b border-gray-50">
                   <div className="p-3 text-center border-r border-gray-50 text-gray-600">30점 ~ 36.4점</div>
-                  <div className="p-3 text-center font-bold text-orange-500">천민</div>
+                  <div className="p-3 text-center font-bold text-orange-500">😒 껄렁한 끼리</div>
                 </div>
                 <div className="grid grid-cols-2">
                   <div className="p-3 text-center border-r border-gray-50 text-gray-600">0점 ~ 29.9점</div>
-                  <div className="p-3 text-center font-bold text-orange-500">노비</div>
+                  <div className="p-3 text-center font-bold text-orange-500">👿 양아치 끼리</div>
                 </div>
               </div>
             </div>

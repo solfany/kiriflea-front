@@ -8,8 +8,8 @@ export interface GuideItem {
 export const GUIDES: GuideItem[] = [
   {
     id: 'manner',
-    title: '🌡️ 끼리플리 매너 계급 및 온도 안내',
-    description: '매너 온도 획득 방식과 7단계 매너 계급(노비부터 황제까지)에 대한 상세 기준을 알아봅니다.',
+    title: '🐘 끼리플리 매너 점수 및 계급 안내',
+    description: '매너 점수 획득 방식과 7단계 매너 계급(아기 끼리부터 전설의 끼리까지)에 대한 상세 기준을 알아봅니다.',
     file: '/guides/manner.md',
   },
   {

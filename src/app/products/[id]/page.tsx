@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { Product, AuctionUpdateMessage } from '@/types';
-import { cn, getMannerRank, getWebSocketHttpUrl } from '@/lib/utils';
+import { cn, getMannerRank, getMannerIcon, getWebSocketHttpUrl } from '@/lib/utils';
 import { useConfirmStore } from '@/store/confirm';
 
 const STATUS_LABEL: Record<string, string> = {
@@ -397,8 +397,8 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
               <p className="font-medium text-gray-900">{product.seller.nickname}</p>
               <div className="flex items-center gap-1 text-xs text-gray-400">
                 <span>
-                  매너 {product.seller.mannerScore.toFixed(1)}점{' '}
-                  <span className="text-orange-500">({getMannerRank(product.seller.mannerScore)})</span>
+                  매너 점수 {product.seller.mannerScore.toFixed(1)}점 {' '}
+                  <span className="text-orange-500">{getMannerIcon(product.seller.mannerScore)} {getMannerRank(product.seller.mannerScore)}</span>
                 </span>
                 <span>· 판매 {product.seller.listingCount}건</span>
               </div>
