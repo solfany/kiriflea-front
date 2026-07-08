@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { api } from '@/lib/api';
-import { ChevronLeft, MapPin, Info } from 'lucide-react';
+import { ChevronLeft, Info, Package } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn, getMannerRank } from '@/lib/utils';
 import ProductSkeleton from '@/components/market/ProductSkeleton';
@@ -170,7 +170,9 @@ export default function UserProfilePage() {
             {product.imageUrls?.[0] ? (
               <Image src={product.imageUrls[0]} alt={product.title} fill className="object-cover" sizes="112px" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-300 text-xl">📦</div>
+              <div className="w-full h-full flex items-center justify-center text-gray-300">
+                <Package size={24} className="opacity-50" />
+              </div>
             )}
             <div className="absolute top-1.5 left-1.5 z-10 flex gap-1 items-center">
               {product.status === 'SALE' && (

@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, Eye } from 'lucide-react';
+import { Heart, Eye, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ProductListItem } from '@/types';
 
@@ -61,7 +61,9 @@ export default function ProductCard({ product, onLikeToggle, actionMenu, bottomA
                 sizes="110px"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-300 text-2xl">📦</div>
+              <div className="w-full h-full flex items-center justify-center text-gray-300">
+              <Package size={24} className="opacity-50" />
+            </div>
             )}
             {!(product.isDeleted || (product as any).deleted) && (
               <div className="absolute top-1.5 left-1.5 z-10 flex gap-1 items-center flex-wrap">

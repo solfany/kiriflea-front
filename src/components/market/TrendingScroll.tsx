@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { TrendingUp } from 'lucide-react';
+import { Flame, Package, TrendingUp } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchTrending } from '@/lib/products';
 import { cn } from '@/lib/utils';
@@ -48,7 +48,9 @@ export default function TrendingScroll() {
                       sizes="112px"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-2xl text-gray-300">📦</div>
+                    <div className="w-full h-full flex items-center justify-center text-gray-300">
+                      <Package size={24} className="opacity-50" />
+                    </div>
                   )}
                   {!item.isDeleted && (
                     <div className="absolute top-1 left-1 z-10 flex gap-1 items-center flex-wrap">

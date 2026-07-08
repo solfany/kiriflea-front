@@ -18,7 +18,9 @@ import { ReviewModal } from '@/components/market/ReviewModal';
 import { toast } from 'sonner';
 import {
   Heart, ChevronLeft, ChevronRight, MessageCircle,
-  Eye, Gavel, Wifi, WifiOff, Timer, Trash2, Lock, Share2, MoreVertical, Edit2
+  Eye, Gavel, Wifi, WifiOff, Timer, Trash2, Lock, MoreVertical, Edit2,
+  Flag,
+  Package
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { Product, AuctionUpdateMessage } from '@/types';
@@ -355,7 +357,9 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
         {images.length > 0 ? (
           <Image src={images[imgIdx]} alt={product.title} fill className="object-cover" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-6xl text-gray-300">📦</div>
+            <div className="w-full h-full flex items-center justify-center text-gray-300">
+              <Package size={64} className="opacity-50" />
+            </div>
         )}
         <button onClick={() => router.back()} className="absolute top-4 left-4 p-2 bg-white/80 backdrop-blur rounded-full shadow-sm hover:bg-white transition-colors">
           <ChevronLeft size={20} className="text-gray-700" />

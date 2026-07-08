@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { api } from '@/lib/api';
 import type { ChatRoom } from '@/types';
-import { ChevronLeft, MessageCircle, X } from 'lucide-react';
+import { ChevronLeft, MessageCircle, X, Package } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useRouter } from 'next/navigation';
 import BottomNav from '@/components/layout/BottomNav';
@@ -79,9 +79,9 @@ export default function ChatListPage() {
                         </>
                       ) : room.product.thumbnailUrl ? (
                         <Image src={room.product.thumbnailUrl} alt={room.product.title} fill className="object-cover" sizes="56px" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xl text-gray-300">📦</div>
-                      )}
+                        <div className="w-full h-full flex items-center justify-center text-gray-300">
+                          <Package size={24} className="opacity-50" />
+                        </div>
                     </div>
                     {/* Overlapping Profile Image */}
                     <div className="absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-full overflow-hidden border-2 border-white bg-gray-200 flex items-center justify-center shadow-sm">

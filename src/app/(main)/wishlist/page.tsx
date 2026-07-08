@@ -3,13 +3,15 @@ import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-q
 import { fetchMyLikes, toggleLike } from '@/lib/products';
 import ProductCard from '@/components/market/ProductCard';
 import ProductSkeleton from '@/components/market/ProductSkeleton';
-import { Heart, Loader2 } from 'lucide-react';
+import { Heart, Loader2, ChevronLeft } from 'lucide-react';
 import { useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import type { ProductCursor, ProductListItem } from '@/types';
 
 export default function WishlistPage() {
+  const router = useRouter();
   const qc = useQueryClient();
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -60,12 +62,17 @@ export default function WishlistPage() {
 
   return (
     <div>
-      <h1 className="text-lg font-bold text-gray-900 mb-4">관심 목록</h1>
+      <div className="flex items-center gap-2 mb-4">
+        <button onClick={() => router.back()} className="p-1 -ml-1 text-gray-500 hover:text-gray-700 transition-colors rounded-full hover:bg-gray-100">
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+        <h1 className="text-lg font-bold text-gray-900">관심 목록</h1>
+      </div>
 
       {products.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-32 text-center">
-          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-4xl mb-4">
-            💖
+          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+            <Heart size={40} className="text-gray-300" />
           </div>
           <p className="text-base font-semibold text-gray-700">찜한 상품이 없어요</p>
           <p className="text-sm text-gray-400 mt-1.5">마음에 드는 상품에 하트를 눌러보세요!</p>

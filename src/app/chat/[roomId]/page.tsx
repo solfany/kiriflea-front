@@ -12,7 +12,7 @@ import { useAuthStore } from '@/store/auth';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ReviewModal } from '@/components/market/ReviewModal';
-import { ChevronLeft, Send, Loader2, Handshake, Plus, MoreVertical } from 'lucide-react';
+import { ChevronLeft, Send, Loader2, Handshake, Plus, MoreVertical, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn, getWebSocketHttpUrl, getMannerRank } from '@/lib/utils';
 import { useConfirmStore } from '@/store/confirm';
@@ -408,7 +408,9 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
               ) : room.productThumbnail ? (
                 <Image src={room.productThumbnail} alt="상품 이미지" fill className="object-cover" sizes="40px" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-300 text-xs">📦</div>
+                <div className="w-full h-full flex items-center justify-center text-gray-300">
+                  <Package size={16} className="opacity-50" />
+                </div>
               )}
             </div>
             <div className="flex-1 min-w-0 flex flex-col justify-center">
