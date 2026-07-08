@@ -18,7 +18,7 @@ import { ReviewModal } from '@/components/market/ReviewModal';
 import { toast } from 'sonner';
 import {
   Heart, ChevronLeft, ChevronRight, MessageCircle,
-  Eye, Gavel, Wifi, WifiOff, Timer, Trash2, Lock, Share2, MoreHorizontal, Edit2
+  Eye, Gavel, Wifi, WifiOff, Timer, Trash2, Lock, Share2, MoreVertical, Edit2
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { Product, AuctionUpdateMessage } from '@/types';
@@ -407,7 +407,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
           
           <DropdownMenu>
             <DropdownMenuTrigger className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600 outline-none">
-              <MoreHorizontal size={20} />
+              <MoreVertical size={20} />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48 bg-white border border-gray-100 rounded-xl shadow-lg !ring-0 !outline-none p-1">
               <DropdownMenuItem
@@ -692,7 +692,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                     <div className="absolute right-0 top-0">
                       <DropdownMenu>
                         <DropdownMenuTrigger className="p-1 text-gray-400 hover:bg-gray-100 rounded-full transition-colors outline-none">
-                          <MoreHorizontal size={16} />
+                          <MoreVertical size={16} />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-32 bg-white border border-gray-100 rounded-xl shadow-lg !ring-0 !outline-none p-1">
                           <DropdownMenuItem

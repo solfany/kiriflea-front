@@ -5,7 +5,7 @@ import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-q
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronLeft, ShoppingBag, MoreHorizontal, Clock } from 'lucide-react';
+import { ChevronLeft, ShoppingBag, MoreVertical, Clock } from 'lucide-react';
 import { fetchMyListings } from '@/lib/products';
 import { useAuthStore } from '@/store/auth';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
@@ -49,7 +49,7 @@ function ListingCard({ product, onReviewClick }: { product: ProductListItem; onR
   const actionMenu = (
     <div className="relative">
       <button onClick={(e) => { e.preventDefault(); setMenuOpen(!menuOpen); }} className="p-1 -mr-2 -mt-1 rounded-full hover:bg-gray-100 text-gray-400">
-        <MoreHorizontal size={20} />
+        <MoreVertical size={20} />
       </button>
       {menuOpen && (
         <>
