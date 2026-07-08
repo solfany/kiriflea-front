@@ -13,107 +13,25 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { ProductListItem, ProductCursor } from '@/types';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import ProductCard from '@/components/market/ProductCard';
 
 import { ReviewModal } from '@/components/market/ReviewModal';
 
-const STATUS_MAP: Record<string, { label: string; className: string }> = {
-  SALE: { label: '판매중', className: 'bg-orange-500 text-white' },
-  RESERVED: { label: '예약중', className: 'bg-green-500 text-white' },
-  SOLD: { label: '판매완료', className: 'bg-gray-500 text-white' },
-  AUCTION: { label: '경매중', className: 'bg-purple-500 text-white' },
-};
-
-function relativeTime(iso: string) {
-  const diff = (Date.now() - new Date(iso).getTime()) / 1000;
-  if (diff < 60) return '방금 전';
-  if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
-  return `${Math.floor(diff / 86400)}일 전`;
-}
-
 function PurchaseCard({ product, onReviewClick }: { product: ProductListItem; onReviewClick: (p: ProductListItem) => void }) {
-  const s = STATUS_MAP[product.status] ?? { label: product.status, className: 'bg-gray-100 text-gray-500' };
+  const bottomAction = product.status === 'SOLD' && product.tradeId && !product.isReviewed ? (
+    <button
+      onClick={(e) => { e.preventDefault(); onReviewClick(product); }}
+      className="text-[11px] bg-orange-500 text-white px-2.5 py-1.5 rounded shadow-sm hover:bg-orange-600 transition-colors shrink-0 font-medium"
+    >
+      거래 후기 남기기
+    </button>
+  ) : undefined;
 
   return (
-    <div className="relative border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
-      <div className="flex gap-4 py-4">
-        {/* Thumbnail */}
-        <Link href={`/products/${product.id}`} className="shrink-0">
-          <div className="relative w-[110px] h-[110px] rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 border border-black/5">
-            {product.imageUrls?.[0] ? (
-              <Image src={product.imageUrls[0]} alt={product.title} fill className="object-cover group-hover:scale-[1.02] transition-transform duration-200" sizes="110px" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-300 text-2xl">📦</div>
-            )}
-            {!product.isDeleted && (
-              <div className="absolute top-1.5 left-1.5 z-10 flex flex-col gap-1">
-                <span className={cn('inline-block text-[10px] px-1.5 py-0.5 font-bold rounded shadow-sm w-fit', s.className)}>
-                  {s.label}
-                </span>
-                {product.isAuction && (
-                  <span className="inline-block text-[10px] px-1.5 py-0.5 font-bold rounded shadow-sm bg-purple-500 text-white w-fit">
-                    경매
-                  </span>
-                )}
-              </div>
-            )}
-            {product.isDeleted && (
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
-                <span className="text-white text-[10px] font-semibold text-center leading-tight">삭제된<br/>상품</span>
-              </div>
-            )}
-          </div>
-        </Link>
-
-        {/* Content Area */}
-        <div className="flex-1 min-w-0 py-0.5 flex flex-col relative">
-          <div className="flex items-start justify-between gap-1">
-            <Link href={`/products/${product.id}`} className="flex-1 min-w-0">
-              <p className={cn("text-[16px] leading-snug line-clamp-2", product.isDeleted ? "text-gray-400" : "text-gray-900")}>
-                {product.isDeleted && <Badge className="text-[10px] px-1.5 py-0 h-4 border-0 rounded-sm block w-fit bg-red-500 text-white mr-1.5 align-text-bottom translate-y-[-1px] inline-flex items-center">삭제</Badge>}
-                {product.title}
-              </p>
-            </Link>
-          </div>
-          
-          <div className="text-[13px] text-gray-500 mt-1 mb-1 flex items-center gap-1">
-            <span suppressHydrationWarning>
-              {relativeTime(product.createdAt)}
-            </span>
-          </div>
-
-          <div className="flex-1 flex flex-col justify-start mt-0.5">
-            <p className={cn('font-bold text-[16px] tracking-tight', product.status === 'SOLD' ? 'text-gray-400' : 'text-gray-900')}>
-              {product.price.toLocaleString()}원
-            </p>
-          </div>
-
-          <div className="absolute bottom-0 right-0 flex items-center gap-2.5 text-gray-400">
-            {product.status === 'SOLD' && product.tradeId && !product.isReviewed ? (
-              <button
-                onClick={() => onReviewClick(product)}
-                className="text-[11px] bg-orange-500 text-white px-2.5 py-1.5 rounded shadow-sm hover:bg-orange-600 transition-colors shrink-0 font-medium"
-              >
-                거래 후기 남기기
-              </button>
-            ) : (
-              <>
-                {product.viewCount > 0 && (
-                  <span className="flex items-center gap-1 text-[13px]">
-                    조회 {product.viewCount}
-                  </span>
-                )}
-                {product.wishCount > 0 && (
-                  <span className="flex items-center gap-1 text-[13px]">
-                    관심 {product.wishCount}
-                  </span>
-                )}
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
+    <ProductCard 
+      product={product} 
+      bottomAction={bottomAction} 
+    />
   );
 }
 
@@ -143,7 +61,7 @@ export default function MyPurchasesPage() {
   return (
     <div className="pb-4">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => router.back()} className="text-gray-500 hover:text-gray-700">
+        <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-500 hover:text-gray-900 active:scale-95 transition-all">
           <ChevronLeft className="w-5 h-5" />
         </button>
         <h1 className="text-lg font-bold text-gray-900">내 구매 목록</h1>
@@ -154,12 +72,12 @@ export default function MyPurchasesPage() {
       {isLoading && (
         <div className="space-y-px animate-pulse">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex gap-3 py-4 border-b border-gray-100">
-              <div className="w-20 h-20 rounded-xl bg-gray-200 shrink-0" />
-              <div className="flex-1 space-y-2 pt-1">
-                <div className="h-4 bg-gray-200 rounded w-3/4" />
-                <div className="h-3 bg-gray-200 rounded w-1/4" />
-                <div className="h-4 bg-gray-200 rounded w-1/3" />
+            <div key={i} className="flex gap-4 py-4 border-b border-gray-100">
+              <div className="w-[110px] h-[110px] rounded-lg bg-gray-100 shrink-0" />
+              <div className="flex-1 space-y-3 py-1">
+                <div className="h-4 bg-gray-100 rounded w-3/4" />
+                <div className="h-3 bg-gray-100 rounded w-1/4" />
+                <div className="h-5 bg-gray-100 rounded w-1/3 mt-2" />
               </div>
             </div>
           ))}
@@ -168,10 +86,18 @@ export default function MyPurchasesPage() {
 
       {/* Empty */}
       {!isLoading && products.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <ShoppingBag className="w-12 h-12 text-gray-200 mb-3" />
-          <p className="text-sm font-medium text-gray-500">구매한 상품이 없어요</p>
-          <p className="text-xs text-gray-400 mt-1">마음에 드는 물건을 찾아보세요</p>
+        <div className="flex flex-col items-center justify-center py-32 text-center">
+          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-4xl mb-4">
+            🛒
+          </div>
+          <p className="text-base font-semibold text-gray-700">구매한 상품이 없어요</p>
+          <p className="text-sm text-gray-400 mt-1.5">따뜻한 거래를 통해 원하던 물건을 찾아보세요!</p>
+          <Link
+            href="/"
+            className="mt-6 px-6 py-3 bg-orange-500 text-white text-[15px] font-bold rounded-full shadow-sm hover:bg-orange-600 active:scale-95 transition-all"
+          >
+            홈으로 가기
+          </Link>
         </div>
       )}
 

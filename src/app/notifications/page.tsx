@@ -1,12 +1,13 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { ChevronLeft, Bell, Heart, Star, TrendingUp, Gavel, MessageCircle, CheckCheck, Trash2, X } from 'lucide-react';
+import { ChevronLeft, Bell, X } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
-import { formatDistanceToNow, isToday, isYesterday, format } from 'date-fns';
+import { format, isToday, isYesterday } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { toast } from 'sonner';
+import { useConfirmStore } from '@/store/confirm';
 
 interface Notification {
   id: number;
@@ -17,48 +18,16 @@ interface Notification {
   createdAt: string;
 }
 
-const TYPE_META: Record<string, { icon: React.ReactNode; bg: string; color: string; label: string }> = {
-  LIKE: {
-    icon: <Heart size={16} strokeWidth={2.5} />,
-    bg: 'bg-rose-50',
-    color: 'text-rose-500',
-    label: '관심',
-  },
-  REVIEW_REQUEST: {
-    icon: <Star size={16} strokeWidth={2.5} />,
-    bg: 'bg-amber-50',
-    color: 'text-amber-500',
-    label: '후기',
-  },
-  OUTBID: {
-    icon: <TrendingUp size={16} strokeWidth={2.5} />,
-    bg: 'bg-blue-50',
-    color: 'text-blue-500',
-    label: '경매',
-  },
-  AUCTION_CLOSED: {
-    icon: <Gavel size={16} strokeWidth={2.5} />,
-    bg: 'bg-purple-50',
-    color: 'text-purple-500',
-    label: '낙찰',
-  },
-  CHAT_REQUEST: {
-    icon: <MessageCircle size={16} strokeWidth={2.5} />,
-    bg: 'bg-green-50',
-    color: 'text-green-500',
-    label: '채팅',
-  },
-};
-
-function getTypeMeta(type: string) {
-  return (
-    TYPE_META[type] ?? {
-      icon: <Bell size={16} strokeWidth={2.5} />,
-      bg: 'bg-gray-50',
-      color: 'text-gray-400',
-      label: '알림',
-    }
-  );
+// 당근마켓 스타일 날짜 포맷 (방금 전, 1시간 전 등)
+function getRelativeTime(dateStr: string) {
+  const d = new Date(dateStr);
+  const diffInSeconds = Math.floor((Date.now() - d.getTime()) / 1000);
+  
+  if (diffInSeconds < 60) return '방금 전';
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}분 전`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}시간 전`;
+  if (diffInSeconds < 86400 * 30) return `${Math.floor(diffInSeconds / 86400)}일 전`;
+  return format(d, 'M월 d일', { locale: ko });
 }
 
 function dateLabel(dateStr: string): string {
@@ -123,14 +92,21 @@ export default function NotificationsPage() {
     } catch { /* noop */ }
   };
 
-  const handleDeleteAll = async () => {
+  const { openConfirm } = useConfirmStore();
+
+  const handleDeleteAll = () => {
     if (notifications.length === 0) return;
-    if (!confirm('모든 알림을 삭제하시겠습니까?')) return;
-    setNotifications([]);
-    try { 
-      await api.delete('/api/notifications/all'); 
-      toast.success('모든 알림이 삭제되었습니다.');
-    } catch { /* noop */ }
+    openConfirm({
+      title: '모든 알림을 삭제하시겠습니까?',
+      confirmText: '삭제하기',
+      onConfirm: async () => {
+        setNotifications([]);
+        try { 
+          await api.delete('/api/notifications/all'); 
+          toast.success('모든 알림이 삭제되었습니다.');
+        } catch { /* noop */ }
+      }
+    });
   };
 
   const handleDelete = async (e: React.MouseEvent, id: number) => {
@@ -153,20 +129,18 @@ export default function NotificationsPage() {
             <ChevronLeft size={24} className="text-gray-800" />
           </button>
           <h1 className="text-lg font-bold text-gray-900 absolute left-1/2 -translate-x-1/2">알림</h1>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={handleDeleteAll}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              aria-label="모두 삭제"
-            >
-              <Trash2 size={20} className="text-gray-800" />
-            </button>
+          <div className="flex items-center gap-3 pr-2">
             <button
               onClick={handleReadAll}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              aria-label="모두 읽음"
+              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
             >
-              <CheckCheck size={20} className="text-gray-800" />
+              모두 읽기
+            </button>
+            <button
+              onClick={handleDeleteAll}
+              className="text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
+            >
+              모두 삭제
             </button>
           </div>
         </div>
@@ -195,55 +169,42 @@ export default function NotificationsPage() {
               </div>
 
               {items.map((n) => {
-                const meta = getTypeMeta(n.type);
                 return (
                   <button
                     key={n.id}
                     onClick={() => handleClick(n)}
-                    className={`w-full text-left flex items-start gap-4 px-5 py-5 transition-all hover:bg-gray-50 border-b border-gray-100 last:border-0 ${
-                      n.isRead ? 'opacity-50' : 'bg-white'
+                    className={`w-full text-left flex flex-col gap-1.5 px-5 py-4 transition-all hover:bg-gray-50 border-b border-gray-100 last:border-0 ${
+                      n.isRead ? 'opacity-60 bg-white' : 'bg-white'
                     }`}
                   >
-                    {/* 타입 아이콘 */}
-                    <div
-                      className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center mt-1 ${meta.bg} ${meta.color}`}
-                    >
-                      {meta.icon}
-                    </div>
-
-                    {/* 내용 영역 */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-1.5">
-                          {!n.isRead && <div className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />}
-                          <span className="text-[13px] font-semibold text-gray-500">{meta.label}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span suppressHydrationWarning className="text-[12px] text-gray-400">
-                            {n.createdAt &&
-                              formatDistanceToNow(new Date(n.createdAt), {
-                                addSuffix: true,
-                                locale: ko,
-                              })}
-                          </span>
-                          <div
-                            onClick={(e) => handleDelete(e, n.id)}
-                            className="p-1.5 -m-1.5 text-gray-300 hover:text-gray-500 transition-colors"
-                            aria-label="삭제"
-                            role="button"
-                          >
-                            <X size={16} strokeWidth={2.5} />
-                          </div>
-                        </div>
+                    {/* 타이틀 및 날짜 */}
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center gap-2">
+                        {!n.isRead && <div className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />}
+                        <span className={`text-sm ${!n.isRead ? 'font-bold text-gray-900' : 'font-medium text-gray-700'}`}>
+                          끼리플리 알림
+                        </span>
+                        <span suppressHydrationWarning className="text-[13px] text-gray-400">
+                          {n.createdAt && getRelativeTime(n.createdAt)}
+                        </span>
                       </div>
-                      <p
-                        className={`text-[15px] leading-relaxed break-keep pr-4 ${
-                          !n.isRead ? 'font-semibold text-gray-900' : 'text-gray-700'
-                        }`}
+                      <div
+                        onClick={(e) => handleDelete(e, n.id)}
+                        className="p-1 -mr-1 text-gray-300 hover:text-gray-500 transition-colors"
+                        aria-label="삭제"
+                        role="button"
                       >
-                        {n.message}
-                      </p>
+                        <X size={16} strokeWidth={2.5} />
+                      </div>
                     </div>
+                    {/* 본문 내용 */}
+                    <p
+                      className={`text-[15px] leading-relaxed break-keep pr-4 pl-3.5 ${
+                        !n.isRead ? 'font-medium text-gray-800' : 'text-gray-600'
+                      }`}
+                    >
+                      {n.message}
+                    </p>
                   </button>
                 );
               })}

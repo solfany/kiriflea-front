@@ -8,10 +8,8 @@ import { cn } from '@/lib/utils';
 import type { TrendingProduct } from '@/types';
 
 const STATUS_MAP: Record<string, { label: string; className: string }> = {
-  SALE: { label: '판매중', className: 'bg-orange-500 text-white' },
-  RESERVED: { label: '예약중', className: 'bg-green-500 text-white' },
-  SOLD: { label: '판매완료', className: 'bg-gray-500 text-white' },
-  AUCTION: { label: '경매중', className: 'bg-purple-500 text-white' },
+  RESERVED: { label: '예약중', className: 'bg-teal-50 text-teal-600 border border-teal-100' },
+  SOLD: { label: '판매완료', className: 'bg-gray-100 text-gray-500' },
 };
 
 export default function TrendingScroll() {
@@ -35,7 +33,7 @@ export default function TrendingScroll() {
       ) : (
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
           {items.map((item) => {
-            const s = STATUS_MAP[item.status] ?? { label: item.status, className: 'bg-gray-100 text-gray-500' };
+            const s = STATUS_MAP[item.status];
             return (
               <Link key={item.id} href={`/products/${item.id}`} className="flex-shrink-0 w-28 group">
                 <div className="relative w-28 h-28 rounded-xl overflow-hidden bg-gray-100 mb-1.5 border border-gray-100">
@@ -53,12 +51,14 @@ export default function TrendingScroll() {
                     <div className="w-full h-full flex items-center justify-center text-2xl text-gray-300">📦</div>
                   )}
                   {!item.isDeleted && (
-                    <div className="absolute top-1 left-1 z-10 flex gap-1 items-center">
-                      <span className={cn('inline-block text-[9px] px-1.5 py-0.5 font-bold rounded shadow-sm', s.className)}>
-                        {s.label}
-                      </span>
+                    <div className="absolute top-1 left-1 z-10 flex gap-1 items-center flex-wrap">
+                      {s && (
+                        <span className={cn('inline-block text-[9px] px-1.5 py-0.5 font-bold rounded shadow-sm', s.className)}>
+                          {s.label}
+                        </span>
+                      )}
                       {item.isAuction && (
-                        <span className="inline-block text-[9px] px-1.5 py-0.5 font-bold rounded shadow-sm bg-purple-500 text-white">
+                        <span className="inline-block text-[9px] px-1.5 py-0.5 font-bold rounded shadow-sm bg-orange-50 text-orange-600 border border-orange-100">
                           경매
                         </span>
                       )}

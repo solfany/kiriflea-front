@@ -82,11 +82,22 @@ export default function HomePage() {
       )}
 
       {products.length === 0 && !isFetchingNextPage && (
-        <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-          <span className="text-4xl mb-3">🛍️</span>
-          <p className="text-sm">등록된 상품이 없습니다</p>
+        <div className="flex flex-col items-center justify-center py-32 text-center">
+          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-4xl mb-4">
+            🛍️
+          </div>
+          <p className="text-base font-semibold text-gray-700">등록된 상품이 없어요</p>
+          <p className="text-sm text-gray-400 mt-1.5">가장 먼저 상품을 등록해 보세요!</p>
         </div>
       )}
+
+      {/* Floating Action Button */}
+      <a
+        href="/sell"
+        className="fixed bottom-20 right-4 z-50 flex items-center justify-center w-14 h-14 bg-orange-500 text-white rounded-full shadow-lg hover:bg-orange-600 hover:shadow-xl active:scale-95 transition-all"
+      >
+        <span className="text-3xl leading-none -mt-1">+</span>
+      </a>
     </div>
   );
 }

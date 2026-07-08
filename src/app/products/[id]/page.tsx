@@ -18,10 +18,11 @@ import { ReviewModal } from '@/components/market/ReviewModal';
 import { toast } from 'sonner';
 import {
   Heart, ChevronLeft, ChevronRight, MessageCircle,
-  Eye, Gavel, Wifi, WifiOff, Timer, Trash2, Lock
+  Eye, Gavel, Wifi, WifiOff, Timer, Trash2, Lock, Share2
 } from 'lucide-react';
 import type { Product, AuctionUpdateMessage } from '@/types';
 import { cn, getMannerRank, getWebSocketHttpUrl } from '@/lib/utils';
+import { useConfirmStore } from '@/store/confirm';
 
 const STATUS_LABEL: Record<string, string> = {
   SALE: '판매중', RESERVED: '예약중', SOLD: '판매완료', AUCTION: '경매중',
@@ -38,6 +39,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const qc = useQueryClient();
+  const { openConfirm } = useConfirmStore();
 
   const [imgIdx, setImgIdx] = useState(0);
   const [comment, setComment] = useState('');
@@ -167,6 +169,29 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
     }
   });
 
+  const cancelEarlyCloseMutation = useMutation({
+    mutationFn: () => api.post(`/api/products/${productId}/auctions/cancel-early-close`),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['product', productId] });
+      toast.success('조기 낙찰이 취소되었습니다.');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || '조기 낙찰 취소에 실패했습니다.');
+    }
+  });
+
+  const cancelTopBidMutation = useMutation({
+    mutationFn: () => api.delete(`/api/products/${productId}/auctions/top-bid`),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['product', productId] });
+      qc.invalidateQueries({ queryKey: ['bids', productId] });
+      toast.success('최고 입찰 내역이 취소되었습니다.');
+    },
+    onError: (err: unknown) => {
+      toast.error((err as any)?.response?.data?.message || '입찰 취소에 실패했습니다.');
+    }
+  });
+
   const completeTradeMutation = useMutation({
     mutationFn: () => api.post('/api/trades', {
       productId: product?.id,
@@ -228,8 +253,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
   useEffect(() => {
     if (!product?.isAuction) return;
 
-    // Countdown timer
-    if (product.status === 'SOLD') {
+    if (['SOLD', 'RESERVED'].includes(product.status) || ['CLOSED', 'CANCELLED'].includes(product.auctionStatus || '')) {
       setTimeLeft('마감됨');
     } else if (product.auctionEndAt) {
       const interval = setInterval(() => {
@@ -246,7 +270,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [product?.isAuction, product?.auctionEndAt, product?.status]);
+  }, [product?.isAuction, product?.auctionEndAt, product?.status, product?.auctionStatus]);
 
   useEffect(() => {
     if (!product?.isAuction) return;
@@ -319,19 +343,34 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
         <button onClick={() => router.back()} className="absolute top-4 left-4 p-2 bg-white/80 backdrop-blur rounded-full shadow-sm hover:bg-white transition-colors">
           <ChevronLeft size={20} className="text-gray-700" />
         </button>
-        {isSeller && !(product.isDeleted || (product as any).deleted) && (
+        <div className="absolute top-4 right-4 flex items-center gap-2">
           <button
             onClick={() => {
-              if (confirm('이 상품을 정말 삭제하시겠습니까? (복구할 수 없습니다)')) {
-                deleteProductMutation.mutate();
-              }
+              navigator.clipboard.writeText(window.location.href);
+              toast.success('상품 링크가 복사되었습니다.');
             }}
-            disabled={deleteProductMutation.isPending}
-            className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur rounded-full shadow-sm hover:bg-red-50 text-red-500 transition-colors"
+            className="p-2 bg-white/80 backdrop-blur rounded-full shadow-sm hover:bg-white transition-colors"
           >
-            <Trash2 size={20} />
+            <Share2 size={20} className="text-gray-700" />
           </button>
-        )}
+          {isSeller && !(product.isDeleted || (product as any).deleted) && (
+            <button
+              onClick={() => {
+                openConfirm({
+                  title: '이 상품을 정말 삭제하시겠습니까?\n(복구할 수 없습니다)',
+                  confirmText: '삭제하기',
+                  onConfirm: () => {
+                    deleteProductMutation.mutate();
+                  }
+                });
+              }}
+              disabled={deleteProductMutation.isPending}
+              className="p-2 bg-white/80 backdrop-blur rounded-full shadow-sm hover:bg-red-50 text-red-500 transition-colors"
+            >
+              <Trash2 size={20} />
+            </button>
+          )}
+        </div>
         {images.length > 1 && (
           <>
             <button onClick={() => setImgIdx((i) => Math.max(0, i - 1))} disabled={imgIdx === 0}
@@ -378,20 +417,34 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
         {/* Status + title */}
         <div className="pt-4 pb-3">
           {product.status === 'SOLD' && product.buyerNickname && (
-            <div className="text-orange-600 font-bold text-sm mb-2 p-3 bg-orange-50 rounded-lg">
+            <div className="text-gray-600 font-bold text-sm mb-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
               🏆 {product.buyerNickname}님과 거래가 완료되었습니다.
             </div>
           )}
           <h1 className="text-xl font-bold text-gray-900 flex items-center flex-wrap gap-2">
-            <span className={cn('text-sm px-2 py-1 rounded border font-bold',
-              product.status === 'SOLD' ? 'bg-gray-500 text-white border-gray-500' :
-                product.status === 'RESERVED' ? 'bg-green-500 text-white border-green-500' :
-                  'bg-orange-500 text-white border-orange-500')}>
-              {product.status === 'SOLD' ? '판매완료' : product.status === 'RESERVED' ? '예약중' : '판매중'}
-            </span>
-            {product.isAuction && (
-              <span className="text-sm px-2 py-1 rounded border font-bold bg-purple-500 text-white border-purple-500 flex items-center gap-1">
+            {product.status === 'SOLD' && (
+              <span className="text-sm px-2 py-0.5 rounded-md font-bold bg-gray-100 text-gray-500 tracking-tight">
+                판매완료
+              </span>
+            )}
+            {product.status === 'RESERVED' && (
+              <span className="text-sm px-2 py-0.5 rounded-md font-bold bg-teal-50 text-teal-600 border border-teal-100 tracking-tight">
+                예약중
+              </span>
+            )}
+            {product.isAuction && product.auctionStatus === 'CANCELLED' && (
+              <span className="text-sm px-2 py-0.5 rounded-md font-bold bg-gray-100 text-gray-500 border border-gray-200 tracking-tight">
+                유찰
+              </span>
+            )}
+            {product.isAuction && product.auctionStatus !== 'CANCELLED' && (
+              <span className="text-sm px-2 py-0.5 rounded-md font-bold bg-orange-50 text-orange-500 border border-orange-100 tracking-tight">
                 경매
+              </span>
+            )}
+            {product.isHidden && (
+              <span className="text-sm px-2 py-0.5 rounded-md font-bold bg-gray-100 text-gray-500 tracking-tight">
+                숨김
               </span>
             )}
             {product.title}
@@ -400,11 +453,11 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
 
         {/* Trade Information (if SOLD) */}
         {product.status === 'SOLD' && trade && (
-          <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 mb-4 flex items-center justify-between">
+          <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-4 flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold text-gray-900 mb-1">🎉 거래 완료</p>
               <p className="text-xs text-gray-600">
-                <span className="font-semibold text-orange-600">{trade.buyerNickname}</span>님이 구매하셨습니다!
+                <span className="font-semibold text-gray-900">{trade.buyerNickname}</span>님이 구매하셨습니다!
               </p>
             </div>
             {user && (user.id === trade.sellerId || user.id === trade.buyerId) && (
@@ -445,19 +498,19 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
             <Separator />
             <div className="py-4">
               <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <Gavel size={16} className="text-orange-500" /> {product.status === 'SOLD' ? '경매 결과' : '경매 입찰'}
+                <Gavel size={16} className="text-gray-500" /> {product.status === 'SOLD' ? '경매 결과' : '경매 입찰'}
                 {stompConnected
-                  ? <span className="flex items-center gap-1 text-[10px] text-green-500 font-normal ml-auto"><Wifi size={11} />실시간</span>
+                  ? <span className="flex items-center gap-1 text-[10px] text-gray-500 font-normal ml-auto"><Wifi size={11} />실시간</span>
                   : <span className="flex items-center gap-1 text-[10px] text-gray-400 font-normal ml-auto"><WifiOff size={11} />연결 중</span>
                 }
               </h3>
               {product.currentBid !== undefined && (
-                <div className="rounded-2xl px-5 py-4 mb-4 flex items-center justify-between bg-gradient-to-br from-orange-50 to-orange-100 shadow-sm">
+                <div className="rounded-2xl px-5 py-4 mb-4 flex items-center justify-between bg-gray-50 border border-gray-100 shadow-sm">
                   <div className="flex flex-col">
-                    <span className="text-xs font-medium mb-1 text-orange-600">
+                    <span className="text-xs font-medium mb-1 text-gray-500">
                       {product.status === 'SOLD' ? '최종 낙찰가' : '현재 최고가'}
                     </span>
-                    <span className="text-2xl font-black tracking-tight text-orange-600">
+                    <span className="text-2xl font-black tracking-tight text-gray-900">
                       {product.currentBid.toLocaleString()}원
                     </span>
                   </div>
@@ -478,19 +531,19 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                     <div key={bid.id} className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
                         <div className={cn("w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold",
-                          i === 0 ? "bg-orange-100 text-orange-600" : "bg-gray-200 text-gray-500")}>
+                          i === 0 ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-500")}>
                           {i + 1}
                         </div>
                         <span className="text-gray-600 font-medium">{bid.bidder.nickname}</span>
                       </div>
-                      <span className={cn("font-bold", i === 0 ? "text-orange-600 text-base" : "text-gray-500")}>
+                      <span className={cn("font-bold", i === 0 ? "text-gray-900 text-base" : "text-gray-500")}>
                         {bid.amount.toLocaleString()}원
                       </span>
                     </div>
                   ))}
                 </div>
               )}
-              {!(product.isDeleted || (product as any).deleted) && user && !isSeller && product.status !== 'SOLD' && (
+              {!(product.isDeleted || (product as any).deleted) && user && !isSeller && product.status === 'SALE' && product.auctionStatus === 'ACTIVE' && timeLeft !== '마감됨' && (
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -517,7 +570,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
         <Separator />
         <div className="py-4">
           <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <MessageCircle size={16} className="text-orange-500" />
+            <MessageCircle size={16} className="text-gray-500" />
             댓글 {comments.length}
           </h3>
           <div className="space-y-4 mb-4">
@@ -547,7 +600,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                         {c.isPrivate && <Lock size={12} className="text-gray-400" />}
                       </span>
                       {c.author.id === product.seller.id && (
-                        <span className="text-[10px] text-orange-500 bg-orange-50 border border-orange-200 px-1.5 py-0.5 rounded-full font-bold">작성자</span>
+                        <span className="text-[10px] text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded-sm font-semibold">작성자</span>
                       )}
                       <span className="text-[10px] text-gray-400">{dateStr}</span>
                     </div>
@@ -556,9 +609,13 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                   {user && c.author.id === user.id && (
                     <button
                       onClick={() => {
-                        if (confirm('댓글을 삭제하시겠습니까?')) {
-                          deleteCommentMutation.mutate(c.id);
-                        }
+                        openConfirm({
+                          title: '댓글을 삭제하시겠습니까?',
+                          confirmText: '삭제하기',
+                          onConfirm: () => {
+                            deleteCommentMutation.mutate(c.id);
+                          }
+                        });
                       }}
                       className="absolute right-0 top-0 p-1 text-gray-300 hover:text-red-500 transition-colors"
                     >
@@ -660,7 +717,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
 
       {/* Bottom action bar */}
       {!(product.isDeleted || (product as any).deleted) && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-3 flex gap-3 z-10 max-w-screen-md mx-auto w-full">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-3 flex flex-wrap gap-2 z-10 max-w-screen-md mx-auto w-full">
           {!isSeller && product.status !== 'SOLD' ? (
             <>
               <button
@@ -695,20 +752,42 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
           )}
 
           {isSeller && product.status === 'RESERVED' && product.isAuction && (
-            <Button
-              className="flex-1 bg-blue-500 hover:bg-blue-600 h-12 text-base font-semibold text-white"
-              onClick={() => {
-                if (confirm('실제 거래가 완료되었습니까?\n확인 시 판매완료 처리됩니다.')) {
-                  completeTradeMutation.mutate();
-                }
-              }}
-              disabled={completeTradeMutation.isPending}
-            >
-              거래완료로 변경
-            </Button>
+            <div className="flex gap-2 w-full">
+              {product.auctionStatus === 'CLOSED' && (
+                <Button
+                  variant="outline"
+                  className="flex-1 h-12 text-base font-semibold border-gray-200 text-gray-700 hover:bg-gray-50"
+                  onClick={() => {
+                    openConfirm({
+                      title: '조기 낙찰을 취소하시겠습니까?\n(경매가 다시 진행됩니다.)',
+                      confirmText: '낙찰 취소',
+                      onConfirm: () => cancelEarlyCloseMutation.mutate()
+                    });
+                  }}
+                  disabled={cancelEarlyCloseMutation.isPending}
+                >
+                  조기 낙찰 취소
+                </Button>
+              )}
+              <Button
+                className="flex-1 bg-emerald-500 hover:bg-emerald-600 h-12 text-base font-semibold text-white"
+                onClick={() => {
+                  openConfirm({
+                    title: '실제 거래가 완료되었습니까?\n확인 시 판매완료 처리됩니다.',
+                    confirmText: '거래완료',
+                    onConfirm: () => {
+                      completeTradeMutation.mutate();
+                    }
+                  });
+                }}
+                disabled={completeTradeMutation.isPending}
+              >
+                거래완료로 변경
+              </Button>
+            </div>
           )}
 
-          {isSeller && product.isAuction && product.status === 'SALE' && (
+          {isSeller && product.isAuction && product.status === 'SALE' && product.auctionStatus !== 'CANCELLED' && (
             <div className="flex gap-2 w-full">
               <Button
                 variant="outline"
@@ -724,9 +803,13 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                     toast.error('입찰자가 없어 조기 낙찰할 수 없습니다.');
                     return;
                   }
-                  if (confirm('현재 최고가로 경매를 종료하고 낙찰하시겠습니까?')) {
-                    closeAuctionEarlyMutation.mutate();
-                  }
+                  openConfirm({
+                    title: '현재 최고가로 경매를 종료하고\n낙찰하시겠습니까?',
+                    confirmText: '낙찰하기',
+                    onConfirm: () => {
+                      closeAuctionEarlyMutation.mutate();
+                    }
+                  });
                 }}
                 disabled={product.bidCount === 0 || closeAuctionEarlyMutation.isPending}
               >
@@ -735,15 +818,36 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
             </div>
           )}
 
-          {isSeller && product.isAuction && !product.hasTrade && (product.status === 'RESERVED' || product.status === 'SOLD') && (
-            <Button
-              variant="outline"
-              className="flex-1 h-12 text-base font-semibold border-gray-200 text-gray-700"
-              onClick={() => setShowReopenModal(true)}
-            >
-              다시 경매 시작
-            </Button>
-          )}
+          {isSeller && product.isAuction && (
+            (product.auctionStatus === 'CANCELLED') ||
+            (!product.hasTrade && (product.status === 'RESERVED' || product.status === 'SOLD'))
+          ) && (
+              <div className="flex gap-2 w-full">
+                <Button
+                  variant="outline"
+                  className="flex-1 h-12 text-base font-semibold border-gray-200 text-gray-700"
+                  onClick={() => setShowReopenModal(true)}
+                >
+                  다시 경매 시작
+                </Button>
+                {product.auctionStatus !== 'CANCELLED' && (product.bidCount ?? 0) > 0 ? (
+                  <Button
+                    variant="outline"
+                    className="flex-1 h-12 text-base font-semibold border-red-200 text-red-500 hover:bg-red-50"
+                    onClick={() => {
+                      openConfirm({
+                        title: '최고 입찰 내역을 취소하시겠습니까?\n(차순위 입찰가로 변경되며, 차순위가 없으면 원래 판매 상태로 돌아갑니다.)',
+                        confirmText: '입찰 취소',
+                        onConfirm: () => cancelTopBidMutation.mutate()
+                      });
+                    }}
+                    disabled={cancelTopBidMutation.isPending}
+                  >
+                    최고 입찰 취소
+                  </Button>
+                ) : null}
+              </div>
+            )}
 
           {isSeller && !product.isAuction && !product.hasTrade && (
             <div className="flex gap-2 w-full">

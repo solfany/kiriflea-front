@@ -65,6 +65,7 @@ export interface Product {
   bidCount?: number;
   buyerNickname?: string;
   buyerId?: number;
+  auctionStatus?: string;
   createdAt: string;
 }
 
@@ -155,7 +156,7 @@ export interface AuctionUpdateMessage {
 // ── Chat ──────────────────────────────────────────────────────
 export interface ChatRoom {
   id: number;
-  product: Pick<Product, 'id' | 'title' | 'price' | 'status'> & { thumbnailUrl: string; isSeller: boolean; isDeleted?: boolean; hasTrade?: boolean };
+  product: Pick<Product, 'id' | 'title' | 'price' | 'status'> & { thumbnailUrl: string; isSeller: boolean; isDeleted?: boolean; hasTrade?: boolean; isAuction?: boolean };
   partner: Pick<User, 'id' | 'nickname' | 'profileImage' | 'mannerScore'>;
   lastMessage?: string;
   lastMessageAt?: string;

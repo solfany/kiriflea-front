@@ -220,12 +220,12 @@ function SearchContent() {
       {isLoading && (
         <div className="space-y-px animate-pulse">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="flex gap-3 py-4 border-b border-gray-100">
-              <div className="w-24 h-24 rounded-xl bg-gray-200 shrink-0" />
-              <div className="flex-1 space-y-2 pt-1">
-                <div className="h-4 bg-gray-200 rounded w-3/4" />
-                <div className="h-3 bg-gray-200 rounded w-1/2" />
-                <div className="h-4 bg-gray-200 rounded w-1/3" />
+            <div key={i} className="flex gap-4 py-4 border-b border-gray-100">
+              <div className="w-[110px] h-[110px] rounded-lg bg-gray-100 shrink-0" />
+              <div className="flex-1 space-y-3 py-1">
+                <div className="h-4 bg-gray-100 rounded w-3/4" />
+                <div className="h-3 bg-gray-100 rounded w-1/4" />
+                <div className="h-5 bg-gray-100 rounded w-1/3 mt-2" />
               </div>
             </div>
           ))}
@@ -234,17 +234,19 @@ function SearchContent() {
 
       {/* Empty state */}
       {!isLoading && products.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <Search className="w-12 h-12 text-gray-200 mb-3" />
+        <div className="flex flex-col items-center justify-center py-32 text-center">
+          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-4xl mb-4">
+            🔍
+          </div>
           {debouncedKeyword ? (
             <>
-              <p className="text-sm font-medium text-gray-500">검색 결과가 없어요</p>
-              <p className="text-xs text-gray-400 mt-1">다른 키워드나 필터를 시도해보세요</p>
+              <p className="text-base font-semibold text-gray-700">검색 결과가 없어요</p>
+              <p className="text-sm text-gray-400 mt-1.5">다른 키워드나 필터를 시도해보세요</p>
             </>
           ) : (
             <>
-              <p className="text-sm font-medium text-gray-500">검색어를 입력하세요</p>
-              <p className="text-xs text-gray-400 mt-1">상품명으로 검색할 수 있어요</p>
+              <p className="text-base font-semibold text-gray-700">검색어를 입력하세요</p>
+              <p className="text-sm text-gray-400 mt-1.5">찾고 싶은 상품명을 입력해보세요!</p>
             </>
           )}
         </div>

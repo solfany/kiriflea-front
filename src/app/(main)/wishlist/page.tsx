@@ -5,6 +5,7 @@ import ProductCard from '@/components/market/ProductCard';
 import ProductSkeleton from '@/components/market/ProductSkeleton';
 import { Heart, Loader2 } from 'lucide-react';
 import { useRef } from 'react';
+import Link from 'next/link';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import type { ProductCursor, ProductListItem } from '@/types';
 
@@ -62,10 +63,18 @@ export default function WishlistPage() {
       <h1 className="text-lg font-bold text-gray-900 mb-4">관심 목록</h1>
 
       {products.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 text-gray-300">
-          <Heart size={48} className="mb-3" />
-          <p className="text-sm font-medium text-gray-400">찜한 상품이 없어요</p>
-          <p className="text-xs text-gray-300 mt-1">마음에 드는 상품에 하트를 눌러보세요</p>
+        <div className="flex flex-col items-center justify-center py-32 text-center">
+          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-4xl mb-4">
+            💖
+          </div>
+          <p className="text-base font-semibold text-gray-700">찜한 상품이 없어요</p>
+          <p className="text-sm text-gray-400 mt-1.5">마음에 드는 상품에 하트를 눌러보세요!</p>
+          <Link
+            href="/"
+            className="mt-6 px-6 py-3 bg-orange-500 text-white text-[15px] font-bold rounded-full shadow-sm hover:bg-orange-600 active:scale-95 transition-all"
+          >
+            상품 둘러보기
+          </Link>
         </div>
       ) : (
         <>

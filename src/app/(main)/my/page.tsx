@@ -13,6 +13,8 @@ import { Separator } from '@/components/ui/separator';
 import { ProfileEditModal } from '@/components/market/ProfileEditModal';
 import { MannerRankModal } from '@/components/market/MannerRankModal';
 import { ContactDeveloperModal } from '@/components/market/ContactDeveloperModal';
+import { ReviewPreviewSection } from '@/components/market/ReviewPreviewSection';
+import { MannerThermometer } from '@/components/market/MannerThermometer';
 import Image from 'next/image';
 import { getMannerRank } from '@/lib/utils';
 import pkg from '../../../../package.json';
@@ -38,7 +40,13 @@ export default function MyPage() {
     enabled: !!user?.id,
   });
 
-  const displayUser = userInfo || user;
+  const { data: myReviews } = useQuery({
+    queryKey: ['myReviews'],
+    queryFn: () => api.get('/api/me/reviews').then(res => res.data?.items || res.data?.content || []),
+    enabled: !!user?.id,
+  });
+
+  const displayUser = { ...user, ...userInfo };
 
   const [mounted, setMounted] = useState(false);
 
@@ -87,12 +95,12 @@ export default function MyPage() {
               </button>
             </div>
             <p className="text-sm text-gray-500 truncate">{displayUser.email}</p>
-            <div className="mt-1.5">
-              <span className="text-xs text-gray-500 font-medium">
-                매너 {displayUser.mannerScore.toFixed(1)}점 <span className="text-orange-500">({getMannerRank(displayUser.mannerScore)})</span>
-              </span>
-            </div>
           </div>
+        </div>
+
+        {/* 매너 온도계 UI 추가 */}
+        <div className="mt-5 mb-2 px-1">
+          <MannerThermometer score={displayUser.mannerScore} />
         </div>
 
         <div className="flex gap-4 mt-4 pt-4 border-t border-gray-50">
@@ -112,6 +120,11 @@ export default function MyPage() {
           </div>
         </div>
       </div>
+
+      {/* 내 리뷰 미리보기 섹션 (당근마켓 스타일) */}
+      {myReviews && myReviews.length > 0 && (
+        <ReviewPreviewSection reviews={myReviews} isMyPage={true} />
+      )}
 
       {/* 메뉴 */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-4">

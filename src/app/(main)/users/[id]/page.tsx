@@ -10,10 +10,13 @@ import { Badge } from '@/components/ui/badge';
 import { cn, getMannerRank } from '@/lib/utils';
 import ProductSkeleton from '@/components/market/ProductSkeleton';
 import { MannerRankModal } from '@/components/market/MannerRankModal';
+import { ReviewPreviewSection } from '@/components/market/ReviewPreviewSection';
+import { MannerThermometer } from '@/components/market/MannerThermometer';
 import { useState } from 'react';
 
 interface UserProfile {
   id: number;
+  email: string;
   nickname: string;
   profileImage: string | null;
   createdAt: string;
@@ -54,6 +57,15 @@ export default function UserProfilePage() {
       const res = await api.get(`/api/users/${userId}/listings`);
       return res.data;
     },
+  });
+
+  const { data: userReviews } = useQuery({
+    queryKey: ['userReviews', userId],
+    queryFn: async () => {
+      const res = await api.get(`/api/users/${userId}/reviews`);
+      return res.data?.items || res.data?.content || res.data?.data || res.data || [];
+    },
+    enabled: !!userId,
   });
 
   if (isProfileLoading || isListingsLoading) {
@@ -109,11 +121,17 @@ export default function UserProfilePage() {
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="font-bold text-gray-900 text-lg mb-1">{profile.nickname}</h2>
+            {profile.email && <p className="text-sm text-gray-500 truncate mb-1.5">{profile.email}</p>}
             <div className="flex items-center text-xs text-gray-500 gap-1">
-              <MapPin size={12} />
-              <span>가입일: {profile.createdAt.split(' ')[0]}</span>
+              <p className="text-sm text-gray-500">
+                가입일 {new Date(profile.createdAt).toLocaleDateString()}
+              </p>
             </div>
           </div>
+        </div>
+
+        <div className="mt-5 mb-2 px-1">
+          <MannerThermometer score={profile.mannerScore} />
         </div>
 
         <div className="flex gap-4 mt-4 pt-4 border-t border-gray-50">
@@ -133,6 +151,11 @@ export default function UserProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* 리뷰 미리보기 섹션 (당근마켓 스타일) */}
+      {userReviews && userReviews.length > 0 && (
+        <ReviewPreviewSection userId={userId} reviews={userReviews} isMyPage={false} />
+      )}
 
       {/* Listings Section */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 min-h-[400px] mb-4">

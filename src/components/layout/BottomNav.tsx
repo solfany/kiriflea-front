@@ -10,7 +10,7 @@ import { useAuthStore } from '@/store/auth';
 const NAV = [
   { href: '/',         icon: Home,       label: '홈' },
   { href: '/search',   icon: Search,     label: '검색' },
-  { href: '/sell',     icon: PlusSquare, label: '판매' },
+  { href: '/register', icon: PlusSquare, label: '등록' },
   { href: '/chat',     icon: MessageCircle, label: '채팅' },
   { href: '/my',       icon: User,       label: '내 정보' },
 ];

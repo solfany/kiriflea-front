@@ -8,6 +8,22 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        pretendard: [
+          '"Pretendard Variable"',
+          'Pretendard',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'system-ui',
+          'Roboto',
+          '"Helvetica Neue"',
+          '"Segoe UI"',
+          '"Apple SD Gothic Neo"',
+          '"Noto Sans KR"',
+          '"Malgun Gothic"',
+          'sans-serif',
+        ],
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
