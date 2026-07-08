@@ -1,7 +1,6 @@
 'use client';
 import { cn } from '@/lib/utils';
 import { getMannerRank } from '@/lib/utils';
-import { MannerIcon } from './MannerIcon';
 
 interface MannerThermometerProps {
   score: number;
@@ -44,8 +43,8 @@ export function MannerThermometer({ score, className }: MannerThermometerProps) 
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
       <div className="flex items-center justify-between">
-        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-500">
-          <MannerIcon score={score} className="w-4 h-4" />
+        <div className="flex flex-col">
+          <span className="text-[14px] font-bold text-gray-800">{rankStr}</span>
         </div>
         <div className="flex flex-col text-right">
           <span className="text-[11px] font-medium text-gray-500 mb-0.5">

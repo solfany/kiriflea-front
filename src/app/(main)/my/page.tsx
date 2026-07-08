@@ -17,7 +17,6 @@ import { ReviewPreviewSection } from '@/components/market/ReviewPreviewSection';
 import { MannerThermometer } from '@/components/market/MannerThermometer';
 import Image from 'next/image';
 import { getMannerRank } from '@/lib/utils';
-import { MannerIcon } from '@/components/market/MannerIcon';
 import pkg from '../../../../package.json';
 
 const MENU_ITEMS = [
@@ -111,8 +110,7 @@ export default function MyPage() {
           </div>
           <div className="w-px bg-gray-100" />
           <div className="flex-1 text-center">
-            <p className="text-lg font-bold text-orange-500 flex items-center justify-center gap-1">
-              <MannerIcon score={displayUser.mannerScore} className="w-4 h-4" />
+            <p className="text-lg font-bold text-orange-500">
               {getMannerRank(displayUser.mannerScore)}
             </p>
             <div className="flex items-center justify-center gap-1 text-xs text-gray-400">

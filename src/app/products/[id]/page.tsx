@@ -18,14 +18,13 @@ import { ReviewModal } from '@/components/market/ReviewModal';
 import { toast } from 'sonner';
 import {
   Heart, ChevronLeft, ChevronRight, MessageCircle,
-  Eye, Gavel, Wifi, WifiOff, Timer, Trash2, Lock, MoreVertical, Edit2,
+  Eye, Gavel, Wifi, WifiOff, Timer, Trash2, Lock, MoreVertical, Edit2, Share2,
   Flag,
   Package
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { Product, AuctionUpdateMessage } from '@/types';
 import { cn, getMannerRank, getWebSocketHttpUrl } from '@/lib/utils';
-import { MannerIcon } from '@/components/market/MannerIcon';
 import { useConfirmStore } from '@/store/confirm';
 
 const STATUS_LABEL: Record<string, string> = {
@@ -403,8 +402,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
               <div className="flex flex-col gap-0.5 text-xs text-gray-400 mt-0.5">
                 <span>매너 점수 {product.seller.mannerScore.toFixed(1)}점</span>
                 <div className="flex items-center gap-1">
-                  <span className="text-orange-500 font-medium flex items-center gap-1">
-                    <MannerIcon score={product.seller.mannerScore} className="w-3.5 h-3.5" />
+                  <span className="text-orange-500 font-medium">
                     {getMannerRank(product.seller.mannerScore)}
                   </span>
                   <span>· 판매 {product.seller.listingCount}건</span>

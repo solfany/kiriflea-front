@@ -73,9 +73,6 @@ export default function TrendingScroll() {
                 {item.isAuction ? (
                   <div className="mt-0.5">
                     <p className="text-[13px] font-bold text-orange-600">{item.currentBid?.toLocaleString() ?? 0}원</p>
-                    {item.bidCount != null && item.bidCount > 0 && (
-                      <p className="text-[10px] text-gray-400">참여 {item.bidCount}명</p>
-                    )}
                   </div>
                 ) : (
                   <p className={cn("text-[13px] font-bold mt-0.5", item.status === 'SOLD' ? "text-gray-400" : "text-gray-900")}>
