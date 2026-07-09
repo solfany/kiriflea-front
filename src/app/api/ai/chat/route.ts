@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     const { history, message } = await req.json();
 
     // 사용 모델 설정
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash', systemInstruction: SYSTEM_PROMPT });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash', systemInstruction: SYSTEM_PROMPT });
 
     // 대화 내역 포맷 변환
     const chat = model.startChat({
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('AI Chat API Error:', error);
     return NextResponse.json(
-      { error: 'AI 끼리봇이 잠시 응답을 머뭇거리고 있어요. 다시 시도해주세요!' },
+      { error: 'AI Error: ' + (error instanceof Error ? error.message : String(error)) },
       { status: 500 }
     );
   }
