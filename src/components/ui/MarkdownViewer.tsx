@@ -86,13 +86,17 @@ export function mdToHtml(md: string): string {
   const parsedLines = lines.map(line => {
     const trimmed = line.trim();
     if (!trimmed) return '';
+    
+    // 항상 인라인 마크다운(굵게, 기울임, 코드) 처리
+    let parsed = trimmed.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-gray-900">$1</strong>');
+    // 별표 하나(*)는 리스트 마커로 쓰인 경우를 피하기 위해, 양옆에 문자가 있는 경우만 처리 (단순화)
+    parsed = parsed.replace(/(?<!^|\s)\*(.*?)\*(?!\s|$)/g, '<em class="italic">$1</em>'); 
+    parsed = parsed.replace(/`(.*?)`/g, '<code class="bg-gray-100 text-orange-600 px-1.5 py-0.5 rounded text-xs font-semibold font-mono">$1</code>');
+
     if (trimmed.startsWith('<') && (trimmed.endsWith('>') || trimmed.includes('</'))) {
-      return line;
+      return parsed; // 이미 테이블/리스트/블록쿼트 등으로 파싱된 줄
     }
     
-    let parsed = trimmed.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-gray-900">$1</strong>');
-    parsed = parsed.replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
-    parsed = parsed.replace(/`(.*?)`/g, '<code class="bg-gray-100 text-orange-600 px-1.5 py-0.5 rounded text-xs font-semibold font-mono">$1</code>');
     return `<p class="my-4 leading-relaxed text-gray-600 text-[14px]">${parsed}</p>`;
   });
   html = parsedLines.join('\n');
