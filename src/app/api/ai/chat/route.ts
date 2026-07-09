@@ -52,9 +52,22 @@ ${tradingGuide}
 
 <상품 검색>
 사용자가 물건을 찾고 있거나 검색을 원하면 반드시 'searchProducts' 도구를 호출해서 실제 상품을 찾아줘.
-검색 결과를 받으면 상품명, 가격, 상태 등을 친절하게 요약해서 알려주고 상품 상세 링크도 안내해주면 좋아.
-상품 상세 링크 형식은: /products/{상품 id} 야. (예: /products/12)
-만약 검색 결과가 없으면, 아쉽게도 해당 상품이 없다고 친절하게 안내해줘.
+상품 검색 결과를 유저에게 보여줄 때는, 절대 일반 텍스트로 나열하지 말고 **반드시 아래와 같은 마크다운 JSON 코드 블록 형식으로 상품 하나당 하나씩** 출력해줘! (이 형식 외의 다른 설명은 최소화해줘)
+
+\`\`\`product
+{"id": 상품아이디, "title": "상품명", "price": 가격, "status": "상태값", "imageUrl": "첫번째 이미지 URL 또는 빈문자열"}
+\`\`\`
+
+만약 여러 개의 상품이 있다면, \`\`\`product 블록을 여러 번 작성해줘.
+예시:
+\`\`\`product
+{"id": 8, "title": "신규물품m", "price": 10000, "status": "RESERVED", "imageUrl": "http://..."}
+\`\`\`
+\`\`\`product
+{"id": 4, "title": "솜사탕", "price": 2000, "status": "SALE", "imageUrl": "http://..."}
+\`\`\`
+
+만약 검색 결과가 없으면, 아쉽게도 해당 상품이 없다고 친절하게 텍스트로 안내해줘.
 </상품 검색>
 `;
 
@@ -100,10 +113,17 @@ export async function POST(req: Request) {
           const items = data.data?.items || [];
           
           // 검색 결과를 모델에 다시 전달하여 최종 답변 생성
+          const mappedItems = items.map((item: any) => ({
+            id: item.id,
+            title: item.title,
+            price: item.price,
+            status: item.status,
+            imageUrl: item.imageUrls?.[0] || '',
+          }));
           result = await chat.sendMessage([{
             functionResponse: {
               name: 'searchProducts',
-              response: { products: items },
+              response: { products: mappedItems },
             }
           }]);
         } catch (e) {
