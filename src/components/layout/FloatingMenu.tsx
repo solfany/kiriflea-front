@@ -37,20 +37,6 @@ export default function FloatingMenu() {
             </div>
           </button>
 
-          {/* 카카오톡 문의 (예시 링크) */}
-          <a 
-            href="https://open.kakao.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-2 group"
-          >
-            <span className="bg-white px-2.5 py-1 rounded-md shadow-sm text-xs font-medium text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">카톡 문의</span>
-            <div className="w-12 h-12 bg-[#FEE500] rounded-full shadow-lg flex items-center justify-center text-[#000000] hover:bg-[#FDD800] active:scale-95 transition-all">
-              <MessageCircle size={20} fill="currentColor" />
-            </div>
-          </a>
-
           {/* 개발자 문의 */}
           <button 
             onClick={() => {

@@ -1,12 +1,10 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Bot, User, Loader2 } from 'lucide-react';
+import { X, Send, Bot, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
-import Link from 'next/link';
-import Image from 'next/image';
 
 interface KiriBotModalProps {
   onClose: () => void;
@@ -23,57 +21,43 @@ const markdownComponents: any = {
   li: ({node, ...props}: any) => <li className="leading-relaxed" {...props} />,
   p: ({node, ...props}: any) => <p className="mb-2 last:mb-0" {...props} />,
   a: ({node, ...props}: any) => <a className="text-orange-500 underline underline-offset-2 hover:text-orange-600" target="_blank" rel="noopener noreferrer" {...props} />,
-  pre: ({node, ...props}: any) => {
-    const isProduct = node?.children?.[0]?.properties?.className?.includes('language-product');
-    if (isProduct) return <>{props.children}</>;
-    return <pre className="bg-gray-100 p-2 rounded-lg my-2 overflow-x-auto text-xs" {...props} />;
-  },
-  code: ({node, className, children, ...props}: any) => {
-    const match = /language-(\w+)/.exec(className || '')
-    if (match && match[1] === 'product') {
-      try {
-        const product = JSON.parse(String(children).replace(/\n$/, ''));
-        return (
-          <Link href={`/products/${product.id}`} className="block mt-2 mb-1 group no-underline">
-            <div className="flex items-center gap-3 p-2.5 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all group-hover:border-orange-300">
-              <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-gray-50 shrink-0 border border-gray-100">
-                {product.imageUrl ? (
-                  <Image src={product.imageUrl} alt={product.title} fill className="object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400 text-[10px]">No Image</div>
-                )}
-              </div>
-              <div className="flex-1 overflow-hidden">
-                <h3 className="font-semibold text-gray-900 truncate text-[13px]">{product.title}</h3>
-                <p className="text-orange-600 font-bold text-[13px] mt-0.5">{product.price?.toLocaleString()}원</p>
-                {product.status && (
-                  <span className="inline-block mt-1 px-1.5 py-0.5 text-[10px] bg-gray-100 text-gray-600 rounded">
-                    {product.status === 'SALE' ? '판매중' : product.status === 'RESERVED' ? '예약중' : '판매완료'}
-                  </span>
-                )}
-              </div>
-            </div>
-          </Link>
-        );
-      } catch (e) {
-        return <code className={className} {...props}>{children}</code>;
-      }
-    }
-    return <code className={className} {...props}>{children}</code>;
-  }
 };
 
+const DEFAULT_MESSAGE: Message = { role: 'bot', text: '안녕하세요! 기리 플리마켓의 귀염둥이 AI 도우미 끼리봇입니다 뿌우- 🐘\n어떤 도움이 필요하신가요?' };
+
 export default function KiriBotModal({ onClose }: KiriBotModalProps) {
-  const [messages, setMessages] = useState<Message[]>([
-    { role: 'bot', text: '안녕하세요! 기리 플리마켓의 귀염둥이 AI 도우미 끼리봇입니다 뿌우- 🐘\n어떤 도움이 필요하신가요?' }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([DEFAULT_MESSAGE]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  // Load from sessionStorage on mount
+  useEffect(() => {
+    const saved = sessionStorage.getItem('kiribot_history');
+    if (saved) {
+      try {
+        setMessages(JSON.parse(saved));
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, []);
+
+  // Save to sessionStorage on change
+  useEffect(() => {
+    if (messages.length > 1) {
+      sessionStorage.setItem('kiribot_history', JSON.stringify(messages));
+    }
+  }, [messages]);
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
+
+  const handleReset = () => {
+    setMessages([DEFAULT_MESSAGE]);
+    sessionStorage.removeItem('kiribot_history');
+  };
 
   const handleSend = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -120,15 +104,23 @@ export default function KiriBotModal({ onClose }: KiriBotModalProps) {
             </div>
             <div>
               <h2 className="font-bold text-gray-900 leading-tight">AI 끼리봇</h2>
-              <p className="text-[11px] text-orange-600 font-medium">언제든 물어보세요! 🐘</p>
+              <p className="text-[11px] text-orange-600 font-medium">가이드라인 기반 AI 도우미 🐘</p>
             </div>
           </div>
-          <button 
-            onClick={onClose}
-            className="p-2 text-orange-400 hover:text-orange-600 hover:bg-orange-100 rounded-full transition-colors"
-          >
-            <X size={20} />
-          </button>
+          <div className="flex items-center gap-1">
+            <button 
+              onClick={handleReset}
+              className="px-3 py-1.5 text-xs font-semibold text-orange-600 hover:bg-orange-100 rounded-full transition-colors flex items-center gap-1 border border-orange-200 bg-white shadow-sm"
+            >
+              <RotateCcw size={14} /> 새 채팅
+            </button>
+            <button 
+              onClick={onClose}
+              className="p-2 ml-1 text-orange-400 hover:text-orange-600 hover:bg-orange-100 rounded-full transition-colors"
+            >
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {/* 채팅 내역 */}
@@ -185,7 +177,7 @@ export default function KiriBotModal({ onClose }: KiriBotModalProps) {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="끼리봇에게 무엇이든 물어보세요!"
+              placeholder="끼리봇에게 가이드라인을 질문해보세요!"
               className="w-full h-12 bg-gray-50 border border-gray-200 rounded-full pl-4 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
             />
             <button
