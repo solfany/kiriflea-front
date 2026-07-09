@@ -118,12 +118,16 @@ function SellForm() {
   };
 
   const handleSubmit = () => {
+    if (images.length === 0) return toast.error('상품 이미지를 최소 1장 이상 등록해주세요.');
+    if (!title.trim()) return toast.error('상품 제목을 입력해주세요.');
+    if (!price) return toast.error(isAuction ? '경매 시작가를 입력해주세요.' : '가격을 입력해주세요.');
+    if (isAuction && !auctionEndAt) return toast.error('경매 마감 시간을 설정해주세요.');
+
     if (isEditMode) updateMutation.mutate();
     else createMutation.mutate();
   };
 
   const isPending = createMutation.isPending || updateMutation.isPending;
-  const canSubmit = title.trim() && price && images.length > 0 && (!isAuction || auctionEndAt);
 
   if (isEditMode && !existingProduct) {
     return (
@@ -142,7 +146,7 @@ function SellForm() {
         <h1 className="font-semibold text-gray-900">{isEditMode ? '상품 수정' : '내 물건 팔기'}</h1>
         <Button
           onClick={handleSubmit}
-          disabled={!canSubmit || isPending}
+          disabled={isPending}
           className="ml-auto bg-orange-500 hover:bg-orange-600 text-sm h-8 px-4"
         >
           {isPending ? <Loader2 size={14} className="animate-spin" /> : isEditMode ? '수정' : '등록'}
@@ -240,8 +244,8 @@ function SellForm() {
 
         {/* Auction toggle — only for new products */}
         {!isEditMode && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between py-3 px-4 bg-orange-50 rounded-xl border border-orange-100">
+          <div className={cn("overflow-hidden rounded-xl border transition-all", isAuction ? "border-orange-200" : "border-orange-100")}>
+            <div className={cn("flex items-center justify-between py-3 px-4 transition-colors", isAuction ? "bg-orange-50/50" : "bg-orange-50")}>
               <div className="flex items-center gap-2">
                 <Gavel size={18} className="text-orange-500" />
                 <div>
@@ -257,7 +261,7 @@ function SellForm() {
               </button>
             </div>
             {isAuction && (
-              <div className="space-y-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="p-4 bg-gray-50 border-t border-gray-100 space-y-3">
                 <Label className="text-gray-700">경매 마감 시간</Label>
                 <Input 
                   type="datetime-local" 
@@ -305,6 +309,16 @@ function SellForm() {
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-orange-300"
           />
           <div className="text-right text-[10px] text-gray-400">{description.length}/1000</div>
+        </div>
+
+        <div className="pt-4 pb-8">
+          <Button
+            onClick={handleSubmit}
+            disabled={isPending}
+            className="w-full h-12 text-base font-semibold bg-orange-500 hover:bg-orange-600"
+          >
+            {isPending ? <Loader2 size={18} className="animate-spin" /> : isEditMode ? '수정 완료' : '등록 완료'}
+          </Button>
         </div>
       </div>
     </div>
