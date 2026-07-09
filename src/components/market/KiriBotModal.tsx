@@ -113,15 +113,20 @@ export default function KiriBotModal({ onClose }: KiriBotModalProps) {
                         li: ({node, ...props}) => <li className="leading-relaxed" {...props} />,
                         p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
                         a: ({node, ...props}) => <a className="text-orange-500 underline underline-offset-2 hover:text-orange-600" target="_blank" rel="noopener noreferrer" {...props} />,
+                        pre: ({node, ...props}: any) => {
+                          const isProduct = node?.children?.[0]?.properties?.className?.includes('language-product');
+                          if (isProduct) return <>{props.children}</>;
+                          return <pre className="bg-gray-100 p-2 rounded-lg my-2 overflow-x-auto text-xs" {...props} />;
+                        },
                         code: ({node, className, children, ...props}: any) => {
                           const match = /language-(\w+)/.exec(className || '')
                           if (match && match[1] === 'product') {
                             try {
                               const product = JSON.parse(String(children).replace(/\n$/, ''));
                               return (
-                                <Link href={`/products/${product.id}`} className="block my-3 group no-underline">
-                                  <div className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all group-hover:border-orange-300">
-                                    <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-50 shrink-0 border border-gray-100">
+                                <Link href={`/products/${product.id}`} className="block mt-2 mb-1 group no-underline">
+                                  <div className="flex items-center gap-3 p-2.5 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all group-hover:border-orange-300">
+                                    <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-gray-50 shrink-0 border border-gray-100">
                                       {product.imageUrl ? (
                                         <Image src={product.imageUrl} alt={product.title} fill className="object-cover" />
                                       ) : (
@@ -129,10 +134,10 @@ export default function KiriBotModal({ onClose }: KiriBotModalProps) {
                                       )}
                                     </div>
                                     <div className="flex-1 overflow-hidden">
-                                      <h3 className="font-semibold text-gray-900 truncate text-sm">{product.title}</h3>
-                                      <p className="text-orange-600 font-bold text-sm mt-0.5">{product.price?.toLocaleString()}원</p>
+                                      <h3 className="font-semibold text-gray-900 truncate text-[13px]">{product.title}</h3>
+                                      <p className="text-orange-600 font-bold text-[13px] mt-0.5">{product.price?.toLocaleString()}원</p>
                                       {product.status && (
-                                        <span className="inline-block mt-1.5 px-1.5 py-0.5 text-[10px] bg-gray-100 text-gray-600 rounded">
+                                        <span className="inline-block mt-1 px-1.5 py-0.5 text-[10px] bg-gray-100 text-gray-600 rounded">
                                           {product.status === 'SALE' ? '판매중' : product.status === 'RESERVED' ? '예약중' : '판매완료'}
                                         </span>
                                       )}
