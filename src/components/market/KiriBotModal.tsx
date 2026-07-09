@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { X, Send, Bot, User, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
 
 interface KiriBotModalProps {
   onClose: () => void;
@@ -98,9 +99,23 @@ export default function KiriBotModal({ onClose }: KiriBotModalProps) {
                   "p-3 rounded-2xl whitespace-pre-wrap text-sm leading-relaxed",
                   msg.role === 'user' 
                     ? "bg-orange-500 text-white rounded-tr-sm" 
-                    : "bg-white text-gray-800 rounded-tl-sm border border-gray-100 shadow-sm"
+                    : "bg-white text-gray-800 rounded-tl-sm border border-gray-100 shadow-sm markdown-body"
                 )}>
-                  {msg.text}
+                  {msg.role === 'user' ? (
+                    msg.text
+                  ) : (
+                    <ReactMarkdown
+                      components={{
+                        strong: ({node, ...props}) => <strong className="font-bold text-orange-600" {...props} />,
+                        ul: ({node, ...props}) => <ul className="list-disc pl-5 space-y-1 my-2" {...props} />,
+                        li: ({node, ...props}) => <li className="leading-relaxed" {...props} />,
+                        p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                        a: ({node, ...props}) => <a className="text-orange-500 underline underline-offset-2 hover:text-orange-600" target="_blank" rel="noopener noreferrer" {...props} />,
+                      }}
+                    >
+                      {msg.text}
+                    </ReactMarkdown>
+                  )}
                 </div>
               </div>
             </div>
