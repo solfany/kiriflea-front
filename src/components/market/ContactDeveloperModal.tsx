@@ -21,7 +21,7 @@ export function ContactDeveloperModal({ onClose }: ContactDeveloperModalProps) {
       toast.error('문의 내용을 입력해주세요.');
       return;
     }
-    
+
     setIsSubmitting(true);
     try {
       await api.post('/api/support/contact', {
@@ -38,21 +38,20 @@ export function ContactDeveloperModal({ onClose }: ContactDeveloperModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={onClose}>
-      <div 
-        className="bg-white rounded-2xl w-full max-w-sm overflow-hidden flex flex-col shadow-xl animate-in zoom-in-95 duration-200"
-        onClick={e => e.stopPropagation()}
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/40 backdrop-blur-sm sm:p-0">
+      <div
+        className="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl shadow-xl overflow-hidden animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200"
       >
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <h2 className="text-lg font-bold text-gray-900">개발자 문의하기</h2>
-          <button 
+          <button
             onClick={onClose}
             className="p-2 -mr-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition-colors"
           >
             <X size={20} />
           </button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="p-4">
           <div className="mb-4">
             <p className="text-sm text-gray-500 mb-3">
@@ -66,9 +65,9 @@ export function ContactDeveloperModal({ onClose }: ContactDeveloperModalProps) {
               disabled={isSubmitting}
             />
           </div>
-          
-          <Button 
-            type="submit" 
+
+          <Button
+            type="submit"
             className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-base font-medium"
             disabled={isSubmitting || !content.trim()}
           >
