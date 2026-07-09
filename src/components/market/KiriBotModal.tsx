@@ -23,7 +23,7 @@ const markdownComponents: any = {
   a: ({node, ...props}: any) => <a className="text-orange-500 underline underline-offset-2 hover:text-orange-600" target="_blank" rel="noopener noreferrer" {...props} />,
 };
 
-const DEFAULT_MESSAGE: Message = { role: 'bot', text: '안녕하세요! 기리 플리마켓의 귀염둥이 AI 도우미 끼리봇입니다 뿌우- 🐘\\n저는 기리 플리마켓의 매너 점수 시스템, 안전 거래 가이드 등 서비스 이용 규칙에 대해 자세히 안내해 드릴 수 있어요. 어떤 도움이 필요하신가요?' };
+const DEFAULT_MESSAGE: Message = { role: 'bot', text: '안녕하세요! 기리 플리마켓의 귀염둥이 AI 도우미 끼리봇입니다 뿌우- 🐘\n저는 기리 플리마켓의 사용 가이드 등 서비스 이용 규칙에 대해 자세히 안내해 드릴 수 있어요. 어떤 도움이 필요하신가요?' };
 
 export default function KiriBotModal({ onClose }: KiriBotModalProps) {
   const [messages, setMessages] = useState<Message[]>([DEFAULT_MESSAGE]);

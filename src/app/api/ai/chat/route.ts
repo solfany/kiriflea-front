@@ -9,9 +9,11 @@ const genAI = new GoogleGenerativeAI(apiKey);
 // Load guides (RAG)
 let mannerGuide = '';
 let tradingGuide = '';
+let serviceGuide = '';
 try {
   mannerGuide = fs.readFileSync(path.join(process.cwd(), 'public/guides/manner.md'), 'utf-8');
   tradingGuide = fs.readFileSync(path.join(process.cwd(), 'public/guides/trading.md'), 'utf-8');
+  serviceGuide = fs.readFileSync(path.join(process.cwd(), 'public/guides/service.md'), 'utf-8');
 } catch (e) {
   console.warn('Failed to load guide files', e);
 }
@@ -29,6 +31,9 @@ const SYSTEM_PROMPT = `
 
 <회사 및 서비스 정보 (가이드라인)>
 다음은 우리 기리 플리마켓의 공식 가이드라인이야. 관련된 질문을 받으면 이 내용을 바탕으로만 답변해줘:
+
+[서비스 이용 가이드]
+${serviceGuide}
 
 [매너 점수 가이드]
 ${mannerGuide}
