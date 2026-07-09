@@ -76,11 +76,11 @@ export function ProfileEditModal({ onClose }: ProfileEditModalProps) {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4" onClick={onClose}>
-        <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden flex flex-col shadow-xl" onClick={e => e.stopPropagation()}>
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={onClose}>
+        <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden flex flex-col shadow-xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
           <div className="flex items-center justify-between p-4 border-b border-gray-100">
-            <h2 className="font-bold text-gray-900">프로필 수정</h2>
-            <button onClick={onClose} className="p-1 -mr-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
+            <h2 className="text-lg font-bold text-gray-900">프로필 수정</h2>
+            <button onClick={onClose} className="p-2 -mr-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-50 transition-colors">
               <X size={20} />
             </button>
           </div>

@@ -38,9 +38,10 @@ export function ContactDeveloperModal({ onClose }: ContactDeveloperModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={onClose}>
       <div 
-        className="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden animate-in zoom-in-95 duration-200"
+        className="bg-white rounded-2xl w-full max-w-sm overflow-hidden flex flex-col shadow-xl animate-in zoom-in-95 duration-200"
+        onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <h2 className="text-lg font-bold text-gray-900">개발자 문의하기</h2>
