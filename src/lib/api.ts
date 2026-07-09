@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-// 상대경로 사용 → Next.js rewrites가 /api/* → localhost:8080 으로 프록시
-// 덕분에 핸드폰 등 외부기기에서도 localhost:8080 직접 호출 없이 동작
-const BASE_URL = '';
+// 상대경로 사용 → Next.js rewrites가 /api/* → localhost:8080 으로 프록시 (클라이언트)
+// 서버 사이드 렌더링(SSR) 시에는 BACKEND_URL이나 localhost:8080을 직접 호출
+const BASE_URL = typeof window === 'undefined' ? (process.env.BACKEND_URL || 'http://localhost:8080') : '';
 
 export const api = axios.create({
   baseURL: BASE_URL,
