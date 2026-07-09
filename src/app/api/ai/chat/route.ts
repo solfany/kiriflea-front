@@ -63,40 +63,7 @@ export async function POST(req: Request) {
       })),
     });
 
-      if (func.name === 'searchProducts') {
-        const keyword = (func.args as any).keyword || '';
-        const backendUrl = process.env.BACKEND_URL || 'http://localhost:8080';
-        try {
-          // 백엔드 API에서 상품 검색 (최신 상품순으로 최대 5개 가져오기 등)
-          const res = await fetch(`${backendUrl}/api/products?keyword=${encodeURIComponent(keyword)}&size=5`);
-          const data = await res.json();
-          const items = data.data?.items || [];
-          
-          // 검색 결과를 모델에 다시 전달하여 최종 답변 생성
-          const mappedItems = items.map((item: any) => ({
-            id: item.id,
-            title: item.title,
-            price: item.price,
-            status: item.status,
-            imageUrl: item.imageUrls?.[0] || '',
-          }));
-          result = await chat.sendMessage([{
-            functionResponse: {
-              name: 'searchProducts',
-              response: { products: mappedItems },
-            }
-          }]);
-        } catch (e) {
-          result = await chat.sendMessage([{
-            functionResponse: {
-              name: 'searchProducts',
-              response: { error: '서버와 통신하는 도중 상품 검색에 실패했습니다.' },
-            }
-          }]);
-        }
-      }
-    }
-
+    const result = await chat.sendMessage(message);
     const responseText = result.response.text();
 
     return NextResponse.json({ text: responseText });
