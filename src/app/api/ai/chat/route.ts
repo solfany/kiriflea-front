@@ -55,12 +55,23 @@ export async function POST(req: Request) {
       systemInstruction: SYSTEM_PROMPT,
     });
 
-    // 대화 내역 포맷 변환
+    // 대화 내역 포맷 변환 및 유효성 검증 (Gemini는 user부터 시작하며 교대로 나와야 함)
+    let rawHistory = history.map((msg: { role: string; text: string }) => ({
+      role: msg.role === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.text }],
+    }));
+
+    const validHistory = [];
+    let expectedRole = 'user';
+    for (const msg of rawHistory) {
+      if (msg.role === expectedRole) {
+        validHistory.push(msg);
+        expectedRole = expectedRole === 'user' ? 'model' : 'user';
+      }
+    }
+
     const chat = model.startChat({
-      history: history.map((msg: { role: string; text: string }) => ({
-        role: msg.role === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.text }],
-      })),
+      history: validHistory,
     });
 
     const result = await chat.sendMessage(message);
