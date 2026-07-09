@@ -7,7 +7,7 @@ interface AuthState {
   user: User | null;
   accessToken: string | null;
   isAuthenticated: boolean;
-  setTokens: (accessToken: string, refreshToken: string, user: User) => void;
+  setTokens: (accessToken: string, refreshToken: string | null, user: User) => void;
   clearAuth: () => void;
 }
 
@@ -21,7 +21,6 @@ export const useAuthStore = create<AuthState>()(
       setTokens: (accessToken, refreshToken, user) => {
         if (typeof window !== 'undefined') {
           localStorage.setItem('access_token', accessToken);
-          localStorage.setItem('refresh_token', refreshToken);
           document.cookie = `access_token=${accessToken}; path=/; max-age=86400`;
         }
         set({ user, accessToken, isAuthenticated: true });
@@ -30,7 +29,6 @@ export const useAuthStore = create<AuthState>()(
       clearAuth: () => {
         if (typeof window !== 'undefined') {
           localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
           document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
         }
         set({ user: null, accessToken: null, isAuthenticated: false });

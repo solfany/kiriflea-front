@@ -46,15 +46,26 @@ api.interceptors.response.use(
     if ((err.response?.status === 401 || err.response?.status === 403) && !original._retry) {
       original._retry = true;
       try {
-        const refreshToken = localStorage.getItem('refresh_token');
-        const res = await axios.post('/api/auth/refresh', { refreshToken });
-        const { accessToken } = res.data;
-        localStorage.setItem('access_token', accessToken);
+        // Send request to refresh endpoint. Browser automatically attaches HttpOnly 'refresh_token' cookie because of withCredentials: true.
+        const res = await axios.post('/api/auth/refresh', {}, { withCredentials: true });
+        const responseData = res.data?.data;
+        if (!responseData || !responseData.accessToken) {
+          throw new Error('Failed to refresh tokens');
+        }
+
+        const { accessToken, refreshToken: newRefreshToken, user } = responseData;
+        
+        // Sync new access token with Zustand store and cookies
+        useAuthStore.getState().setTokens(accessToken, newRefreshToken, user);
+
         original.headers.Authorization = `Bearer ${accessToken}`;
         return api(original);
-      } catch {
+      } catch (refreshErr) {
+        console.error('[API] Token refresh failed, logging out:', refreshErr);
         useAuthStore.getState().clearAuth();
-        window.location.href = '/login';
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(err);
