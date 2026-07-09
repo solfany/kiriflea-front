@@ -595,7 +595,7 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
       {/* 빠른 인사말 칩 (입력창 위) */}
       {messages.length === 0 && !isLoading && !room?.productIsDeleted && (
         <div className="flex-shrink-0 bg-white px-4 pt-2 pb-2">
-          <div className="flex flex-wrap gap-2">
+          <div className="flex overflow-x-auto gap-2 scrollbar-hide pb-1">
             {['안녕하세요! 😊', '아직 판매 중이신가요?', '제가 살게요!', '직거래 가능한가요?'].map(text => (
               <button 
                 key={text}
@@ -611,7 +611,7 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
                     }
                   }, 50);
                 }}
-                className="px-3.5 py-1.5 bg-orange-50 text-orange-600 rounded-full text-[13px] font-medium hover:bg-orange-100 transition-colors border border-orange-100"
+                className="flex-shrink-0 px-3.5 py-1.5 bg-orange-50 text-orange-600 rounded-full text-[13px] font-medium hover:bg-orange-100 transition-colors border border-orange-100"
               >
                 {text}
               </button>
