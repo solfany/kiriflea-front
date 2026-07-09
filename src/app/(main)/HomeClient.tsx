@@ -9,6 +9,7 @@ import CategoryFilter from '@/components/market/CategoryFilter';
 import { useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import type { Category, ProductCursor, ProductListItem } from '@/types';
+import FloatingMenu from '@/components/layout/FloatingMenu';
 
 export default function HomeClient() {
   const [category, setCategory] = useState<Category | undefined>();
@@ -92,12 +93,7 @@ export default function HomeClient() {
       )}
 
       {/* Floating Action Button */}
-      <a
-        href="/sell"
-        className="hidden fixed bottom-20 right-4 z-50 items-center justify-center w-14 h-14 bg-orange-500 text-white rounded-full shadow-lg hover:bg-orange-600 hover:shadow-xl active:scale-95 transition-all"
-      >
-        <span className="text-3xl leading-none -mt-1">+</span>
-      </a>
+      <FloatingMenu />
     </div>
   );
 }
