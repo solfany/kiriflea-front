@@ -20,6 +20,57 @@ import type { ChatMessage, ChatRoom, PageResponse } from '@/types';
 
 const WS_HTTP_URL = getWebSocketHttpUrl();
 
+// 이미지 리사이즈 및 WebP 압축을 수행하는 유틸리티
+const compressImage = async (file: File): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image();
+    const url = URL.createObjectURL(file);
+    img.src = url;
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const canvas = document.createElement('canvas');
+      let { width, height } = img;
+      const MAX_SIZE = 1080;
+
+      if (width > height) {
+        if (width > MAX_SIZE) {
+          height = Math.round((height * MAX_SIZE) / width);
+          width = MAX_SIZE;
+        }
+      } else {
+        if (height > MAX_SIZE) {
+          width = Math.round((width * MAX_SIZE) / height);
+          height = MAX_SIZE;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return resolve(file);
+      
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) return resolve(file);
+          const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", {
+            type: 'image/webp',
+            lastModified: Date.now(),
+          });
+          resolve(newFile);
+        },
+        'image/webp',
+        0.8
+      );
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(file);
+    };
+  });
+};
+
 async function fetchMessages(roomId: number, pageParam: number = 0): Promise<PageResponse<ChatMessage>> {
   const res = await api.get<PageResponse<ChatMessage>>(`/api/chat/rooms/${roomId}/messages?page=${pageParam}&size=20`);
   return res.data;
@@ -79,6 +130,7 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
   const router = useRouter();
   const qc = useQueryClient();
   const user = useAuthStore((s) => s.user);
+  const accessToken = useAuthStore((s) => s.accessToken);
   const { openConfirm } = useConfirmStore();
 
   const [newMessages, setNewMessages] = useState<ChatMessage[]>([]);
@@ -123,17 +175,20 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
     return Array.from(map.values()).sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   }, [historyData, newMessages]);
 
+  // Invalidate chat rooms list and read notifications on mount or when roomIdNum changes
   useEffect(() => {
-    qc.invalidateQueries({ queryKey: ['chatMessages', roomIdNum] });
     qc.invalidateQueries({ queryKey: ['chatRooms'] });
     window.dispatchEvent(new Event('chatRead'));
+  }, [roomIdNum, qc]);
 
+  // Restore scroll position when fetching next page (pagination)
+  useEffect(() => {
     if (scrollRef.current && prevScrollHeight > 0) {
       const newScrollHeight = scrollRef.current.scrollHeight;
       scrollRef.current.scrollTop = newScrollHeight - prevScrollHeight;
       setPrevScrollHeight(0);
     }
-  }, [messages, prevScrollHeight, qc, roomIdNum]);
+  }, [messages, prevScrollHeight]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight } = e.currentTarget;
@@ -143,11 +198,19 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
     }
   };
 
+  const hasInitialScrolled = useRef(false);
+
   useEffect(() => {
-    if (messages.length > 0 && prevScrollHeight === 0 && newMessages.length === 0) {
+    hasInitialScrolled.current = false;
+  }, [roomIdNum]);
+
+  // Scroll to bottom on initial message load
+  useEffect(() => {
+    if (messages.length > 0 && !hasInitialScrolled.current) {
       bottomRef.current?.scrollIntoView();
+      hasInitialScrolled.current = true;
     }
-  }, [messages, prevScrollHeight, newMessages]);
+  }, [messages]);
 
   const tradeMutation = useMutation({
     mutationFn: () => api.post('/api/trades', {
@@ -217,10 +280,10 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
 
   // STOMP 연결
   useEffect(() => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+    if (!accessToken) return;
 
     const client = new Client({
-      webSocketFactory: () => new (SockJS as any)(token ? `${WS_HTTP_URL}?token=${token}` : WS_HTTP_URL),
+      webSocketFactory: () => new (SockJS as any)(`${WS_HTTP_URL}?token=${accessToken}`),
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
@@ -281,8 +344,7 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
       client.deactivate();
       stompRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomIdNum, user?.id, user?.email]);
+  }, [roomIdNum, user?.id, user?.email, accessToken, qc]);
 
   const handleSend = () => {
     const content = input.trim();
@@ -307,11 +369,10 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
     const file = e.target.files?.[0];
     if (!file || !stompRef.current?.connected) return;
 
-    const formData = new FormData();
-    formData.append('file', file);
-
     try {
-      const { url: imageUrl } = await uploadImage(file);
+      // 모바일 대용량 파일 업로드 실패 및 HEIC 파일 문제를 방지하기 위해 업로드 전 리사이즈/WebP 압축 적용
+      const compressedFile = await compressImage(file);
+      const { url: imageUrl } = await uploadImage(compressedFile);
 
       stompRef.current.publish({
         destination: `/app/chat/${roomIdNum}`,

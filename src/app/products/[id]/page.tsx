@@ -418,9 +418,29 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
             <DropdownMenuContent align="end" className="w-48 bg-white border border-gray-100 rounded-xl shadow-lg !ring-0 !outline-none p-1">
               <DropdownMenuItem
                 className="flex items-center gap-2 p-3 hover:bg-gray-50 cursor-pointer rounded-lg text-sm text-gray-700 font-medium"
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  toast.success('상품 링크가 복사되었습니다.');
+                onClick={async () => {
+                  const shareData = {
+                    title: product.title,
+                    text: product.description,
+                    url: window.location.href,
+                  };
+                  if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+                    try {
+                      await navigator.share(shareData);
+                    } catch (err) {
+                      if (err instanceof Error && err.name !== 'AbortError') {
+                        navigator.clipboard.writeText(window.location.href);
+                        toast.success('상품 링크가 복사되었습니다.');
+                      }
+                    }
+                  } else {
+                    try {
+                      await navigator.clipboard.writeText(window.location.href);
+                      toast.success('상품 링크가 복사되었습니다.');
+                    } catch {
+                      toast.error('링크 복사에 실패했습니다.');
+                    }
+                  }
                 }}
               >
                 <Share2 size={16} className="text-gray-500" />
