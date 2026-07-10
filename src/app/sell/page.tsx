@@ -23,6 +23,59 @@ const CATEGORIES: { value: Category; label: string }[] = [
 
 interface UploadedImage { id: number; url: string }
 
+// 1080px 기준으로 이미지 리사이즈 및 WebP 압축을 수행하는 유틸리티
+const compressImage = async (file: File): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image();
+    const url = URL.createObjectURL(file);
+    img.src = url;
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const canvas = document.createElement('canvas');
+      let { width, height } = img;
+      const MAX_SIZE = 1080;
+
+      if (width > height) {
+        if (width > MAX_SIZE) {
+          height = Math.round((height * MAX_SIZE) / width);
+          width = MAX_SIZE;
+        }
+      } else {
+        if (height > MAX_SIZE) {
+          width = Math.round((width * MAX_SIZE) / height);
+          height = MAX_SIZE;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return resolve(file); // fail safe
+      
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) return resolve(file);
+          // WebP 형태로 압축 (아이폰 등 호환성 문제 시 jpeg로 가능하나 요즘은 webp 지원이 대부분 잘됨)
+          // 여기서는 원본 파일명을 유지하고 확장자만 변경
+          const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", {
+            type: 'image/webp',
+            lastModified: Date.now(),
+          });
+          resolve(newFile);
+        },
+        'image/webp',
+        0.8 // 80% 퀄리티
+      );
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(file); // 에러 시 원본 반환
+    };
+  });
+};
+
 function SellForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -108,7 +161,9 @@ function SellForm() {
     if (images.length + files.length > 10) { toast.error('이미지는 최대 10장까지 등록 가능합니다.'); return; }
     setUploading(true);
     try {
-      const uploaded = await Promise.all(Array.from(files).map(uploadImage));
+      // 업로드 전 이미지 최적화(압축) 적용
+      const compressedFiles = await Promise.all(Array.from(files).map(compressImage));
+      const uploaded = await Promise.all(compressedFiles.map(uploadImage));
       setImages((prev) => [...prev, ...uploaded]);
     } catch {
       toast.error('이미지 업로드에 실패했습니다.');
@@ -121,6 +176,12 @@ function SellForm() {
     if (images.length === 0) return toast.error('상품 이미지를 최소 1장 이상 등록해주세요.');
     if (!title.trim()) return toast.error('상품 제목을 입력해주세요.');
     if (!price) return toast.error(isAuction ? '경매 시작가를 입력해주세요.' : '가격을 입력해주세요.');
+
+    const numPrice = Number(price);
+    if (isNaN(numPrice) || numPrice < 0) {
+      return toast.error(isAuction ? '경매 시작가는 0원 이상이어야 합니다.' : '가격은 0원 이상이어야 합니다.');
+    }
+
     if (isAuction && !auctionEndAt) return toast.error('경매 마감 시간을 설정해주세요.');
 
     if (isEditMode) updateMutation.mutate();
