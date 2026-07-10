@@ -280,10 +280,11 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
 
   // STOMP 연결
   useEffect(() => {
-    if (!accessToken) return;
+    const token = accessToken || (typeof window !== 'undefined' ? localStorage.getItem('access_token') : null);
+    if (!token) return;
 
     const client = new Client({
-      webSocketFactory: () => new (SockJS as any)(`${WS_HTTP_URL}?token=${accessToken}`),
+      webSocketFactory: () => new (SockJS as any)(`${WS_HTTP_URL}?token=${token}`),
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
