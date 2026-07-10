@@ -9,7 +9,11 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useRouter } from 'next/navigation';
 import BottomNav from '@/components/layout/BottomNav';
 import { toast } from 'sonner';
-import { stripMarkdown } from '@/lib/utils';
+import { stripMarkdown, getWebSocketHttpUrl } from '@/lib/utils';
+import { useEffect } from 'react';
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
+import { useAuthStore } from '@/store/auth';
 
 async function fetchChatRooms(): Promise<ChatRoom[]> {
   const res = await api.get<ChatRoom[]>('/api/chat/rooms');
@@ -28,11 +32,39 @@ function relativeTime(iso?: string) {
 export default function ChatListPage() {
   const router = useRouter();
   const qc = useQueryClient();
+  const user = useAuthStore((s) => s.user);
+  const accessToken = useAuthStore((s) => s.accessToken);
+
   const { data: rooms = [], isLoading } = useQuery<ChatRoom[]>({
     queryKey: ['chatRooms'],
     queryFn: fetchChatRooms,
     refetchInterval: 10_000,
   });
+
+  // 실시간 새 메시지 감지 시 채팅방 목록 즉시 갱신
+  useEffect(() => {
+    if (!user?.id) return;
+    const token = accessToken || (typeof window !== 'undefined' ? localStorage.getItem('access_token') : null);
+    if (!token) return;
+
+    const wsUrl = getWebSocketHttpUrl();
+    const client = new Client({
+      webSocketFactory: () => new (SockJS as any)(`${wsUrl}?token=${token}`),
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+      onConnect: () => {
+        client.subscribe(`/topic/user/${user.id}/chats`, () => {
+          qc.invalidateQueries({ queryKey: ['chatRooms'] });
+        });
+      },
+    });
+
+    client.activate();
+    return () => {
+      client.deactivate();
+    };
+  }, [user?.id, accessToken, qc]);
 
   if (isLoading) {
     return (
