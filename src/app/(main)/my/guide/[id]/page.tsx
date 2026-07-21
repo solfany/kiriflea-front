@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -54,7 +55,7 @@ export default function GuideDetailPage() {
           <div className="h-6 w-32 bg-gray-100/70 rounded-md animate-pulse" />
         </div>
         <div className="bg-white py-32 flex flex-col items-center justify-center">
-          <Loader2 className="w-8 h-8 text-orange-500 animate-spin mb-4" />
+          <Loader2 className="w-8 h-8 text-emerald-600 animate-spin mb-4" />
           <p className="text-sm font-semibold text-gray-400">가이드를 로딩하고 있습니다...</p>
         </div>
       </div>
@@ -75,7 +76,7 @@ export default function GuideDetailPage() {
           <p className="text-gray-600 font-semibold mb-6">{error || '페이지를 불러올 수 없습니다.'}</p>
           <button 
             onClick={() => router.back()} 
-            className="px-6 py-3 bg-orange-500 text-white hover:bg-orange-600 font-bold rounded-2xl text-sm transition-colors shadow-md"
+            className="px-6 py-3 bg-emerald-600 text-white hover:bg-emerald-700 font-bold rounded-2xl text-sm transition-colors shadow-md"
           >
             이전 화면으로
           </button>

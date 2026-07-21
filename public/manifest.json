@@ -1,6 +1,6 @@
 {
-  "name": "우리끼리 플리마켓",
-  "short_name": "끼리플리",
+  "name": "우리 너굴상점",
+  "short_name": "너굴상점",
   "description": "사내 중고거래 마켓",
   "start_url": "/",
   "display": "standalone",

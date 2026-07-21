@@ -45,7 +45,7 @@ export function ReviewModal({ tradeId, partnerNickname, onClose, onSuccess }: Re
         </div>
         <div className="p-5 flex flex-col items-center">
           <p className="text-sm text-gray-600 mb-4 text-center">
-            <span className="font-semibold text-orange-600">{partnerNickname}</span>님과의 거래는 어떠셨나요?
+            <span className="font-semibold text-emerald-700">{partnerNickname}</span>님과의 거래는 어떠셨나요?
           </p>
           <div className="flex gap-1 mb-6">
             {[1, 2, 3, 4, 5].map((star) => (
@@ -61,7 +61,7 @@ export function ReviewModal({ tradeId, partnerNickname, onClose, onSuccess }: Re
                   size={36}
                   className={cn(
                     "transition-colors",
-                    (hoverScore || score) >= star ? "fill-orange-400 text-orange-400" : "fill-gray-100 text-gray-200"
+                    (hoverScore || score) >= star ? "fill-amber-400 text-amber-400" : "fill-gray-100 text-gray-200"
                   )}
                 />
               </button>
@@ -71,14 +71,15 @@ export function ReviewModal({ tradeId, partnerNickname, onClose, onSuccess }: Re
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder="따뜻한 후기를 남겨주세요 (선택)"
-            className="w-full text-sm border border-gray-200 rounded-xl p-3 resize-none focus:outline-none focus:ring-2 focus:ring-orange-300"
+            maxLength={255}
+            className="w-full text-sm border border-gray-200 rounded-xl p-3 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
             rows={3}
           />
         </div>
         <div className="p-4 border-t border-gray-50 flex gap-2">
           <Button variant="outline" className="flex-1 h-12 text-[15px] font-semibold" onClick={onClose}>나중에</Button>
           <Button 
-            className="flex-1 bg-orange-500 hover:bg-orange-600 h-12 text-[15px] font-semibold" 
+            className="flex-1 bg-emerald-600 hover:bg-emerald-700 h-12 text-[15px] font-semibold text-white" 
             disabled={score === 0 || reviewMutation.isPending}
             onClick={() => reviewMutation.mutate()}
           >

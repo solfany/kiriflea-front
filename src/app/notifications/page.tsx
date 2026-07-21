@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { ChevronLeft, Bell, X } from 'lucide-react';
+import Image from 'next/image';
 import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import { format, isToday, isYesterday } from 'date-fns';
@@ -152,11 +153,12 @@ export default function NotificationsPage() {
             <LoadingSpinner />
           </div>
         ) : notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 gap-4">
-            <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center">
-              <Bell size={28} className="text-gray-300" />
+          <div className="flex flex-col items-center justify-center py-32 text-center font-nook tracking-[1px]">
+            <div className="w-20 h-20 bg-emerald-50/50 rounded-full flex items-center justify-center mb-4">
+              <Image src="/images/logo/raccoon-mascot-hi.png" alt="no notifications" width={40} height={40} className="object-contain" />
             </div>
-            <p className="text-gray-400">새로운 알림이 없습니다</p>
+            <p className="text-[17px] font-semibold text-gray-700">새로운 알림이 없다구리!</p>
+            <p className="text-[15px] text-gray-500 mt-1.5">알림이 오면 가장 먼저 알려주겠다구리!</p>
           </div>
         ) : (
           groups.map(([label, items]) => (
@@ -180,9 +182,9 @@ export default function NotificationsPage() {
                     {/* 타이틀 및 날짜 */}
                     <div className="flex items-center justify-between w-full">
                       <div className="flex items-center gap-2">
-                        {!n.isRead && <div className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />}
+                        {!n.isRead && <div className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0" />}
                         <span className={`text-sm ${!n.isRead ? 'font-bold text-gray-900' : 'font-medium text-gray-700'}`}>
-                          끼리플리 알림
+                          너굴상점 알림
                         </span>
                         <span suppressHydrationWarning className="text-[13px] text-gray-400">
                           {n.createdAt && getRelativeTime(n.createdAt)}

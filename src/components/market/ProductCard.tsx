@@ -1,13 +1,15 @@
 'use client';
+import { memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Heart, Eye, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ProductListItem } from '@/types';
-
+// 너굴상점 시그니처 선명한 뱃지 (솔리드 에메랄드 그린 & 리치 너굴 갈색)
 const STATUS_MAP: Record<string, { label: string; className: string }> = {
-  RESERVED: { label: '예약중', className: 'bg-teal-50 text-teal-600 border border-teal-100' },
-  SOLD: { label: '판매완료', className: 'bg-gray-100 text-gray-500' },
+  RESERVED: { label: '예약중', className: 'bg-amber-500 text-white font-bold shadow-xs' },
+  SOLD: { label: '판매완료', className: 'bg-gray-600 text-white font-bold shadow-xs' },
+  AUCTION: { label: '경매중', className: 'bg-violet-600 text-white font-bold shadow-xs' },
 };
 
 function relativeTime(iso: string) {
@@ -26,7 +28,7 @@ interface Props {
   customPriceArea?: React.ReactNode;
 }
 
-export default function ProductCard({ product, onLikeToggle, actionMenu, bottomAction, customPriceArea }: Props) {
+function ProductCard({ product, onLikeToggle, actionMenu, bottomAction, customPriceArea }: Props) {
   const s = STATUS_MAP[product.status];
 
   return (
@@ -42,7 +44,7 @@ export default function ProductCard({ product, onLikeToggle, actionMenu, bottomA
                     src={product.imageUrls[0]}
                     alt="삭제됨"
                     fill
-                    className="object-cover"
+                    className="object-cover opacity-40"
                     sizes="110px"
                   />
                 ) : (
@@ -62,23 +64,23 @@ export default function ProductCard({ product, onLikeToggle, actionMenu, bottomA
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-300">
-              <Package size={24} className="opacity-50" />
-            </div>
+                <Package size={24} className="opacity-50" />
+              </div>
             )}
             {!(product.isDeleted || (product as any).deleted) && (
               <div className="absolute top-1.5 left-1.5 z-10 flex gap-1 items-center flex-wrap">
                 {s && (
-                  <span className={cn('inline-block text-[10px] px-1.5 py-0.5 font-bold rounded shadow-sm', s.className)}>
+                  <span className={cn('inline-block text-[10px] px-1.5 py-0.5 font-bold rounded shadow-xs', s.className)}>
                     {s.label}
                   </span>
                 )}
                 {product.isAuction && (
-                  <span className="inline-block text-[10px] px-1.5 py-0.5 font-bold rounded shadow-sm bg-orange-50 text-orange-600 border border-orange-100">
+                  <span className="inline-block text-[10px] px-1.5 py-0.5 font-bold rounded shadow-xs bg-nook-brown text-white">
                     경매
                   </span>
                 )}
                 {(product as any).hidden && (
-                  <span className="inline-block text-[10px] px-1.5 py-0.5 font-bold rounded shadow-sm bg-gray-600 text-white">
+                  <span className="inline-block text-[10px] px-1.5 py-0.5 font-bold rounded shadow-xs bg-gray-600 text-white">
                     숨김
                   </span>
                 )}
@@ -91,7 +93,7 @@ export default function ProductCard({ product, onLikeToggle, actionMenu, bottomA
         <div className="flex-1 min-w-0 py-0.5 flex flex-col relative">
           <div className="flex items-start justify-between gap-1">
             <Link href={`/products/${product.id}`} className="flex-1 min-w-0">
-              <p className={cn('text-[16px] leading-snug text-gray-900 line-clamp-2', (product.status === 'SOLD' || product.isDeleted || (product as any).deleted) && 'text-gray-400')}>
+              <p className={cn('text-[16px] font-bold leading-snug text-gray-900 line-clamp-2', (product.status === 'SOLD' || product.isDeleted || (product as any).deleted) && 'text-gray-400')}>
                 {product.title}
               </p>
             </Link>
@@ -123,9 +125,16 @@ export default function ProductCard({ product, onLikeToggle, actionMenu, bottomA
                   </p>
                 </div>
                 {product.bidCount != null && product.bidCount > 0 && (
-                  <p className={cn('text-[12px] font-medium mt-0.5', product.status === 'SOLD' ? 'text-gray-400' : 'text-orange-600')}>
-                    🔥 현재 {product.bidCount}명 참여 중
-                  </p>
+                  <span className={cn('text-[12px] font-bold mt-0.5 flex items-center', product.status === 'SOLD' ? 'text-gray-400' : 'text-nook-brown')}>
+                    <Image
+                      src="/images/logo/raccoon-mascot-logo.png"
+                      alt="너굴"
+                      width={20}
+                      height={20}
+                      className="object-contain shrink-0"
+                    />
+                    현재 {product.bidCount}명 참여 중
+                  </span>
                 )}
               </div>
             ) : (
@@ -171,3 +180,5 @@ export default function ProductCard({ product, onLikeToggle, actionMenu, bottomA
     </div>
   );
 }
+
+export default memo(ProductCard);

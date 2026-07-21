@@ -1,13 +1,15 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { login } from '@/lib/auth';
 import { useAuthStore } from '@/store/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Loader2, MessageCircleHeart } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { NookLogo } from '@/components/ui/NookLogo';
 
 export default function LoginPage() {
   const setTokens = useAuthStore((s) => s.setTokens);
@@ -34,20 +36,22 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-sm">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center gap-2.5 mb-4">
-            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-orange-50">
-              <MessageCircleHeart
-                size={34}
-                className="text-orange-500"
-                strokeWidth={1.9}
+
+        {/* 상단 로고 & 안녕하는 너구리 캐릭터 (hi 이미지) */}
+        <div className="text-center mb-8">
+          <div className="flex flex-col items-center justify-center mb-3">
+            {/* 너구리가 안녕하는 사진 (raccoon-mascot-hi.png) */}
+            <div className="relative w-24 h-24 mb-2 hover:scale-105 transition-transform">
+              <Image
+                src="/images/logo/raccoon-mascot-hi.png"
+                alt="안녕하는 너구리"
+                fill
+                className="object-contain"
+                priority
               />
             </div>
-            <div className="flex items-baseline tracking-tight">
-              <span className="font-extrabold text-[28px] text-gray-800">우리</span>
-              <span className="font-black text-[30px] text-orange-500 ml-[2px]">끼리플리</span>
-              <span className="font-extrabold text-[28px] text-gray-800 ml-[2px]">마켓</span>
-            </div>
+            {/* 로고 & 브랜드 타이틀 */}
+            <NookLogo size="lg" variant="logo" />
           </div>
           <p className="mt-2 text-sm text-gray-500 font-medium">임직원 전용 중고거래 플랫폼</p>
         </div>
@@ -62,7 +66,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="h-12 text-base"
+              className="h-12 text-base border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
             />
           </div>
 
@@ -75,11 +79,11 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="h-12 text-base"
+              className="h-12 text-base border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
             />
           </div>
 
-          <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 h-12 text-base font-semibold" disabled={loading}>
+          <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-12 text-base font-semibold transition-colors" disabled={loading}>
             {loading ? <Loader2 size={16} className="animate-spin" /> : '로그인'}
           </Button>
         </form>
@@ -87,7 +91,7 @@ export default function LoginPage() {
         <div className="mt-6 flex flex-col items-center justify-center gap-3 text-sm text-gray-500">
           <p>
             계정이 없으신가요?{' '}
-            <Link href="/register" className="text-orange-500 font-semibold hover:underline">
+            <Link href="/register" className="text-emerald-600 font-semibold hover:underline">
               회원가입
             </Link>
           </p>
@@ -95,6 +99,7 @@ export default function LoginPage() {
             비밀번호를 잊으셨나요?
           </Link>
         </div>
+
       </div>
     </div>
   );

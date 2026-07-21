@@ -18,19 +18,13 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       isAuthenticated: false,
 
+      // 액세스/리프레시 토큰은 백엔드가 httpOnly 쿠키로 직접 내려주므로 여기서 JS로
+      // localStorage/document.cookie에 저장하지 않는다 (XSS 한 방에 토큰이 털리는 걸 방지).
       setTokens: (accessToken, refreshToken, user) => {
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('access_token', accessToken);
-          document.cookie = `access_token=${accessToken}; path=/; max-age=86400`;
-        }
         set({ user, accessToken, isAuthenticated: true });
       },
 
       clearAuth: () => {
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('access_token');
-          document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-        }
         set({ user: null, accessToken: null, isAuthenticated: false });
       },
     }),

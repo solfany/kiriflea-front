@@ -10,7 +10,6 @@ import { fetchMyListings } from '@/lib/products';
 import { useAuthStore } from '@/store/auth';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { api } from '@/lib/api';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { ProductListItem, ProductCursor } from '@/types';
 import { toast } from 'sonner';
@@ -55,6 +54,40 @@ function ListingCard({ product, onReviewClick }: { product: ProductListItem; onR
         <>
           <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
           <div className="absolute right-0 top-full mt-1 w-36 bg-white border border-gray-100 shadow-lg rounded-xl z-50 overflow-hidden py-1">
+            {/* 상태 변경 버튼들 */}
+            {!(product.isDeleted || (product as any).deleted) && !product.isAuction && !product.tradeId && (
+              <>
+                {product.status !== 'SALE' && (
+                  <button
+                    onClick={(e) => { e.preventDefault(); statusMutation.mutate('SALE'); }}
+                    disabled={statusMutation.isPending}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 outline-none transition-colors disabled:opacity-50"
+                  >
+                    {product.status === 'SOLD' ? '다시 판매하기' : '판매중으로 변경'}
+                  </button>
+                )}
+                {product.status !== 'RESERVED' && product.status !== 'SOLD' && (
+                  <button
+                    onClick={(e) => { e.preventDefault(); statusMutation.mutate('RESERVED'); }}
+                    disabled={statusMutation.isPending}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 outline-none transition-colors disabled:opacity-50"
+                  >
+                    예약중으로 변경
+                  </button>
+                )}
+                {product.status !== 'SOLD' && (
+                  <button
+                    onClick={(e) => { e.preventDefault(); statusMutation.mutate('SOLD'); }}
+                    disabled={statusMutation.isPending}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 outline-none transition-colors disabled:opacity-50"
+                  >
+                    판매완료로 변경
+                  </button>
+                )}
+                <div className="border-b border-gray-100 my-1"></div>
+              </>
+            )}
+            {/* 수정 / 숨김 / 삭제 */}
             {!(product.isDeleted || (product as any).deleted) && (
               <Link
                 href={`/sell?edit=${product.id}`}
@@ -62,30 +95,6 @@ function ListingCard({ product, onReviewClick }: { product: ProductListItem; onR
               >
                 수정하기
               </Link>
-            )}
-            {!(product.isDeleted || (product as any).deleted) && !product.isAuction && product.status !== 'SALE' && !product.tradeId && (
-              <button
-                onClick={(e) => { e.preventDefault(); statusMutation.mutate('SALE'); }}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 outline-none transition-colors"
-              >
-                {product.status === 'SOLD' ? '다시 판매하기' : '판매중으로 변경'}
-              </button>
-            )}
-            {!(product.isDeleted || (product as any).deleted) && !product.isAuction && product.status !== 'RESERVED' && !product.tradeId && (
-              <button
-                onClick={(e) => { e.preventDefault(); statusMutation.mutate('RESERVED'); }}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 outline-none transition-colors"
-              >
-                예약중으로 변경
-              </button>
-            )}
-            {!(product.isDeleted || (product as any).deleted) && !product.isAuction && product.status !== 'SOLD' && (
-              <button
-                onClick={(e) => { e.preventDefault(); statusMutation.mutate('SOLD'); }}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 outline-none transition-colors"
-              >
-                판매완료로 변경
-              </button>
             )}
             <button
               onClick={(e) => {
@@ -123,10 +132,12 @@ function ListingCard({ product, onReviewClick }: { product: ProductListItem; onR
   );
 
   return (
-    <ProductCard 
-      product={product} 
-      actionMenu={actionMenu} 
-    />
+    <div className="flex flex-col relative">
+      <ProductCard
+        product={product}
+        actionMenu={actionMenu}
+      />
+    </div>
   );
 }
 
@@ -197,15 +208,15 @@ export default function MyListingsPage() {
 
       {/* Empty */}
       {!isLoading && products.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-32 text-center">
-          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-4xl mb-4">
-            🛍️
+        <div className="flex flex-col items-center justify-center py-32 text-center font-nook tracking-[1px]">
+          <div className="w-20 h-20 bg-emerald-50/50 rounded-full flex items-center justify-center mb-4">
+            <Image src="/images/logo/raccoon-mascot-hi.png" alt="no products" width={40} height={40} className="object-contain" />
           </div>
-          <p className="text-base font-semibold text-gray-700">판매 중인 상품이 없어요</p>
-          <p className="text-sm text-gray-400 mt-1.5">안 쓰는 물건을 당근마켓처럼 팔아보세요!</p>
+          <p className="text-[17px] font-semibold text-gray-700">판매 중인 상품이 없다구리!</p>
+          <p className="text-[15px] text-gray-500 mt-1.5">안 쓰는 물건을 너굴상점에서 편리하게 팔아보라구리!</p>
           <Link
             href="/sell"
-            className="mt-6 px-6 py-3 bg-orange-500 text-white text-[15px] font-bold rounded-full shadow-sm hover:bg-orange-600 active:scale-95 transition-all"
+            className="mt-6 px-6 py-3 bg-emerald-600 font-sans tracking-normal text-white text-[15px] font-bold rounded-full shadow-sm hover:bg-emerald-700 active:scale-95 transition-all"
           >
             상품 등록하기
           </Link>

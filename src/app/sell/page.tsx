@@ -13,6 +13,16 @@ import { Camera, X, ChevronLeft, Loader2, Gavel } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Category } from '@/types';
 
+// 현재 시간 기준 최소/최대 로컬 ISO string 계산
+function getLocalIsoMinMax() {
+  const now = new Date();
+  const tzOffset = now.getTimezoneOffset() * 60000;
+  const min = new Date(now.getTime() - tzOffset).toISOString().slice(0, 16);
+  const maxD = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000 - tzOffset);
+  const max = maxD.toISOString().slice(0, 16);
+  return { min, max };
+}
+
 const CATEGORIES: { value: Category; label: string }[] = [
   { value: 'ELECTRONICS', label: '전자기기' },
   { value: 'CLOTHING', label: '의류' },
@@ -208,7 +218,7 @@ function SellForm() {
         <Button
           onClick={handleSubmit}
           disabled={isPending}
-          className="ml-auto bg-orange-500 hover:bg-orange-600 text-sm h-8 px-4"
+          className="ml-auto bg-emerald-600 hover:bg-emerald-700 text-sm h-8 px-4 text-white"
         >
           {isPending ? <Loader2 size={14} className="animate-spin" /> : isEditMode ? '수정' : '등록'}
         </Button>
@@ -221,7 +231,7 @@ function SellForm() {
             <button
               onClick={() => fileRef.current?.click()}
               disabled={uploading || images.length >= 10}
-              className="flex-shrink-0 w-20 h-20 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:border-orange-300 transition-colors disabled:opacity-50"
+              className="flex-shrink-0 w-20 h-20 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:border-emerald-500 transition-colors disabled:opacity-50"
             >
               {uploading ? <Loader2 size={18} className="animate-spin" /> : <Camera size={22} />}
               <span className="text-xs mt-1">{images.length}/10</span>
@@ -259,7 +269,7 @@ function SellForm() {
                 onClick={() => setCategory(c.value)}
                 className={cn(
                   'px-3 py-1.5 rounded-full text-sm border transition-colors',
-                  category === c.value ? 'bg-orange-500 text-white border-orange-500' : 'text-gray-600 border-gray-200 hover:border-orange-300',
+                  category === c.value ? 'bg-emerald-600 text-white border-emerald-600' : 'text-gray-600 border-gray-200 hover:border-emerald-400',
                 )}
               >
                 {c.label}
@@ -277,8 +287,17 @@ function SellForm() {
               placeholder="0"
               value={price ? Number(price).toLocaleString() : ''}
               onChange={(e) => {
-                const val = e.target.value.replace(/[^0-9]/g, '');
-                if (val.length <= 9) setPrice(val);
+                const rawVal = e.target.value;
+                if (rawVal.includes('-')) {
+                  toast.error('금액은 0원 이상이어야 한다구리!', { id: 'price-negative-alert' });
+                  return;
+                }
+                const val = rawVal.replace(/[^0-9]/g, '');
+                if (val.length > 9) {
+                  toast.error('최대 999,999,999원까지만 입력할 수 있다구리!', { id: 'price-limit-alert' });
+                  return;
+                }
+                setPrice(val);
               }}
               className="pr-8"
             />
@@ -305,10 +324,10 @@ function SellForm() {
 
         {/* Auction toggle — only for new products */}
         {!isEditMode && (
-          <div className={cn("overflow-hidden rounded-xl border transition-all", isAuction ? "border-orange-200" : "border-orange-100")}>
-            <div className={cn("flex items-center justify-between py-3 px-4 transition-colors", isAuction ? "bg-orange-50/50" : "bg-orange-50")}>
+          <div className={cn("overflow-hidden rounded-xl border transition-all", isAuction ? "border-nook-brown/30" : "border-gray-200")}>
+            <div className={cn("flex items-center justify-between py-3 px-4 transition-colors", isAuction ? "bg-nook-brown/10" : "bg-gray-50")}>
               <div className="flex items-center gap-2">
-                <Gavel size={18} className="text-orange-500" />
+                <Gavel size={18} className="text-nook-brown" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">경매로 판매</p>
                   <p className="text-xs text-gray-500">입찰가가 올라가는 경매 방식</p>
@@ -316,18 +335,33 @@ function SellForm() {
               </div>
               <button
                 onClick={() => setIsAuction((v) => !v)}
-                className={cn('w-11 h-6 rounded-full transition-colors relative shrink-0', isAuction ? 'bg-orange-500' : 'bg-gray-200')}
+                className={cn('w-11 h-6 rounded-full transition-colors relative shrink-0', isAuction ? 'bg-nook-brown' : 'bg-gray-200')}
               >
                 <span className={cn('absolute left-[2px] top-[2px] w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200', isAuction ? 'translate-x-5' : 'translate-x-0')} />
               </button>
             </div>
             {isAuction && (
               <div className="p-4 bg-gray-50 border-t border-gray-100 space-y-3">
-                <Label className="text-gray-700">경매 마감 시간</Label>
+                <Label className="text-gray-700">경매 마감 시간 (최대 7일)</Label>
                 <Input 
                   type="datetime-local" 
                   value={auctionEndAt} 
-                  onChange={(e) => setAuctionEndAt(e.target.value)} 
+                  onChange={(e) => {
+                    let val = e.target.value;
+                    const { min, max } = getLocalIsoMinMax();
+                    if (val) {
+                      if (val < min) {
+                        toast.error('과거 시간은 경매 마감일로 설정할 수 없다구리!', { id: 'auction-past-alert' });
+                        val = min;
+                      } else if (val > max) {
+                        toast.error('경매는 최대 7일까지만 진행할 수 있다구리!', { id: 'auction-max-alert' });
+                        val = max;
+                      }
+                    }
+                    setAuctionEndAt(val);
+                  }}
+                  min={getLocalIsoMinMax().min}
+                  max={getLocalIsoMinMax().max}
                   className="bg-white"
                 />
                 <div className="flex gap-2">
@@ -335,7 +369,7 @@ function SellForm() {
                     <button
                       key={days}
                       onClick={() => {
-                        const d = auctionEndAt ? new Date(auctionEndAt) : new Date();
+                        const d = new Date();
                         d.setDate(d.getDate() + days);
                         const tzOffset = d.getTimezoneOffset() * 60000;
                         const localIso = new Date(d.getTime() - tzOffset).toISOString().slice(0, 16);
@@ -367,7 +401,7 @@ function SellForm() {
             onChange={(e) => setDescription(e.target.value)}
             maxLength={1000}
             rows={6}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-orange-300"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
           />
           <div className="text-right text-[10px] text-gray-400">{description.length}/1000</div>
         </div>
@@ -376,7 +410,7 @@ function SellForm() {
           <Button
             onClick={handleSubmit}
             disabled={isPending}
-            className="w-full h-12 text-base font-semibold bg-orange-500 hover:bg-orange-600"
+            className="w-full h-12 text-base font-semibold bg-emerald-600 hover:bg-emerald-700 text-white"
           >
             {isPending ? <Loader2 size={18} className="animate-spin" /> : isEditMode ? '수정 완료' : '등록 완료'}
           </Button>

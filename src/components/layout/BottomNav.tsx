@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 import { Home, Search, PlusSquare, MessageCircle, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { api } from '@/lib/api';
@@ -56,13 +57,17 @@ export default function BottomNav() {
               href={href}
               className={cn(
                 'relative flex-1 flex flex-col items-center justify-center gap-1 text-xs transition-colors',
-                active ? 'text-orange-500' : 'text-gray-400 hover:text-gray-600',
+                active ? 'text-emerald-600' : 'text-gray-400 hover:text-gray-600',
               )}
             >
               <div className="relative">
-                <Icon size={24} strokeWidth={active ? 2.5 : 1.8} />
+                {active ? (
+                  <Image src="/images/logo/raccoon-mascot-logo-sm.png" alt={label} width={24} height={24} className="object-contain" />
+                ) : (
+                  <Icon size={21} strokeWidth={1.8} />
+                )}
                 {href === '/chat' && unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white box-content">
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white box-content">
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </span>
                 )}

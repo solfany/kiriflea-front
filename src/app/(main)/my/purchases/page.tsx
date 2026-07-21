@@ -21,7 +21,7 @@ function PurchaseCard({ product, onReviewClick }: { product: ProductListItem; on
   const bottomAction = product.status === 'SOLD' && product.tradeId && !product.isReviewed ? (
     <button
       onClick={(e) => { e.preventDefault(); onReviewClick(product); }}
-      className="text-[11px] bg-orange-500 text-white px-2.5 py-1.5 rounded shadow-sm hover:bg-orange-600 transition-colors shrink-0 font-medium"
+      className="text-[11px] bg-emerald-600 text-white px-2.5 py-1.5 rounded shadow-sm hover:bg-emerald-700 transition-colors shrink-0 font-medium"
     >
       거래 후기 남기기
     </button>
@@ -86,15 +86,15 @@ export default function MyPurchasesPage() {
 
       {/* Empty */}
       {!isLoading && products.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-32 text-center">
-          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-4xl mb-4">
-            🛒
+        <div className="flex flex-col items-center justify-center py-32 text-center font-nook tracking-[1px]">
+          <div className="w-20 h-20 bg-emerald-50/50 rounded-full flex items-center justify-center mb-4">
+            <Image src="/images/logo/raccoon-mascot-hi.png" alt="no purchases" width={40} height={40} className="object-contain" />
           </div>
-          <p className="text-base font-semibold text-gray-700">구매한 상품이 없어요</p>
-          <p className="text-sm text-gray-400 mt-1.5">따뜻한 거래를 통해 원하던 물건을 찾아보세요!</p>
+          <p className="text-[17px] font-semibold text-gray-700">구매한 상품이 없다구리!</p>
+          <p className="text-[15px] text-gray-500 mt-1.5">너굴상점에서 필요한 물건을 찾아보라구리!</p>
           <Link
             href="/"
-            className="mt-6 px-6 py-3 bg-orange-500 text-white text-[15px] font-bold rounded-full shadow-sm hover:bg-orange-600 active:scale-95 transition-all"
+            className="mt-6 px-6 py-3 bg-emerald-600 text-white text-[15px] font-bold rounded-full shadow-sm hover:bg-emerald-700 active:scale-95 transition-all font-sans tracking-normal"
           >
             홈으로 가기
           </Link>

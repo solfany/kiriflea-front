@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Search, X, SlidersHorizontal } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
@@ -97,11 +98,13 @@ function SearchContent() {
         <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 h-11 shadow-sm">
           <Search className="w-4 h-4 text-gray-400 shrink-0" />
           <input
-            type="search"
+            type="text"
+            enterKeyHint="search"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             placeholder="상품명으로 검색"
             className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400"
+            maxLength={50}
             autoFocus
           />
           {keyword && (
@@ -114,13 +117,13 @@ function SearchContent() {
         {/* Category chips */}
         <div className="flex items-center justify-between mt-2">
           <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
-            {CATEGORIES.filter((c) => c.value).map((c) => (
+            {CATEGORIES.map((c) => (
               <button
                 key={c.value}
-                onClick={() => setCategory(category === c.value ? '' : c.value as Category)}
+                onClick={() => setCategory(c.value as Category | '')}
                 className={`shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                   category === c.value
-                    ? 'bg-orange-500 text-white'
+                    ? 'bg-emerald-600 text-white'
                     : 'bg-white border border-gray-200 text-gray-600'
                 }`}
               >
@@ -131,7 +134,7 @@ function SearchContent() {
           <button
             onClick={() => setShowFilter(!showFilter)}
             className={`shrink-0 flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ml-2 ${
-              hasActiveFilter ? 'bg-orange-500 text-white' : 'bg-white border border-gray-200 text-gray-600'
+              hasActiveFilter ? 'bg-emerald-600 text-white' : 'bg-white border border-gray-200 text-gray-600'
             }`}
           >
             <SlidersHorizontal className="w-3 h-3" />
@@ -151,7 +154,7 @@ function SearchContent() {
                     onClick={() => setStatus(s.value as ProductStatus)}
                     className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                       status === s.value
-                        ? 'bg-orange-500 text-white'
+                        ? 'bg-emerald-600 text-white'
                         : 'bg-gray-50 border border-gray-200 text-gray-600'
                     }`}
                   >
@@ -169,7 +172,7 @@ function SearchContent() {
                     onClick={() => setSort(s)}
                     className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                       sort === s
-                        ? 'bg-orange-500 text-white'
+                        ? 'bg-emerald-600 text-white'
                         : 'bg-gray-50 border border-gray-200 text-gray-600'
                     }`}
                   >
@@ -186,7 +189,7 @@ function SearchContent() {
                   value={minPrice}
                   onChange={(e) => setMinPrice(e.target.value)}
                   placeholder="최소"
-                  className="flex-1 h-8 px-3 rounded-lg border border-gray-200 text-xs outline-none focus:border-orange-400"
+                  className="flex-1 h-8 px-3 rounded-lg border border-gray-200 text-xs outline-none focus:border-emerald-500"
                 />
                 <span className="text-gray-400 text-xs">~</span>
                 <input
@@ -194,12 +197,12 @@ function SearchContent() {
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(e.target.value)}
                   placeholder="최대"
-                  className="flex-1 h-8 px-3 rounded-lg border border-gray-200 text-xs outline-none focus:border-orange-400"
+                  className="flex-1 h-8 px-3 rounded-lg border border-gray-200 text-xs outline-none focus:border-emerald-500"
                 />
               </div>
             </div>
             {hasActiveFilter && (
-              <button onClick={clearFilters} className="w-full py-1.5 text-xs text-orange-500 font-medium">
+              <button onClick={clearFilters} className="w-full py-1.5 text-xs text-emerald-600 font-medium">
                 필터 초기화
               </button>
             )}
@@ -208,11 +211,9 @@ function SearchContent() {
       </div>
 
       {/* Result count */}
-      {!isLoading && debouncedKeyword && (
+      {debouncedKeyword && !isLoading && products.length > 0 && (
         <p className="text-xs text-gray-400 px-1 mb-2">
-          {products.length > 0
-            ? `"${debouncedKeyword}" 검색 결과 ${products.length}건`
-            : `"${debouncedKeyword}" 검색 결과가 없습니다`}
+          "{debouncedKeyword}" 검색 결과 {products.length}건
         </p>
       )}
 
@@ -234,14 +235,14 @@ function SearchContent() {
 
       {/* Empty state */}
       {!isLoading && products.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-32 text-center">
-          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-4xl mb-4">
-            🔍
+        <div className="flex flex-col items-center justify-center py-32 text-center font-nook tracking-[1px]">
+          <div className="w-20 h-20 bg-emerald-50/50 rounded-full flex items-center justify-center mb-4">
+            <Image src="/images/logo/raccoon-mascot-hi.png" alt="no search results" width={40} height={40} className="object-contain" />
           </div>
           {debouncedKeyword ? (
             <>
-              <p className="text-base font-semibold text-gray-700">검색 결과가 없어요</p>
-              <p className="text-sm text-gray-400 mt-1.5">다른 키워드나 필터를 시도해보세요</p>
+              <p className="text-[17px] font-semibold text-gray-700">"{debouncedKeyword}" 검색 결과가 없다구리!</p>
+              <p className="text-[15px] text-gray-500 mt-1.5">다른 단어로 다시 검색해 보라구리!</p>
             </>
           ) : (
             <>

@@ -11,24 +11,41 @@ export const api = axios.create({
   withCredentials: true,
 });
 
-api.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('access_token');
-    if (token) config.headers.Authorization = `Bearer ${token}`;
+// 액세스 토큰은 백엔드가 내려주는 httpOnly 쿠키로 자동 전송된다(withCredentials).
+// JS가 토큰 값을 들고 있지 않으므로 여기서 Authorization 헤더를 수동으로 붙이지 않는다.
+
+function sanitizeUrls(data: any): any {
+  if (typeof data === 'string') {
+    // 백엔드가 하드코딩된 localhost URL을 내려보내면, 프론트 프록시(/uploads)를 타도록 상대 경로로 바꾼다
+    return data.replace('http://localhost:8080/uploads', '/uploads');
   }
-  return config;
-});
+  if (Array.isArray(data)) {
+    return data.map(sanitizeUrls);
+  }
+  if (data !== null && typeof data === 'object') {
+    const result: any = {};
+    for (const key in data) {
+      result[key] = sanitizeUrls(data[key]);
+    }
+    return result;
+  }
+  return data;
+}
 
 api.interceptors.response.use(
   (res) => {
+    let responseData = res.data;
     if (
-      res.data !== null &&
-      typeof res.data === 'object' &&
-      'success' in res.data &&
-      'data' in res.data
+      responseData !== null &&
+      typeof responseData === 'object' &&
+      'success' in responseData &&
+      'data' in responseData
     ) {
-      res.data = res.data.data;
+      responseData = responseData.data;
     }
+    // 데이터 내부에 숨어있는 localhost:8080 이미지 URL들을 일괄 변환
+    res.data = sanitizeUrls(responseData);
+    
     return res;
   },
   async (err) => {
@@ -43,22 +60,27 @@ api.interceptors.response.use(
   (res) => res,
   async (err) => {
     const original = err.config;
+    
+    // 리프레시 요청 자체가 실패한 경우, 무한 루프 방지를 위해 바로 에러를 던짐
+    if (original.url === '/api/auth/refresh') {
+      return Promise.reject(err);
+    }
+
     if ((err.response?.status === 401 || err.response?.status === 403) && !original._retry) {
       original._retry = true;
       try {
-        // Send request to refresh endpoint. Browser automatically attaches HttpOnly 'refresh_token' cookie because of withCredentials: true.
-        const res = await axios.post('/api/auth/refresh', {}, { withCredentials: true });
+        // Send request to refresh endpoint using api instance (which has baseURL for SSR)
+        const res = await api.post('/api/auth/refresh', {}, { withCredentials: true });
         const responseData = res.data?.data;
         if (!responseData || !responseData.accessToken) {
           throw new Error('Failed to refresh tokens');
         }
 
         const { accessToken, refreshToken: newRefreshToken, user } = responseData;
-        
-        // Sync new access token with Zustand store and cookies
+
+        // 새 access_token은 이미 응답의 Set-Cookie로 내려왔으므로, 여기서는 화면에 쓰일 user 상태만 동기화한다.
         useAuthStore.getState().setTokens(accessToken, newRefreshToken, user);
 
-        original.headers.Authorization = `Bearer ${accessToken}`;
         return api(original);
       } catch (refreshErr) {
         console.error('[API] Token refresh failed, logging out:', refreshErr);

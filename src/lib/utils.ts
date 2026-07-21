@@ -6,13 +6,12 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getMannerRank(score: number): string {
-  if (score < 30) return '블랙컨슈머';
-  if (score < 36.5) return '뜨내기 손님';
-  if (score < 40) return '동네 이웃';
-  if (score < 60) return '단골 손님';
-  if (score < 80) return '베테랑 상인';
-  if (score < 100) return '대상인';
-  return '전설의 거상';
+  if (score < 20) return '새싹 주민';
+  if (score < 40) return '이웃 주민';
+  if (score < 60) return '단골 주민';
+  if (score < 80) return '상점 친구';
+  if (score < 100) return '인기 주민';
+  return '명예 주민';
 }
 
 export function stripMarkdown(md: string): string {
@@ -34,22 +33,16 @@ export function stripMarkdown(md: string): string {
 export function getWebSocketHttpUrl(): string {
   if (typeof window === 'undefined') return 'http://localhost:8080/ws';
   
-  const { hostname } = window.location;
-  
   if (process.env.NEXT_PUBLIC_WS_URL) {
     return process.env.NEXT_PUBLIC_WS_URL;
   }
   
-  // 로컬 개발 환경
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return 'http://localhost:8080/ws';
+  // 로컬 개발 환경 (backend는 10005 포트로 매핑됨)
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:10005/ws';
   }
   
-  // 모바일 로컬 테스트 (예: 192.168.x.x)
-  if (hostname.startsWith('192.168.') || hostname.startsWith('10.')) {
-    return `http://${hostname}:8080/ws`;
-  }
-  
-  // 리눅스 실서버 배포 환경 (포트 10005)
-  return `http://${hostname}:10005/ws`;
+  // 운영 환경: Next.js 프록시가 SockJS/WS를 제대로 처리하지 못하는 경우가 있으므로,
+  // 프론트 도메인에서 포트만 10005(백엔드 노출 포트)로 바꿔서 직접 연결
+  return `http://${window.location.hostname}:10005/ws`;
 }

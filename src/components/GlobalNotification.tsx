@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
@@ -16,24 +16,27 @@ export function GlobalNotification() {
   const user = useAuthStore((s) => s.user);
   const pathname = usePathname();
   const router = useRouter();
+  // 페이지 이동마다 소켓을 재연결하지 않도록, 최신 pathname은 ref로만 읽는다.
+  const pathnameRef = useRef(pathname);
+  useEffect(() => {
+    pathnameRef.current = pathname;
+  }, [pathname]);
 
   useEffect(() => {
-    if (!user) return;
-
-    const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+    if (!user?.id) return;
 
     const client = new Client({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      webSocketFactory: () => new (SockJS as any)(token ? `${WS_HTTP_URL}?token=${token}` : WS_HTTP_URL),
+      webSocketFactory: () => new (SockJS as any)(WS_HTTP_URL),
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
       onConnect: () => {
         client.subscribe(`/topic/user/${user.id}/chats`, (frame) => {
           const msg: ChatMessage = JSON.parse(frame.body);
-          
+
           // 현재 사용자가 해당 채팅방을 보고 있지 않은 경우에만 알림 띄우기
-          if (pathname !== `/chat/${msg.roomId}`) {
+          if (pathnameRef.current !== `/chat/${msg.roomId}`) {
             const contentPreview = msg.type === 'IMAGE' ? '사진을 보냈습니다.' : msg.content;
             
             toast.custom((t) => (
@@ -48,7 +51,7 @@ export function GlobalNotification() {
                       toast.dismiss(t);
                       router.push(`/chat/${msg.roomId}`);
                     }}
-                    className="px-4 py-2 bg-orange-500 text-white text-sm font-bold rounded-lg hover:bg-orange-600 transition-colors shrink-0"
+                    className="px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded-lg hover:bg-emerald-700 transition-colors shrink-0"
                   >
                     보기
                   </button>
@@ -73,7 +76,7 @@ export function GlobalNotification() {
                   <span className="font-bold text-gray-900 text-sm">새로운 알림</span>
                   <span className="text-gray-600 text-sm mt-0.5 line-clamp-2">{noti.message}</span>
                 </div>
-                <div className="w-2 h-2 rounded-full bg-orange-500 shrink-0 mt-1" />
+                <div className="w-2 h-2 rounded-full bg-emerald-600 shrink-0 mt-1" />
               </div>
             </div>
           ), { duration: 5000 });
@@ -91,7 +94,8 @@ export function GlobalNotification() {
     return () => {
       client.deactivate();
     };
-  }, [user, pathname, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   return null;
 }

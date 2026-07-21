@@ -33,7 +33,6 @@ export default function ChatListPage() {
   const router = useRouter();
   const qc = useQueryClient();
   const user = useAuthStore((s) => s.user);
-  const accessToken = useAuthStore((s) => s.accessToken);
 
   const { data: rooms = [], isLoading } = useQuery<ChatRoom[]>({
     queryKey: ['chatRooms'],
@@ -44,12 +43,10 @@ export default function ChatListPage() {
   // 실시간 새 메시지 감지 시 채팅방 목록 즉시 갱신
   useEffect(() => {
     if (!user?.id) return;
-    const token = accessToken || (typeof window !== 'undefined' ? localStorage.getItem('access_token') : null);
-    if (!token) return;
 
     const wsUrl = getWebSocketHttpUrl();
     const client = new Client({
-      webSocketFactory: () => new (SockJS as any)(`${wsUrl}?token=${token}`),
+      webSocketFactory: () => new (SockJS as any)(wsUrl),
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
@@ -64,7 +61,7 @@ export default function ChatListPage() {
     return () => {
       client.deactivate();
     };
-  }, [user?.id, accessToken, qc]);
+  }, [user?.id, qc]);
 
   if (isLoading) {
     return (
@@ -84,9 +81,12 @@ export default function ChatListPage() {
       </header>
 
       {rooms.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 text-gray-400">
-          <MessageCircle size={40} className="mb-3 text-gray-200" />
-          <p className="text-sm">아직 채팅 내역이 없습니다</p>
+        <div className="flex flex-col items-center justify-center py-24 text-center font-nook tracking-[1px]">
+          <div className="w-20 h-20 bg-emerald-50/50 rounded-full flex items-center justify-center mb-4">
+            <Image src="/images/logo/raccoon-mascot-hi.png" alt="no chats" width={40} height={40} className="object-contain" />
+          </div>
+          <p className="text-[17px] font-semibold text-gray-700">아직 채팅 내역이 없다구리!</p>
+          <p className="text-[15px] text-gray-500 mt-1.5">이웃들과 즐거운 거래를 시작해 보라구리!</p>
         </div>
       ) : (
         <ul>
@@ -106,7 +106,7 @@ export default function ChatListPage() {
                             <div className="w-full h-full bg-gray-200" />
                           )}
                           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                            <span className="text-white text-[9px] font-bold text-center leading-tight">삭제된<br/>상품</span>
+                            <span className="text-white text-[9px] font-bold text-center leading-tight">삭제된<br />상품</span>
                           </div>
                         </>
                       ) : room.product.thumbnailUrl ? (
@@ -139,7 +139,7 @@ export default function ChatListPage() {
 
                   {isUnread && room.unreadCount > 0 && (
                     <div className="flex-shrink-0 flex items-center ml-2">
-                      <span className="min-w-[20px] h-5 px-1.5 bg-orange-500 text-white text-[11px] font-bold rounded-full flex items-center justify-center">
+                      <span className="min-w-[20px] h-5 px-1.5 bg-emerald-600 text-white text-[11px] font-bold rounded-full flex items-center justify-center">
                         {room.unreadCount > 99 ? '99+' : room.unreadCount}
                       </span>
                     </div>

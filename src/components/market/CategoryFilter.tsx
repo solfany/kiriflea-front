@@ -26,8 +26,8 @@ export default function CategoryFilter({ value, onChange }: Props) {
           className={cn(
             'flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors',
             value === c.value
-              ? 'bg-orange-500 text-white border-orange-500'
-              : 'bg-white text-gray-600 border-gray-200 hover:border-orange-300',
+              ? 'bg-emerald-600 text-white border-emerald-600'
+              : 'bg-white text-gray-600 border-gray-200 hover:border-emerald-300',
           )}
         >
           {c.label}

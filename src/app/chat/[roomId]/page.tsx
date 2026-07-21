@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-dynamic';
 import React, { useEffect, useRef, useState } from 'react';
 import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
@@ -107,7 +108,7 @@ const renderMessageContent = (content: string, isMine: boolean = true) => {
     return (
       <div className="flex flex-col min-w-[220px]">
         <div className={cn("font-bold text-[14.5px] pb-2.5 border-b border-dashed mb-2.5 whitespace-nowrap tracking-tight", isMine ? "border-white/40 text-white" : "border-gray-300 text-gray-900")}>
-          끼리플리 안내톡 ✨
+          너굴상점 안내톡 🍃
         </div>
         <div className={cn("leading-relaxed", isMine ? "text-white" : "text-gray-800")}>
           {parts.map((part, i) => {
@@ -130,7 +131,6 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
   const router = useRouter();
   const qc = useQueryClient();
   const user = useAuthStore((s) => s.user);
-  const accessToken = useAuthStore((s) => s.accessToken);
   const { openConfirm } = useConfirmStore();
 
   const [newMessages, setNewMessages] = useState<ChatMessage[]>([]);
@@ -280,11 +280,10 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
 
   // STOMP 연결
   useEffect(() => {
-    const token = accessToken || (typeof window !== 'undefined' ? localStorage.getItem('access_token') : null);
-    if (!token) return;
+    if (!user?.id) return;
 
     const client = new Client({
-      webSocketFactory: () => new (SockJS as any)(`${WS_HTTP_URL}?token=${token}`),
+      webSocketFactory: () => new (SockJS as any)(WS_HTTP_URL),
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
@@ -345,7 +344,7 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
       client.deactivate();
       stompRef.current = null;
     };
-  }, [roomIdNum, user?.id, user?.email, accessToken, qc]);
+  }, [roomIdNum, user?.id, user?.email, qc]);
 
   const handleSend = () => {
     const content = input.trim();
@@ -617,7 +616,7 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
                     className={cn(
                       'px-3.5 py-2.5 rounded-2xl text-[14px] leading-relaxed overflow-hidden whitespace-pre-wrap',
                       isMine
-                        ? 'bg-orange-500 text-white rounded-br-sm'
+                        ? 'bg-emerald-600 text-white rounded-br-sm'
                         : 'bg-gray-100 text-gray-800 rounded-bl-sm',
                       msg.type === 'IMAGE' && 'p-0 bg-transparent'
                     )}
@@ -635,7 +634,7 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
                   </div>
                   <div className={cn("flex items-center gap-1 px-1", isMine ? "justify-end" : "justify-start")}>
                     {isMine && !msg.isRead && (
-                      <span className="text-[10px] font-bold text-orange-500">1</span>
+                      <span className="text-[10px] font-bold text-emerald-600">1</span>
                     )}
                     <span suppressHydrationWarning className="text-[10px] text-gray-400">{formatTime(msg.createdAt)}</span>
                   </div>
@@ -673,7 +672,7 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
                     }
                   }, 50);
                 }}
-                className="flex-shrink-0 px-3.5 py-1.5 bg-orange-50 text-orange-600 rounded-full text-[13px] font-medium hover:bg-orange-100 transition-colors border border-orange-100"
+                className="flex-shrink-0 px-3.5 py-1.5 bg-emerald-50 text-emerald-600 rounded-full text-[13px] font-medium hover:bg-emerald-100 transition-colors border border-emerald-100"
               >
                 {text}
               </button>
@@ -694,14 +693,15 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
           onKeyDown={handleKeyDown}
           placeholder={room?.productIsDeleted ? "삭제된 상품은 채팅할 수 없습니다" : "메시지를 입력하세요"}
           disabled={room?.productIsDeleted}
+          maxLength={2000}
           rows={1}
-          className="flex-1 resize-none border border-gray-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 max-h-32 overflow-y-auto disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
+          className="flex-1 resize-none border border-gray-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 max-h-32 overflow-y-auto disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
           style={{ lineHeight: '1.5' }}
         />
         <Button
           onClick={handleSend}
           disabled={!input.trim() || !connected || room?.productIsDeleted}
-          className="flex-shrink-0 w-10 h-10 p-0 bg-orange-500 hover:bg-orange-600 rounded-full disabled:opacity-40"
+          className="flex-shrink-0 w-10 h-10 p-0 bg-emerald-600 hover:bg-emerald-700 rounded-full disabled:opacity-40 text-white"
         >
           <Send size={16} />
         </Button>

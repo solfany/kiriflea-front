@@ -34,8 +34,8 @@ export function ProfileEditModal({ onClose }: ProfileEditModalProps) {
       // user info 갱신
       if (user) {
         useAuthStore.setState({ user: { ...user, nickname, profileImage: profileImage || '' } });
+        qc.invalidateQueries({ queryKey: ['user', user.id] });
       }
-      qc.invalidateQueries({ queryKey: ['myProfile'] });
       onClose();
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -87,7 +87,7 @@ export function ProfileEditModal({ onClose }: ProfileEditModalProps) {
 
           <div className="p-5 space-y-5">
             <div className="flex flex-col items-center">
-              <div className="relative w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center text-3xl font-bold text-orange-500 overflow-hidden cursor-pointer group border border-gray-200" onClick={() => fileInputRef.current?.click()}>
+              <div className="relative w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center text-3xl font-bold text-emerald-700 overflow-hidden cursor-pointer group border border-gray-200" onClick={() => fileInputRef.current?.click()}>
                 {profileImage ? (
                   <Image src={profileImage} alt="프로필 이미지" fill className="object-cover" sizes="80px" />
                 ) : (
@@ -110,6 +110,7 @@ export function ProfileEditModal({ onClose }: ProfileEditModalProps) {
                   id="nickname"
                   value={nickname}
                   onChange={(e) => setNickname(e.target.value)}
+                  maxLength={15}
                   className="mt-1.5 h-12 text-base rounded-xl"
                 />
               </div>
@@ -119,7 +120,7 @@ export function ProfileEditModal({ onClose }: ProfileEditModalProps) {
           <div className="p-4 border-t border-gray-100 flex gap-2">
             <Button variant="outline" className="flex-1 h-12 text-base font-semibold rounded-xl text-gray-600 border-gray-200" onClick={onClose}>취소</Button>
             <Button
-              className="flex-1 h-12 text-base font-semibold rounded-xl bg-orange-500 hover:bg-orange-600 text-white"
+              className="flex-1 h-12 text-base font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white"
               onClick={() => updateMutation.mutate()}
               disabled={updateMutation.isPending || isUploading || !nickname}
             >

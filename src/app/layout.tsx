@@ -4,14 +4,13 @@ import { Providers } from '@/lib/providers';
 import { GlobalConfirmModal } from '@/components/GlobalConfirmModal';
 
 export const metadata: Metadata = {
-  title: '우리끼리 플리마켓',
-  description: '사내 중고거래 마켓',
+  title: '모여봐요 너굴상점 ',
+  description: '너굴 사장님과 함께하는 숲속 사내 중고장터',
   manifest: '/manifest.json',
-  themeColor: '#f97316',
+  themeColor: '#46834B',
   appleWebApp: {
-    capable: true,
     statusBarStyle: 'default',
-    title: '끼리플리',
+    title: '모여봐요 너굴상점',
   },
 };
 
@@ -26,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
+        <meta name="mobile-web-app-capable" content="yes" />
         <link rel="stylesheet" as="style" crossOrigin="" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
       </head>
       <body className="font-pretendard" suppressHydrationWarning>

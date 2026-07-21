@@ -83,8 +83,8 @@ export default function FindPasswordPage() {
 
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-orange-50 mb-4">
-            <KeyRound size={28} className="text-orange-500" strokeWidth={2} />
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-50 mb-4">
+            <KeyRound size={28} className="text-emerald-600" strokeWidth={2} />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">비밀번호 찾기</h1>
           <p className="text-sm text-gray-500">
@@ -108,7 +108,7 @@ export default function FindPasswordPage() {
                 className="h-12 text-base"
               />
             </div>
-            <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 h-12 text-base font-semibold" disabled={loading || !email}>
+            <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 h-12 text-base font-semibold text-white" disabled={loading || !email}>
               {loading ? <Loader2 size={16} className="animate-spin" /> : '인증 코드 받기'}
             </Button>
           </form>
@@ -128,7 +128,7 @@ export default function FindPasswordPage() {
                 className="h-12 text-base tracking-widest text-center"
               />
             </div>
-            <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 h-12 text-base font-semibold" disabled={loading || code.length !== 6}>
+            <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 h-12 text-base font-semibold text-white" disabled={loading || code.length !== 6}>
               {loading ? <Loader2 size={16} className="animate-spin" /> : '코드 인증하기'}
             </Button>
           </form>
@@ -162,7 +162,7 @@ export default function FindPasswordPage() {
                 minLength={8}
               />
             </div>
-            <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 h-12 text-base font-semibold mt-6" disabled={loading || !newPassword || !newPasswordConfirm}>
+            <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 h-12 text-base font-semibold text-white mt-6" disabled={loading || !newPassword || !newPasswordConfirm}>
               {loading ? <Loader2 size={16} className="animate-spin" /> : '비밀번호 재설정'}
             </Button>
           </form>

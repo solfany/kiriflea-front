@@ -10,7 +10,7 @@ interface Props {
 export function MannerRankModal({ onClose }: Props) {
   return (
     <>
-      <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4" onClick={onClose}>
         <div 
           className="bg-white rounded-2xl w-full max-w-sm overflow-hidden" 
           onClick={e => e.stopPropagation()}
@@ -35,34 +35,33 @@ export function MannerRankModal({ onClose }: Props) {
               <div className="text-sm">
                 <div className="grid grid-cols-2 border-b border-gray-50">
                   <div className="p-3 text-center border-r border-gray-50 text-gray-600">100점 이상</div>
-                  <div className="p-3 text-center font-bold text-orange-500">전설의 거상</div>
+                  <div className="p-3 text-center font-extrabold text-emerald-900">명예 주민</div>
                 </div>
                 <div className="grid grid-cols-2 border-b border-gray-50">
                   <div className="p-3 text-center border-r border-gray-50 text-gray-600">80점 ~ 99.9점</div>
-                  <div className="p-3 text-center font-bold text-orange-500">대상인</div>
+                  <div className="p-3 text-center font-bold text-emerald-800">인기 주민</div>
                 </div>
                 <div className="grid grid-cols-2 border-b border-gray-50">
                   <div className="p-3 text-center border-r border-gray-50 text-gray-600">60점 ~ 79.9점</div>
-                  <div className="p-3 text-center font-bold text-orange-500">베테랑 상인</div>
+                  <div className="p-3 text-center font-bold text-emerald-700">상점 친구</div>
                 </div>
                 <div className="grid grid-cols-2 border-b border-gray-50">
                   <div className="p-3 text-center border-r border-gray-50 text-gray-600">40점 ~ 59.9점</div>
-                  <div className="p-3 text-center font-bold text-orange-500">단골 손님</div>
-                </div>
-                <div className="grid grid-cols-2 border-b border-gray-50 bg-orange-50/30">
-                  <div className="p-3 text-center border-r border-gray-50 text-gray-600 flex flex-col items-center justify-center gap-1">
-                    <span>36.5점 ~ 39.9점</span>
-                    <span className="text-[10px] text-orange-500 font-medium bg-orange-100 px-1.5 py-0.5 rounded-sm">시작 점수 (36.5점)</span>
-                  </div>
-                  <div className="p-3 text-center font-bold text-orange-500">동네 이웃</div>
+                  <div className="p-3 text-center font-bold text-emerald-600">단골 주민</div>
                 </div>
                 <div className="grid grid-cols-2 border-b border-gray-50">
-                  <div className="p-3 text-center border-r border-gray-50 text-gray-600">30점 ~ 36.4점</div>
-                  <div className="p-3 text-center font-bold text-orange-500">뜨내기 손님</div>
+                  <div className="p-3 text-center border-r border-gray-50 text-gray-600">20점 ~ 39.9점</div>
+                  <div className="p-3 text-center font-bold text-emerald-500">이웃 주민</div>
                 </div>
-                <div className="grid grid-cols-2">
-                  <div className="p-3 text-center border-r border-gray-50 text-gray-600">0점 ~ 29.9점</div>
-                  <div className="p-3 text-center font-bold text-orange-500">블랙컨슈머</div>
+                <div className="grid grid-cols-2 border-emerald-100 bg-emerald-50 relative">
+                  {/* 하이라이트 포인트 바 */}
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-400 rounded-r-md"></div>
+                  <div className="p-3 text-center border-r border-emerald-100 text-emerald-800 font-semibold flex items-center justify-center">
+                    0점 ~ 19.9점
+                  </div>
+                  <div className="p-3 text-center font-bold text-emerald-400 flex items-center justify-center">
+                    새싹 주민
+                  </div>
                 </div>
               </div>
             </div>

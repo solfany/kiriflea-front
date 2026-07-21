@@ -122,7 +122,7 @@ export interface Comment {
 // ── Auction ───────────────────────────────────────────────────
 export interface Bid {
   id: number;
-  bidder: { id: number; nickname: string };
+  bidder: { id: number; nickname: string; profileImage?: string };
   amount: number;
   createdAt: string;
 }

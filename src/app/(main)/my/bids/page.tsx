@@ -37,7 +37,7 @@ function BidCard({ bid }: { bid: MyBid }) {
       </div>
       <div className="flex items-center gap-2 text-[13px]">
         <span className="text-gray-500">현재 최고가</span>
-        <span className={cn('font-bold', bid.isWinning ? 'text-orange-500' : 'text-gray-700')}>
+        <span className={cn('font-bold', bid.isWinning ? 'text-emerald-700' : 'text-gray-700')}>
           {bid.currentHighestBid.toLocaleString()}원
         </span>
         <div className="ml-1 flex items-center">
@@ -50,7 +50,7 @@ function BidCard({ bid }: { bid: MyBid }) {
               <span className="text-gray-400 font-medium text-[12px]">낙찰 실패</span>
             )
           ) : bid.isWinning ? (
-            <span className="flex items-center gap-0.5 text-orange-500 font-medium text-[12px]">
+            <span className="flex items-center gap-0.5 text-emerald-700 font-medium text-[12px]">
               <Trophy className="w-3 h-3" /> 최고 입찰자
             </span>
           ) : (
@@ -133,15 +133,15 @@ export default function MyBidsPage() {
 
       {/* Empty state */}
       {!isLoading && bids.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-32 text-center">
-          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-4xl mb-4">
-            🔨
+        <div className="flex flex-col items-center justify-center py-32 text-center font-nook tracking-[1px]">
+          <div className="w-20 h-20 bg-emerald-50/50 rounded-full flex items-center justify-center mb-4">
+            <Image src="/images/logo/raccoon-mascot-hi.png" alt="no bids" width={40} height={40} className="object-contain" />
           </div>
-          <p className="text-base font-semibold text-gray-700">입찰 내역이 없어요</p>
-          <p className="text-sm text-gray-400 mt-1.5">흥미로운 경매 상품을 찾아보고 입찰에 참여해보세요!</p>
+          <p className="text-[17px] font-semibold text-gray-700">입찰 내역이 없다구리!</p>
+          <p className="text-[15px] text-gray-500 mt-1.5">경매 상품에 참여해 보라구리!</p>
           <Link
             href="/"
-            className="mt-6 px-6 py-3 bg-orange-500 text-white text-[15px] font-bold rounded-full shadow-sm hover:bg-orange-600 active:scale-95 transition-all"
+            className="mt-6 px-6 py-3 bg-emerald-600 text-white text-[15px] font-bold rounded-full shadow-sm hover:bg-emerald-700 active:scale-95 transition-all font-sans tracking-normal"
           >
             경매 상품 보기
           </Link>

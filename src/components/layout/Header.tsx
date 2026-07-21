@@ -1,9 +1,10 @@
 'use client';
 import Link from 'next/link';
-import { Search, MessageCircleHeart } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useAuthStore } from '@/store/auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { HeaderNotifications } from './HeaderNotifications';
+import { NookLogo } from '@/components/ui/NookLogo';
 
 export default function Header() {
   const user = useAuthStore((s) => s.user);
@@ -12,20 +13,9 @@ export default function Header() {
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
       <div className="max-w-screen-md mx-auto px-4 h-[52px] flex items-center justify-between">
 
-        {/* 로고 */}
+        {/* 로고 (로그인 했을 때도 로고 이미지 + "모여봐요 너굴상점" 텍스트가 표시됨) */}
         <Link href="/" className="flex items-center gap-1.5 group">
-          <div className="flex items-center justify-center w-7 h-7 rounded-xl bg-orange-50 transition-transform group-hover:scale-105 shrink-0">
-            <MessageCircleHeart
-              size={19}
-              className="text-orange-500"
-              strokeWidth={2.2}
-            />
-          </div>
-          <div className="flex items-baseline tracking-tight">
-            <span className="font-extrabold text-[16px] text-gray-800">우리</span>
-            <span className="font-black text-[17px] text-orange-500 ml-[1px]">끼리플리</span>
-            <span className="font-extrabold text-[16px] text-gray-800 ml-[1px]">마켓</span>
-          </div>
+          <NookLogo size="md" variant="logo" />
         </Link>
 
         {/* 우측 액션 */}
@@ -48,7 +38,7 @@ export default function Header() {
                       className="object-cover"
                     />
                   )}
-                  <AvatarFallback className="bg-orange-100 text-orange-600 text-[10px] font-semibold">
+                  <AvatarFallback className="bg-emerald-100 text-emerald-700 text-[10px] font-semibold">
                     {user.nickname.slice(0, 2)}
                   </AvatarFallback>
                 </Avatar>

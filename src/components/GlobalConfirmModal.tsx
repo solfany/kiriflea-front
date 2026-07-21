@@ -26,7 +26,7 @@ export function GlobalConfirmModal() {
             {options.cancelText || '취소'}
           </button>
           <button
-            className="flex-1 py-3.5 rounded-xl text-white font-semibold bg-orange-500 hover:bg-orange-600 transition-colors text-[15px]"
+            className="flex-1 py-3.5 rounded-xl text-white font-semibold bg-emerald-600 hover:bg-emerald-700 transition-colors text-[15px]"
             onClick={() => {
               options.onConfirm();
               closeConfirm();
