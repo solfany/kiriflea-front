@@ -44,14 +44,6 @@ export function NookLogo({
   return (
     <span className={`inline-flex items-center select-none ${className}`}>
       {/* Raccoon Logo Image */}
-
-      {showText && (
-        <span className="inline-flex items-baseline tracking-[1px] font-nook mt-1 font-bold">
-          <span className={`${subTextSizes[size]} text-gray-800`}>모여봐요</span>
-          <span className={`${textSizes[size]} text-emerald-600 ml-[3px]`}>너굴</span>
-          <span className={`${subTextSizes[size]} text-gray-800 ml-[1px]`}>상점</span>
-        </span>
-      )}
       <span className="relative shrink-0 inline-flex items-center justify-center">
         <Image
           src={imageSrcs[variant]}
@@ -63,6 +55,13 @@ export function NookLogo({
         />
       </span>
 
+      {showText && (
+        <span className="inline-flex items-baseline tracking-[1px] font-nook mt-1 font-bold">
+          <span className={`${subTextSizes[size]} text-gray-800`}>모여봐요</span>
+          <span className={`${textSizes[size]} text-emerald-600 ml-[3px]`}>너굴</span>
+          <span className={`${subTextSizes[size]} text-gray-800 ml-[1px]`}>상점</span>
+        </span>
+      )}
     </span>
   );
 }
