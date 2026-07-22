@@ -13,7 +13,12 @@
   font-family: 'OngleipKonkon', sans-serif;
 }
 
+
 @layer utilities {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
   .text-balance {
     text-wrap: balance;
   }

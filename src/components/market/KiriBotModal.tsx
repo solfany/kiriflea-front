@@ -99,10 +99,10 @@ export default function KiriBotModal({ onClose }: KiriBotModalProps) {
   return (
     <>
       <div className="fixed inset-0 z-[90] bg-black/40 backdrop-blur-sm sm:bg-transparent sm:backdrop-blur-none transition-all duration-300" onClick={onClose} />
-      <div className="fixed inset-x-0 bottom-0 sm:inset-auto sm:bottom-24 sm:right-6 z-[100] flex justify-center sm:block p-0 pointer-events-none transition-all duration-300">
-        {/* 바텀시트(모바일) or 우측 하단 플로팅 챗봇(PC) 디자인 */}
+      <div className="fixed inset-0 sm:inset-auto sm:bottom-24 sm:right-6 z-[100] flex justify-center sm:block p-0 pointer-events-none transition-all duration-300">
+        {/* 모바일 전체화면 or 우측 하단 플로팅 챗봇(PC) 디자인 */}
         <div
-          className="w-full sm:w-[380px] h-[85vh] sm:h-[600px] bg-white sm:rounded-2xl rounded-t-3xl shadow-2xl sm:border sm:border-gray-100 flex flex-col overflow-hidden animate-in slide-in-from-bottom-full duration-300 pointer-events-auto"
+          className="w-full sm:w-[380px] h-[100dvh] sm:h-[600px] bg-white sm:rounded-2xl shadow-2xl sm:border sm:border-gray-100 flex flex-col overflow-hidden animate-in slide-in-from-bottom-full duration-300 pointer-events-auto"
           onClick={e => e.stopPropagation()}
         >
           {/* 헤더 */}

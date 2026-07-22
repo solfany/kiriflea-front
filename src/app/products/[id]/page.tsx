@@ -922,9 +922,9 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
             })}
           </div>
           {!(product.isDeleted || (product as any).deleted) && product.status !== 'SOLD' && user && (
-            <div className="flex items-start gap-2">
-              <label className="flex items-center gap-1.5 text-xs text-gray-500 mt-2.5 flex-shrink-0 cursor-pointer">
-                <input type="checkbox" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} className="w-3 h-3" />
+            <div className="flex items-center gap-2">
+              <label className="flex items-center gap-1.5 text-xs text-gray-500 flex-shrink-0 cursor-pointer">
+                <input type="checkbox" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} className="w-3.5 h-3.5" />
                 비공개
               </label>
               <input
@@ -932,11 +932,11 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="댓글을 입력하세요"
                 maxLength={1000}
-                className="flex-1 border border-gray-200 rounded-xl px-3 h-10 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                className="flex-1 min-w-0 border border-gray-200 rounded-xl px-3 h-10 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
                 onKeyDown={(e) => { if (e.key === 'Enter' && comment.trim()) commentMutation.mutate(); }}
               />
               <Button size="sm" onClick={() => commentMutation.mutate()} disabled={!comment.trim() || commentMutation.isPending}
-                className="bg-emerald-600 hover:bg-emerald-700 text-sm font-semibold h-10 px-4 rounded-xl text-white">
+                className="bg-emerald-600 hover:bg-emerald-700 text-sm font-semibold h-10 px-4 rounded-xl text-white shrink-0">
                 등록
               </Button>
             </div>

@@ -84,6 +84,15 @@ api.interceptors.response.use(
         return api(original);
       } catch (refreshErr) {
         console.error('[API] Token refresh failed, logging out:', refreshErr);
+        
+        // 401 발생 시, 프론트 상태만 지우면 쿠키가 남아 무한 리다이렉트가 발생할 수 있음
+        // 백엔드에 명시적으로 로그아웃을 요청해 쿠키를 완전히 지운다
+        try {
+          await api.post('/api/auth/logout', {}, { withCredentials: true });
+        } catch (logoutErr) {
+          console.error('[API] Clear cookie failed:', logoutErr);
+        }
+
         useAuthStore.getState().clearAuth();
         if (typeof window !== 'undefined') {
           window.location.href = '/login';

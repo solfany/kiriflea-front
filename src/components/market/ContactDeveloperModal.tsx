@@ -99,7 +99,7 @@ export function ContactDeveloperModal({ onClose }: ContactDeveloperModalProps) {
               </div>
               <DeveloperEmail />
               <textarea
-                className="w-full h-32 p-3 text-sm border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-colors"
+                className="w-full h-32 p-3 text-sm border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-colors font-sans tracking-normal"
                 placeholder="여기에 문의 내용을 작성해주세요..."
                 value={content}
                 onChange={e => setContent(e.target.value)}

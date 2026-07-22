@@ -72,7 +72,7 @@ const nextConfig = {
       "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
       "img-src 'self' data: blob: https://api.dicebear.com https://*.amazonaws.com http://localhost:8080 http://192.168.0.25:8080 http://211.234.108.224:10005",
       "font-src 'self' data: https://cdn.jsdelivr.net",
-      "connect-src 'self' ws: wss: http://localhost:8080 http://192.168.0.25:8080 http://211.234.108.224:10005 https://cdn.jsdelivr.net",
+      "connect-src 'self' ws: wss: http://localhost:8080 http://localhost:10005 http://192.168.0.25:8080 http://192.168.0.25:10005 http://211.234.108.224:10005 https://cdn.jsdelivr.net",
       "worker-src 'self' blob:",
       "frame-ancestors 'self'",
       "base-uri 'self'",

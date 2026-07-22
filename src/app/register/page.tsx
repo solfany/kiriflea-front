@@ -101,7 +101,6 @@ export default function RegisterPage() {
         email,
         verificationCode: code,
         password,
-        name: nickname,
         nickname,
         phone: phone || undefined
       });

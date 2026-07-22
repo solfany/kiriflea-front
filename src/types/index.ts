@@ -2,7 +2,6 @@
 export interface User {
   id: number;
   email: string;
-  name: string;
   nickname: string;
   profileImage?: string;
   phone?: string;
@@ -22,7 +21,6 @@ export interface RegisterRequest {
   email: string;
   verificationCode: string;
   password: string;
-  name: string;
   nickname: string;
   phone?: string;
 }

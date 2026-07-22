@@ -26,19 +26,19 @@ export default function GuideListPage() {
             {i > 0 && <div className="h-px bg-gray-100/70 w-full" />}
             <Link 
               href={`/my/guide/${guide.id}`}
-              className="group flex gap-4 px-4 sm:px-5 py-5 hover:bg-gray-50/50 transition-colors items-start"
+              className="group flex gap-3 px-5 py-5 sm:px-6 hover:bg-gray-50/80 active:bg-gray-100 transition-colors items-start"
             >
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-100 transition-all duration-300">
-                <Image src="/images/logo/raccoon-mascot-logo.png" alt="logo" width={24} height={24} className="object-contain" />
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-100 group-hover:scale-105 transition-all duration-300 shadow-sm border border-emerald-100/50">
+                <Image src="/images/logo/raccoon-mascot-logo.png" alt="logo" width={28} height={28} className="object-contain drop-shadow-sm" />
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2 mb-1.5">
-                  <h2 className="font-bold text-gray-800 text-[15px] sm:text-[16px] group-hover:text-emerald-600 transition-colors truncate">
+              <div className="flex-1 min-w-0 pt-0.5">
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <h2 className="font-bold text-gray-900 text-[16px] sm:text-[17px] group-hover:text-emerald-700 transition-colors truncate tracking-tight">
                     {guide.title}
                   </h2>
-                  <ChevronRight size={16} className="text-gray-300 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all self-center" />
+                  <ChevronRight size={18} className="text-gray-300 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all self-center shrink-0" />
                 </div>
-                <p className="text-xs sm:text-sm text-gray-400 leading-relaxed line-clamp-1">
+                <p className="text-[13px] sm:text-[14px] text-gray-500 leading-snug line-clamp-1 break-keep pr-2 sm:pr-4">
                   {guide.description}
                 </p>
               </div>

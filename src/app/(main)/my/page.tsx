@@ -73,8 +73,14 @@ export default function MyPage() {
   };
 
   useEffect(() => {
-    if (mounted && !user) router.replace('/login');
-  }, [mounted, user, router]);
+    if (mounted && !user) {
+      // 로컬 스토리지(user)는 지워졌는데 쿠키(token)가 남아있어서 미들웨어에서 튕기는 현상 방지
+      // 백엔드에 명시적으로 로그아웃을 요청해 쿠키를 완전히 삭제하고 이동
+      logout().catch(() => {}).finally(() => {
+        window.location.href = '/login';
+      });
+    }
+  }, [mounted, user]);
 
   if (!mounted || !user) return null;
 
@@ -143,7 +149,7 @@ export default function MyPage() {
               href={href}
               className="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 transition-colors"
             >
-              <Image src="/images/logo/raccoon-mascot-logo-sm.png" alt="logo" width={18} height={18} className="w-[18px] h-[18px] object-contain" />
+              <Image src="/images/logo/raccoon-mascot-logo-sm.png" alt="logo" width={18} height={18} className="w-auto h-auto object-contain" />
               <span className="flex-1 text-sm font-medium text-gray-800">{label}</span>
               <ChevronRight size={16} className="text-gray-300" />
             </Link>
@@ -157,7 +163,7 @@ export default function MyPage() {
           href="/my/guide"
           className="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 transition-colors border-b border-gray-50"
         >
-          <Image src="/images/logo/raccoon-mascot-face.png" alt="logo" width={25} height={25} className="w-[25px] h-[25px] object-contain" />
+          <Image src="/images/logo/raccoon-mascot-face.png" alt="logo" width={25} height={25} className="w-auto h-auto object-contain" />
           <span className="flex-1 text-sm font-medium text-gray-800">서비스 사용 가이드</span>
           <ChevronRight size={16} className="text-gray-300" />
         </Link>
@@ -175,7 +181,7 @@ export default function MyPage() {
       <footer className="mt-6 mb-8 px-2">
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2 grayscale opacity-60">
-            <Image src="/images/logo/raccoon-mascot-logo-sm.png" alt="logo" width={20} height={20} className="w-[20px] h-[20px] object-contain" />
+            <Image src="/images/logo/raccoon-mascot-logo-sm.png" alt="logo" width={20} height={20} className="w-auto h-auto object-contain" />
             <span className="font-bold text-base text-gray-400 font-nook tracking-[1px]">모여봐요 너굴상점</span>
           </div>
 
