@@ -426,23 +426,43 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
               <DropdownMenuItem
                 className="flex items-center gap-2 p-3 hover:bg-gray-50 cursor-pointer rounded-lg text-sm text-gray-700 font-medium"
                 onClick={async () => {
-                  const shareData = {
-                    title: product.title,
-                    text: product.description,
-                    url: window.location.href,
+                  const url = window.location.href;
+                  const shareData = { title: product.title, text: product.description, url };
+                  
+                  const fallbackCopy = (text: string) => {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    textArea.style.position = 'absolute';
+                    textArea.style.opacity = '0';
+                    document.body.prepend(textArea);
+                    textArea.select();
+                    try {
+                      document.execCommand('copy');
+                    } finally {
+                      textArea.remove();
+                    }
                   };
+
+                  const copyText = async (text: string) => {
+                    if (navigator.clipboard && window.isSecureContext) {
+                      await navigator.clipboard.writeText(text);
+                    } else {
+                      fallbackCopy(text);
+                    }
+                  };
+
                   if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
                     try {
                       await navigator.share(shareData);
                     } catch (err) {
                       if (err instanceof Error && err.name !== 'AbortError') {
-                        navigator.clipboard.writeText(window.location.href);
-                        toast.success('상품 링크가 복사되었습니다.');
+                        try { await copyText(url); toast.success('상품 링크가 복사되었습니다.'); } 
+                        catch { toast.error('링크 복사에 실패했습니다.'); }
                       }
                     }
                   } else {
                     try {
-                      await navigator.clipboard.writeText(window.location.href);
+                      await copyText(url);
                       toast.success('상품 링크가 복사되었습니다.');
                     } catch {
                       toast.error('링크 복사에 실패했습니다.');
