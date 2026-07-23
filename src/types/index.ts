@@ -65,6 +65,7 @@ export interface Product {
   buyerId?: number;
   auctionStatus?: string;
   createdAt: string;
+  participantCount?: number;
 }
 
 export interface ProductListItem {
@@ -87,6 +88,7 @@ export interface ProductListItem {
   partnerNickname?: string;
   isReviewed?: boolean;
   bidCount?: number;
+  participantCount?: number;
 }
 
 export interface ProductCursor {

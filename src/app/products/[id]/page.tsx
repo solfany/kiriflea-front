@@ -428,7 +428,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                 onClick={async () => {
                   const url = window.location.href;
                   const shareData = { title: product.title, text: product.description, url };
-                  
+
                   const fallbackCopy = (text: string) => {
                     const textArea = document.createElement('textarea');
                     textArea.value = text;
@@ -456,7 +456,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                       await navigator.share(shareData);
                     } catch (err) {
                       if (err instanceof Error && err.name !== 'AbortError') {
-                        try { await copyText(url); toast.success('상품 링크가 복사되었습니다.'); } 
+                        try { await copyText(url); toast.success('상품 링크가 복사되었습니다.'); }
                         catch { toast.error('링크 복사에 실패했습니다.'); }
                       }
                     }
@@ -642,7 +642,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
               )}
 
               {/* 입찰 순위 리더보드 (좌측: 시상대, 우측: 1위~전체 입찰자 목록) */}
-              {bids.length > 0 && (() => {
+              {(() => {
                 // 한 유저당 최고 입찰가 1개만 추출하여 내림차순 정렬
                 const uniqueBids = Array.from(
                   bids.reduce((map, bid) => {
@@ -704,7 +704,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
 
                         {/* 1위 (Center - 최고 높이) */}
                         <div className="flex flex-col items-center flex-1 max-w-[110px] group h-full justify-end">
-                          {top1 && (
+                          {top1 ? (
                             <>
                               <Link href={`/users/${top1.bidder.id}`} className="flex flex-col items-center group-hover:-translate-y-1 transition-transform mb-2 z-10 relative">
                                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 z-20 animate-bounce">
@@ -727,6 +727,8 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                                 1
                               </div>
                             </>
+                          ) : (
+                            <div className="w-full bg-gray-50 rounded-t-xl flex items-start justify-center pt-3 font-black text-gray-200 text-4xl h-20">1</div>
                           )}
                         </div>
 
@@ -765,56 +767,66 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                           onScroll={handleListScroll}
                           ref={listRef}
                         >
-                          {uniqueBids.map((bid, idx) => {
-                            const rank = idx + 1;
-                            const isTop1 = rank === 1;
-                            const isTop2 = rank === 2;
-                            const isTop3 = rank === 3;
+                          {uniqueBids.length > 0 ? (
+                            uniqueBids.map((bid, idx) => {
+                              const rank = idx + 1;
+                              const isTop1 = rank === 1;
+                              const isTop2 = rank === 2;
+                              const isTop3 = rank === 3;
 
-                            return (
-                              <div
-                                key={bid.id}
-                                className={cn(
-                                  "flex items-center justify-between rounded-2xl px-3 py-2.5 border transition-all text-xs",
-                                  // 1등 border 초록색으로 해줘야지 
-                                  isTop1 ? "bg-emerald-50 border border-emerald-400" :
-                                    isTop2 ? "bg-white border-gray-200" :
-                                      isTop3 ? "bg-white border-gray-100" : "bg-transparent border-gray-50"
-                                )}
-                              >
-                                <div className="flex items-center gap-2.5 min-w-0">
-                                  <div
-                                    className={cn(
-                                      "w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black shrink-0 relative",
-                                      isTop1 ? "bg-emerald-500 text-white shadow-sm" :
-                                        isTop2 ? "bg-emerald-400 text-white" :
-                                          isTop3 ? "bg-emerald-300 text-white" : "bg-gray-100 text-gray-500"
-                                    )}
-                                  >
-                                    {/* {isTop1 && <span className="absolute -top-[12px] -right-[5px] text-[12px] rotate-[15deg]">👑</span>} */}
-                                    {rank}
+                              return (
+                                <div
+                                  key={bid.id}
+                                  className={cn(
+                                    "flex items-center justify-between rounded-2xl px-3 py-2.5 border transition-all text-xs",
+                                    // 1등 border 초록색으로 해줘야지 
+                                    isTop1 ? "bg-emerald-50 border border-emerald-400" :
+                                      isTop2 ? "bg-white border-gray-200" :
+                                        isTop3 ? "bg-white border-gray-100" : "bg-transparent border-gray-50"
+                                  )}
+                                >
+                                  <div className="flex items-center gap-2.5 min-w-0">
+                                    <div
+                                      className={cn(
+                                        "w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black shrink-0 relative",
+                                        isTop1 ? "bg-emerald-500 text-white shadow-sm" :
+                                          isTop2 ? "bg-emerald-400 text-white" :
+                                            isTop3 ? "bg-emerald-300 text-white" : "bg-gray-100 text-gray-500"
+                                      )}
+                                    >
+                                      {/* {isTop1 && <span className="absolute -top-[12px] -right-[5px] text-[12px] rotate-[15deg]">👑</span>} */}
+                                      {rank}
+                                    </div>
+                                    <Link
+                                      href={`/users/${bid.bidder.id}`}
+                                      className="flex items-center gap-1.5 min-w-0 hover:opacity-85 transition-opacity group cursor-pointer"
+                                    >
+                                      <Avatar className="w-5.5 h-5.5 border border-gray-200/60 shrink-0">
+                                        <AvatarImage src={bid.bidder.profileImage || undefined} alt={bid.bidder.nickname} />
+                                        <AvatarFallback className="text-[9px] bg-gray-100 text-gray-700 font-bold">
+                                          {bid.bidder.nickname ? bid.bidder.nickname.slice(0, 1) : 'U'}
+                                        </AvatarFallback>
+                                      </Avatar>
+                                      <span className={cn("truncate group-hover:text-emerald-600 transition-colors duration-200", isTop1 ? "font-bold text-gray-900" : "font-medium text-gray-700")}>
+                                        {bid.bidder.nickname}
+                                      </span>
+                                    </Link>
                                   </div>
-                                  <Link
-                                    href={`/users/${bid.bidder.id}`}
-                                    className="flex items-center gap-1.5 min-w-0 hover:opacity-85 transition-opacity group cursor-pointer"
-                                  >
-                                    <Avatar className="w-5.5 h-5.5 border border-gray-200/60 shrink-0">
-                                      <AvatarImage src={bid.bidder.profileImage || undefined} alt={bid.bidder.nickname} />
-                                      <AvatarFallback className="text-[9px] bg-gray-100 text-gray-700 font-bold">
-                                        {bid.bidder.nickname ? bid.bidder.nickname.slice(0, 1) : 'U'}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                    <span className={cn("truncate group-hover:text-emerald-600 transition-colors duration-200", isTop1 ? "font-bold text-gray-900" : "font-medium text-gray-700")}>
-                                      {bid.bidder.nickname}
-                                    </span>
-                                  </Link>
+                                  <span className={cn("font-bold tracking-tight shrink-0", isTop1 ? "text-nook-brown font-black" : "text-gray-800")}>
+                                    {bid.amount.toLocaleString()}원
+                                  </span>
                                 </div>
-                                <span className={cn("font-bold tracking-tight shrink-0", isTop1 ? "text-nook-brown font-black" : "text-gray-800")}>
-                                  {bid.amount.toLocaleString()}원
-                                </span>
+                              );
+                            })
+                          ) : (
+                            <div className="flex flex-col items-center justify-center h-full text-center font-nook tracking-[1px] min-h-[140px] py-2">
+                              <div className="w-12 h-12 bg-emerald-50/70 rounded-full flex items-center justify-center mb-2">
+                                <Image src="/images/logo/raccoon-mascot-hi.png" alt="no bids" width={26} height={26} className="object-contain" />
                               </div>
-                            );
-                          })}
+                              <span className="text-[13px] font-semibold text-gray-700">아직 입찰자가 없다구리!</span>
+                              <span className="text-[11px] text-gray-500 mt-1">아래의 입찰 버튼을 눌러 가장 먼저 입찰해 보라구리!</span>
+                            </div>
+                          )}
 
                         </div>
 

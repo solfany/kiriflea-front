@@ -124,7 +124,7 @@ function ProductCard({ product, onLikeToggle, actionMenu, bottomAction, customPr
                     {product.currentBid?.toLocaleString() ?? 0}원
                   </p>
                 </div>
-                {product.bidCount != null && product.bidCount > 0 && (
+                {product.participantCount != null && product.participantCount > 0 && (
                   <span className={cn('text-[12px] font-bold mt-0.5 flex items-center', product.status === 'SOLD' ? 'text-gray-400' : 'text-nook-brown')}>
                     <Image
                       src="/images/logo/raccoon-mascot-logo.png"
@@ -133,7 +133,7 @@ function ProductCard({ product, onLikeToggle, actionMenu, bottomAction, customPr
                       height={20}
                       className="object-contain shrink-0"
                     />
-                    현재 {product.bidCount}명 참여 중
+                    현재 {product.participantCount}명 참여 중
                   </span>
                 )}
               </div>

@@ -194,10 +194,12 @@ export default function UserProfilePage() {
               <ProductCard key={product.id} product={product} />
             ))
           ) : (
-            <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-              <div className="text-4xl mb-3">📭</div>
-              <p className="text-sm">
-                {activeTab === 'SOLD' ? '판매 완료된 상품이 없습니다.' : '판매 중인 상품이 없습니다.'}
+            <div className="flex flex-col items-center justify-center py-16 text-center font-nook tracking-[1px]">
+              <div className="w-16 h-16 bg-emerald-50/50 rounded-full flex items-center justify-center mb-3">
+                <Image src="/images/logo/raccoon-mascot-hi.png" alt="no products" width={32} height={32} className="object-contain" />
+              </div>
+              <p className="text-[16px] font-semibold text-gray-700">
+                {activeTab === 'SOLD' ? '판매 완료된 상품이 없다구리!' : '판매 중인 상품이 없다구리!'}
               </p>
             </div>
           )}
