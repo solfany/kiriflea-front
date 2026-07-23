@@ -127,11 +127,18 @@
   * {
     border-color: var(--border);
   }
-  /* 운영 환경에서 아이콘/SVG가 거대하게 노출되는 현상 방지 */
+  /* 운영 환경에서 아이콘/SVG가 거대하게 노출되는 현상 방지 (SSR FOUC 완벽 방지) */
   svg {
     display: inline-block;
     vertical-align: middle;
     max-width: 100%;
+    height: auto;
+  }
+  
+  /* Tailwind CSS 로드 전 초기 크기 제한을 두어 거대하게 번쩍이는 현상 차단 */
+  svg.lucide {
+    width: 1.5rem;
+    height: 1.5rem;
   }
   body {
     background-color: var(--background);

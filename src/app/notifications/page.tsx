@@ -56,7 +56,8 @@ export default function NotificationsPage() {
   const fetchNotifications = async () => {
     try {
       const res = await api.get<{ items: Notification[]; unreadCount: number }>('/api/notifications');
-      setNotifications(res.data.items || []);
+      const sorted = (res.data.items || []).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      setNotifications(sorted);
     } catch {
       // silent
     } finally {
@@ -130,16 +131,16 @@ export default function NotificationsPage() {
             <ChevronLeft size={24} className="text-gray-800" />
           </button>
           <h1 className="text-lg font-bold text-gray-900 absolute left-1/2 -translate-x-1/2">알림</h1>
-          <div className="flex items-center gap-3 pr-2">
+          <div className="flex items-center gap-2 pr-2">
             <button
               onClick={handleReadAll}
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+              className="px-2.5 py-1.5 text-[13px] font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors"
             >
               모두 읽기
             </button>
             <button
               onClick={handleDeleteAll}
-              className="text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
+              className="px-2.5 py-1.5 text-[13px] font-semibold bg-red-50 hover:bg-red-100 text-red-600 rounded-md transition-colors"
             >
               모두 삭제
             </button>

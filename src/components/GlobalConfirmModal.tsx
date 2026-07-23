@@ -1,8 +1,24 @@
 'use client';
+import { useEffect } from 'react';
 import { useConfirmStore } from '@/store/confirm';
 
 export function GlobalConfirmModal() {
   const { isOpen, options, closeConfirm } = useConfirmStore();
+
+  useEffect(() => {
+    if (!isOpen || !options) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        options.onConfirm();
+        closeConfirm();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, options, closeConfirm]);
 
   if (!isOpen || !options) return null;
 

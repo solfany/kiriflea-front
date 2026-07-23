@@ -22,7 +22,8 @@ import {
   Heart, ChevronLeft, ChevronRight, MessageCircle,
   Eye, Gavel, Wifi, WifiOff, Timer, Trash2, Lock, MoreVertical, Edit2, Share2,
   Flag,
-  Package
+  Package,
+  ChevronUp
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { Product, AuctionUpdateMessage } from '@/types';
@@ -57,10 +58,16 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState('');
   const [editIsPrivate, setEditIsPrivate] = useState(false);
-  const [bidAmount, setBidAmount] = useState('');
+
 
   // Fun elements state
   const [timeLeft, setTimeLeft] = useState<string>('');
+
+  const listRef = useRef<HTMLDivElement>(null);
+  const [showListScrollTop, setShowListScrollTop] = useState(false);
+  const handleListScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    setShowListScrollTop(e.currentTarget.scrollTop > 50);
+  };
 
   // Review state
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -200,17 +207,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
     }
   });
 
-  const cancelTopBidMutation = useMutation({
-    mutationFn: () => api.delete(`/api/products/${productId}/auctions/top-bid`),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['product', productId] });
-      qc.invalidateQueries({ queryKey: ['bids', productId] });
-      toast.success('최고 입찰 내역이 취소되었습니다.');
-    },
-    onError: (err: unknown) => {
-      toast.error((err as any)?.response?.data?.message || '입찰 취소에 실패했습니다.');
-    }
-  });
+
 
   const completeTradeMutation = useMutation({
     mutationFn: () => api.post('/api/trades', {
@@ -256,14 +253,23 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
   });
 
   const bidMutation = useMutation({
-    mutationFn: () => placeBid(productId, Number(bidAmount)),
+    mutationFn: (amount: number) => placeBid(productId, amount),
     onSuccess: () => {
-      setBidAmount('');
       toast.success('입찰 완료!');
       qc.invalidateQueries({ queryKey: ['bids', productId] });
       qc.invalidateQueries({ queryKey: ['product', productId] });
     },
     onError: () => toast.error('입찰에 실패했습니다. 현재 최고가보다 높은 금액을 입력해주세요.'),
+  });
+
+  const withdrawBidMutation = useMutation({
+    mutationFn: () => api.delete(`/api/products/${productId}/auctions/my-bid`),
+    onSuccess: () => {
+      toast.success('입찰이 철회되었습니다.');
+      qc.invalidateQueries({ queryKey: ['bids', productId] });
+      qc.invalidateQueries({ queryKey: ['product', productId] });
+    },
+    onError: (err: any) => toast.error(err.response?.data?.message || '입찰 철회에 실패했습니다.'),
   });
 
   // STOMP real-time subscription for auction products
@@ -648,95 +654,97 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
 
                       {/* 좌측: Top 1, 2, 3위 시상대 뷰 (기둥 없음, 아바타 대형화, 1위 최고 높이 단차) */}
-                      <div className="md:col-span-6 bg-gradient-to-b from-amber-50/40 via-white to-gray-50/50 rounded-xl p-3 border border-gray-100 flex items-end justify-center gap-2 sm:gap-4 h-52 pb-3">
+                      <div className="md:col-span-6 bg-gradient-to-b from-emerald-50/40 via-white to-emerald-50/10 rounded-xl px-2 sm:px-4 pt-4 border border-emerald-100 flex items-end justify-center gap-2 sm:gap-4 h-72 overflow-hidden">
                         {/* 2위 (Left - 중간 높이) */}
-                        {top2 ? (
-                          <div className="flex flex-col items-center flex-1 max-w-[80px] group" style={{ marginBottom: '20px' }}>
-                            <Link href={`/users/${top2.bidder.id}`} className="flex flex-col items-center group-hover:scale-105 transition-transform">
-                              <div className="relative mb-1">
-                                <Avatar className="w-12 h-12 border-2 border-slate-300 shadow-sm">
+                        <div className="flex flex-col items-center flex-1 max-w-[90px] group h-full justify-end">
+                          {top2 ? (
+                            <>
+                              <Link href={`/users/${top2.bidder.id}`} className="flex flex-col items-center group-hover:-translate-y-1 transition-transform mb-2 z-10 relative">
+                                <Avatar className="w-12 h-12 border-1 border-emerald-200 shadow-sm mb-1 z-10 bg-white">
                                   <AvatarImage src={top2.bidder.profileImage} alt={top2.bidder.nickname} />
-                                  <AvatarFallback className="text-xs bg-slate-100 text-slate-700 font-bold">
+                                  <AvatarFallback className="text-xs bg-emerald-50 text-emerald-700 font-bold">
                                     {top2.bidder.nickname?.slice(0, 1)}
                                   </AvatarFallback>
                                 </Avatar>
-                                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-slate-400 text-white text-[10px] font-black flex items-center justify-center border-2 border-white shadow-sm leading-none">
-                                  2
+                                <span className="text-xs font-semibold text-gray-800 truncate w-full text-center group-hover:text-emerald-600 transition-colors duration-200">
+                                  {top2.bidder.nickname}
                                 </span>
+                                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-md mt-0.5 whitespace-nowrap border border-emerald-100/50">
+                                  {top2.amount.toLocaleString()}원
+                                </span>
+                              </Link>
+                              <div className="w-full bg-gradient-to-b from-emerald-100 to-white border-t border-emerald-100 rounded-t-xl flex items-start justify-center pt-2 font-black text-emerald-300/60 text-3xl h-16 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]">
+                                2
                               </div>
-                              <span className="text-xs font-semibold text-gray-800 truncate max-w-[80px] text-center group-hover:underline">
-                                {top2.bidder.nickname}
-                              </span>
-                              <span className="text-[11px] font-bold text-nook-brown bg-nook-brown/10 px-1.5 py-0.5 rounded-md mt-0.5 whitespace-nowrap">
-                                {top2.amount.toLocaleString()}원
-                              </span>
-                            </Link>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center flex-1 max-w-[80px] opacity-40" style={{ marginBottom: '20px' }}>
-                            <div className="w-12 h-12 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-xs text-gray-400">2위</div>
-                          </div>
-                        )}
+                            </>
+                          ) : (
+                            <div className="w-full bg-gray-50 rounded-t-xl flex items-start justify-center pt-2 font-black text-gray-200 text-2xl h-12">2</div>
+                          )}
+                        </div>
 
-                        {/* 1위 (Center - 최고 높이 👑) */}
-                        {top1 && (
-                          <div className="flex flex-col items-center flex-1 max-w-[100px] group" style={{ marginBottom: '42px' }}>
-                            <Link href={`/users/${top1.bidder.id}`} className="flex flex-col items-center group-hover:scale-105 transition-transform">
-                              <div className="relative mb-1">
-                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-base">👑</div>
-                                <Avatar className="w-16 h-16 border-[3px] border-amber-400 shadow-lg ring-2 ring-amber-200">
+                        {/* 1위 (Center - 최고 높이) */}
+                        <div className="flex flex-col items-center flex-1 max-w-[110px] group h-full justify-end">
+                          {top1 && (
+                            <>
+                              <Link href={`/users/${top1.bidder.id}`} className="flex flex-col items-center group-hover:-translate-y-1 transition-transform mb-2 z-10 relative">
+                                <div className="absolute -top-6 left-1/2 -translate-x-1/2 z-20 animate-bounce">
+                                  <span className="inline-block rotate-[10deg] text-xl">👑</span>
+                                </div>
+                                <Avatar className="w-16 h-16 border-[3px] border-emerald-400 shadow-md ring-4 ring-emerald-50 mb-1 z-10 bg-white">
                                   <AvatarImage src={top1.bidder.profileImage} alt={top1.bidder.nickname} />
-                                  <AvatarFallback className="text-sm bg-amber-100 text-amber-800 font-bold">
+                                  <AvatarFallback className="text-sm bg-emerald-100 text-emerald-800 font-bold">
                                     {top1.bidder.nickname?.slice(0, 1)}
                                   </AvatarFallback>
                                 </Avatar>
-                                <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-amber-500 text-white text-[11px] font-black flex items-center justify-center border-2 border-white shadow-sm leading-none">
-                                  1
+                                <span className="text-sm font-black text-gray-900 truncate w-full text-center group-hover:text-emerald-600 transition-colors duration-200 mt-1">
+                                  {top1.bidder.nickname}
                                 </span>
+                                <span className="text-[11px] font-black text-white bg-emerald-500 px-2.5 py-0.5 rounded-md mt-0.5 whitespace-nowrap shadow-sm">
+                                  {top1.amount.toLocaleString()}원
+                                </span>
+                              </Link>
+                              <div className="w-full bg-gradient-to-b from-emerald-200 to-emerald-100 rounded-t-xl flex items-start justify-center pt-3 font-black text-emerald-50/70 text-4xl h-28 shadow-[inset_0_2px_6px_rgba(0,0,0,0.05)]">
+                                1
                               </div>
-                              <span className="text-xs font-black text-gray-900 truncate max-w-[90px] text-center group-hover:underline">
-                                {top1.bidder.nickname}
-                              </span>
-                              <span className="text-[11px] font-black text-white bg-nook-brown px-2 py-0.5 rounded-md mt-0.5 whitespace-nowrap shadow-sm">
-                                {top1.amount.toLocaleString()}원
-                              </span>
-                            </Link>
-                          </div>
-                        )}
+                            </>
+                          )}
+                        </div>
 
-                        {/* 3위 (Right - 낮은 높이) */}
-                        {top3 ? (
-                          <div className="flex flex-col items-center flex-1 max-w-[80px] group" style={{ marginBottom: '6px' }}>
-                            <Link href={`/users/${top3.bidder.id}`} className="flex flex-col items-center group-hover:scale-105 transition-transform">
-                              <div className="relative mb-1">
-                                <Avatar className="w-10 h-10 border-2 border-amber-700/40 shadow-sm">
+                        {/* 3위 (Right - 가장 낮은 높이) */}
+                        <div className="flex flex-col items-center flex-1 max-w-[90px] group h-full justify-end">
+                          {top3 ? (
+                            <>
+                              <Link href={`/users/${top3.bidder.id}`} className="flex flex-col items-center group-hover:-translate-y-1 transition-transform mb-2 z-10 relative">
+                                <Avatar className="w-10 h-10 border-2 border-emerald-200 shadow-sm mb-1 z-10 bg-white">
                                   <AvatarImage src={top3.bidder.profileImage} alt={top3.bidder.nickname} />
-                                  <AvatarFallback className="text-xs bg-amber-50 text-amber-900 font-bold">
+                                  <AvatarFallback className="text-xs bg-emerald-50/50 text-emerald-600 font-bold">
                                     {top3.bidder.nickname?.slice(0, 1)}
                                   </AvatarFallback>
                                 </Avatar>
-                                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-700 text-white text-[10px] font-black flex items-center justify-center border-2 border-white shadow-sm leading-none">
-                                  3
+                                <span className="text-xs font-semibold text-gray-800 truncate w-full text-center group-hover:text-emerald-600 transition-colors duration-200">
+                                  {top3.bidder.nickname}
                                 </span>
+                                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50/50 px-1.5 py-0.5 rounded-md mt-0.5 whitespace-nowrap border border-emerald-100/30">
+                                  {top3.amount.toLocaleString()}원
+                                </span>
+                              </Link>
+                              <div className="w-full bg-gradient-to-b from-emerald-50 to-emerald-50/30 rounded-t-xl flex items-start justify-center pt-1 font-black text-emerald-200/50 text-2xl h-10 shadow-[inset_0_2px_2px_rgba(0,0,0,0.01)]">
+                                3
                               </div>
-                              <span className="text-xs font-semibold text-gray-800 truncate max-w-[80px] text-center group-hover:underline">
-                                {top3.bidder.nickname}
-                              </span>
-                              <span className="text-[11px] font-bold text-nook-brown bg-nook-brown/10 px-1.5 py-0.5 rounded-md mt-0.5 whitespace-nowrap">
-                                {top3.amount.toLocaleString()}원
-                              </span>
-                            </Link>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center flex-1 max-w-[80px] opacity-40" style={{ marginBottom: '6px' }}>
-                            <div className="w-12 h-12 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-xs text-gray-400">3위</div>
-                          </div>
-                        )}
+                            </>
+                          ) : (
+                            <div className="w-full bg-gray-50 rounded-t-xl flex items-start justify-center pt-1 font-black text-gray-200 text-xl h-8">3</div>
+                          )}
+                        </div>
                       </div>
 
                       {/* 우측: 1위부터 전체 입찰자 순위 리스트 (1위, 2위, 3위 포함) */}
-                      <div className="md:col-span-6 flex flex-col h-52">
-                        <div className="space-y-1.5 flex-1 overflow-y-auto no-scrollbar pt-1 md:pt-0">
+                      <div className="md:col-span-6 flex flex-col h-72 relative">
+                        <div
+                          className="space-y-2 flex-1 overflow-y-auto no-scrollbar pt-2 md:pt-0 pb-2 px-1"
+                          onScroll={handleListScroll}
+                          ref={listRef}
+                        >
                           {uniqueBids.map((bid, idx) => {
                             const rank = idx + 1;
                             const isTop1 = rank === 1;
@@ -747,21 +755,23 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                               <div
                                 key={bid.id}
                                 className={cn(
-                                  "flex items-center justify-between rounded-xl px-2.5 py-2 border transition-all text-xs",
-                                  isTop1 ? "bg-amber-50/80 border-amber-200/80" :
-                                    isTop2 ? "bg-slate-50 border-slate-200/60" :
-                                      isTop3 ? "bg-amber-900/5 border-amber-900/10" : "bg-gray-50/60 border-gray-100"
+                                  "flex items-center justify-between rounded-2xl px-3 py-2.5 border transition-all text-xs",
+                                  // 1등 border 초록색으로 해줘야지 
+                                  isTop1 ? "bg-emerald-50 border border-emerald-400" :
+                                    isTop2 ? "bg-white border-gray-200" :
+                                      isTop3 ? "bg-white border-gray-100" : "bg-transparent border-gray-50"
                                 )}
                               >
-                                <div className="flex items-center gap-2 min-w-0">
+                                <div className="flex items-center gap-2.5 min-w-0">
                                   <div
                                     className={cn(
-                                      "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 shadow-2xs",
-                                      isTop1 ? "bg-amber-500 text-white" :
-                                        isTop2 ? "bg-slate-400 text-white" :
-                                          isTop3 ? "bg-amber-800/70 text-white" : "bg-gray-200 text-gray-600"
+                                      "w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black shrink-0 relative",
+                                      isTop1 ? "bg-emerald-500 text-white shadow-sm" :
+                                        isTop2 ? "bg-emerald-400 text-white" :
+                                          isTop3 ? "bg-emerald-300 text-white" : "bg-gray-100 text-gray-500"
                                     )}
                                   >
+                                    {/* {isTop1 && <span className="absolute -top-[12px] -right-[5px] text-[12px] rotate-[15deg]">👑</span>} */}
                                     {rank}
                                   </div>
                                   <Link
@@ -774,7 +784,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                                         {bid.bidder.nickname ? bid.bidder.nickname.slice(0, 1) : 'U'}
                                       </AvatarFallback>
                                     </Avatar>
-                                    <span className={cn("truncate group-hover:underline", isTop1 ? "font-bold text-gray-900" : "font-medium text-gray-700")}>
+                                    <span className={cn("truncate group-hover:text-emerald-600 transition-colors duration-200", isTop1 ? "font-bold text-gray-900" : "font-medium text-gray-700")}>
                                       {bid.bidder.nickname}
                                     </span>
                                   </Link>
@@ -788,28 +798,58 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
 
                         </div>
 
+                        {showListScrollTop && (
+                          <button
+                            onClick={() => listRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
+                            className="absolute bottom-4 right-4 bg-white/95 backdrop-blur border border-gray-200 text-gray-600 p-2 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:bg-gray-50 hover:scale-105 active:scale-95 transition-all z-20 animate-in fade-in zoom-in duration-200"
+                          >
+                            <ChevronUp className="w-5 h-5" />
+                          </button>
+                        )}
+
                         {/* 입찰 입력폼 (리더보드 스크롤 바깥, 항상 맨 아래 고정) */}
                         {!(product.isDeleted || (product as any).deleted) && user && !isSeller && (product.status === 'SALE' || product.status === 'AUCTION') && product.auctionStatus === 'ACTIVE' && timeLeft !== '마감됨' && (
-                          <div className="flex items-center gap-2 rounded-xl px-2.5 py-1.5 border border-emerald-200 bg-emerald-50/50 mt-2 shrink-0">
-                            <span className="font-bold text-emerald-800 text-xs shrink-0 ml-1">입찰 금액</span>
-                            <input
-                              type="text"
-                              value={bidAmount ? Number(bidAmount).toLocaleString() : ''}
-                              onChange={(e) => {
-                                const val = e.target.value.replace(/[^\d]/g, '');
-                                if (!val || Number(val) <= 1000000000) setBidAmount(val);
-                              }}
-                              maxLength={13}
-                              placeholder={`${((product.currentBid ?? product.price) + 1000).toLocaleString()}원 이상`}
-                              className="flex-1 min-w-0 bg-white border border-emerald-200/60 rounded-md px-2 py-1.5 text-xs font-bold text-emerald-900 focus:outline-none focus:ring-1 focus:ring-emerald-500 placeholder:font-normal placeholder:text-emerald-300"
-                            />
-                            <button
-                              onClick={() => bidMutation.mutate()}
-                              disabled={!bidAmount || Number(bidAmount) < ((product.currentBid ?? product.price) + 1000) || bidMutation.isPending}
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shrink-0 transition-colors disabled:opacity-50 shadow-sm"
-                            >
-                              입찰
-                            </button>
+                          <div className="flex flex-col gap-1.5 mt-3 w-full shrink-0">
+                            <div className="flex items-start justify-between gap-2 w-full">
+                              {[1000, 5000, 10000].map((inc) => {
+                                const nextBid = (product.currentBid ?? product.price) + inc;
+                                return (
+                                  <div key={inc} className="flex flex-col flex-1 gap-1">
+                                    <button
+                                      onClick={() => {
+                                        openConfirm({
+                                          title: `현재가보다 ${inc.toLocaleString()}원 높은 금액입니다.\n${nextBid.toLocaleString()}원으로 입찰하시겠습니까?`,
+                                          confirmText: '입찰하기',
+                                          onConfirm: () => bidMutation.mutate(nextBid)
+                                        });
+                                      }}
+                                      disabled={bidMutation.isPending}
+                                      className="w-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 text-[12px] font-bold px-2 py-2 rounded-lg transition-colors disabled:opacity-50 shadow-sm"
+                                    >
+                                      +{inc.toLocaleString()}원
+                                    </button>
+                                    <span className="text-[10px] text-center text-emerald-500 font-medium tracking-tight">
+                                      {nextBid.toLocaleString()}원으로 입찰
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            {bids.some((b: any) => b.bidder.id === user?.id) && (
+                              <button
+                                onClick={() => {
+                                  openConfirm({
+                                    title: '모든 입찰 내역을 철회하시겠습니까?\n(최고 입찰자인 경우 차순위 금액으로 내려갑니다.)',
+                                    confirmText: '입찰 철회',
+                                    onConfirm: () => withdrawBidMutation.mutate()
+                                  });
+                                }}
+                                disabled={withdrawBidMutation.isPending}
+                                className="w-full mt-1 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-600 text-[12px] font-semibold px-2 py-2.5 rounded-lg transition-colors disabled:opacity-50"
+                              >
+                                내 입찰 철회하기
+                              </button>
+                            )}
                           </div>
                         )}
                       </div>
@@ -1135,22 +1175,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                 >
                   다시 경매 시작
                 </Button>
-                {product.auctionStatus !== 'CANCELLED' && (bids.length) > 0 ? (
-                  <Button
-                    variant="outline"
-                    className="flex-1 h-12 text-base font-semibold border-gray-200 text-gray-600 hover:bg-gray-50"
-                    onClick={() => {
-                      openConfirm({
-                        title: '최고 입찰 내역을 취소하시겠습니까?\n(차순위 입찰가로 변경되며, 차순위가 없으면 원래 판매 상태로 돌아갑니다.)',
-                        confirmText: '입찰 취소',
-                        onConfirm: () => cancelTopBidMutation.mutate()
-                      });
-                    }}
-                    disabled={cancelTopBidMutation.isPending}
-                  >
-                    최고 입찰 취소
-                  </Button>
-                ) : null}
+
               </div>
             )}
 
