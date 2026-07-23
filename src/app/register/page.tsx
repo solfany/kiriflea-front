@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Loader2, RefreshCw, CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { Loader2, RefreshCw, CheckCircle, Eye, EyeOff, X } from 'lucide-react';
 import { NookLogo } from '@/components/ui/NookLogo';
 
 type Step = 'email' | 'code' | 'profile';
@@ -23,7 +23,9 @@ export default function RegisterPage() {
   const setTokens = useAuthStore((s) => s.setTokens);
 
   const [step, setStep] = useState<Step>('email');
-  const [email, setEmail] = useState('');
+  const [localPart, setLocalPart] = useState('');
+  const [domainPart, setDomainPart] = useState('');
+  const email = `${localPart}@${domainPart}`;
   const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -139,17 +141,39 @@ export default function RegisterPage() {
 
         {step === 'email' && (
           <div className="space-y-4">
-            <div className="space-y-1.5">
-              <Label>회사 이메일</Label>
-              <Input
-                type="email"
-                placeholder="name@nplohs.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="h-12 text-base border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
-              />
+            <div>
+              <div className="flex items-center h-14 rounded-2xl bg-gray-50/80 border border-gray-100 px-4 transition-all duration-300 focus-within:bg-white focus-within:border-emerald-500 focus-within:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]">
+                <input
+                  type="text"
+                  placeholder="아이디"
+                  value={localPart}
+                  onChange={(e) => setLocalPart(e.target.value)}
+                  maxLength={64}
+                  className="flex-1 h-full bg-transparent outline-none border-none focus:ring-0 text-[15px] font-medium text-gray-900 placeholder:text-gray-400 w-full"
+                />
+                <span className="text-gray-300 font-medium px-2 select-none">@</span>
+                <div className="relative flex items-center h-full">
+                  <input
+                    type="text"
+                    placeholder="nplohs.com"
+                    value={domainPart}
+                    onChange={(e) => setDomainPart(e.target.value)}
+                    maxLength={255}
+                    className="w-[110px] h-full bg-transparent outline-none border-none focus:ring-0 text-[15px] font-medium text-gray-500 placeholder:text-gray-300 pr-7"
+                  />
+                  {domainPart && (
+                    <button
+                      type="button"
+                      onClick={() => setDomainPart('')}
+                      className="absolute right-0 flex items-center justify-center w-4 h-4 rounded-full bg-gray-200 text-gray-400 hover:bg-gray-300 hover:text-gray-600 transition-colors"
+                    >
+                      <X size={10} strokeWidth={3} />
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
-            <Button onClick={handleSendCode} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-12 text-base font-semibold" disabled={loading}>
+            <Button onClick={handleSendCode} className="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white h-14 rounded-2xl text-[16px] font-bold transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-[1px]" disabled={loading || !localPart || !domainPart}>
               {loading ? <Loader2 size={16} className="animate-spin" /> : '인증코드 발송'}
             </Button>
           </div>
@@ -161,21 +185,22 @@ export default function RegisterPage() {
               <span className="font-semibold text-emerald-600">{email}</span>로<br />
               6자리 인증코드를 발송했습니다.
             </p>
-            <div className="space-y-1.5">
-              <Label>인증코드</Label>
-              <Input
-                type="text"
-                placeholder="123456"
-                maxLength={6}
-                value={code}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-                className="h-12 text-center text-xl tracking-widest border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
-              />
+            <div>
+              <div className="flex items-center h-14 rounded-2xl bg-gray-50/80 border border-gray-100 px-4 transition-all duration-300 focus-within:bg-white focus-within:border-emerald-500 focus-within:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]">
+                <input
+                  type="text"
+                  placeholder="6자리 인증코드 입력"
+                  maxLength={6}
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                  className="flex-1 h-full bg-transparent outline-none border-none focus:ring-0 text-center text-[18px] tracking-[0.5em] font-medium text-gray-900 placeholder:text-gray-400 placeholder:tracking-normal w-full"
+                />
+              </div>
             </div>
-            <Button onClick={handleVerifyCode} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-12 text-base font-semibold" disabled={loading || code.length !== 6}>
+            <Button onClick={handleVerifyCode} className="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white h-14 rounded-2xl text-[16px] font-bold transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-[1px]" disabled={loading || code.length !== 6}>
               {loading ? <Loader2 size={16} className="animate-spin" /> : '인증 확인'}
             </Button>
-            <button onClick={() => setStep('email')} className="w-full text-sm text-gray-400 hover:text-gray-600">
+            <button onClick={() => setStep('email')} className="w-full text-sm text-gray-400 hover:text-gray-600 mt-2 font-medium">
               이메일 다시 입력
             </button>
           </div>
@@ -183,41 +208,45 @@ export default function RegisterPage() {
 
         {step === 'profile' && (
           <form onSubmit={handleRegister} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label>비밀번호</Label>
-              <div className="relative">
-                <Input type={showPassword ? 'text' : 'password'} placeholder="영문+숫자+특수문자 8~20자" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} maxLength={20} className="h-12 text-base border-gray-200 focus:border-emerald-500 pr-10" />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
+            <div>
+              <div className="flex items-center h-14 rounded-2xl bg-gray-50/80 border border-gray-100 px-4 transition-all duration-300 focus-within:bg-white focus-within:border-emerald-500 focus-within:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]">
+                <input type={showPassword ? 'text' : 'password'} placeholder="비밀번호 (영문+숫자+특수문자 8~20자)" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} maxLength={20} className="flex-1 h-full bg-transparent outline-none border-none focus:ring-0 text-[15px] font-medium text-gray-900 placeholder:text-gray-400 w-full" />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="pl-3 h-full flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors bg-transparent" tabIndex={-1}>
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
-            <div className="space-y-1.5">
-              <Label>비밀번호 확인</Label>
-              <Input type={showPassword ? 'text' : 'password'} placeholder="비밀번호 재입력" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} required minLength={8} maxLength={20} className="h-12 text-base border-gray-200 focus:border-emerald-500" />
-            </div>
-            <div className="space-y-1.5">
-              <Label>닉네임</Label>
-              <div className="flex gap-2">
-                <Input type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} minLength={2} maxLength={15} required className="h-12 text-base border-gray-200 focus:border-emerald-500" />
-                <Button type="button" variant="outline" size="icon" onClick={handleRandomNickname} title="랜덤 닉네임" className="h-12 w-12 flex-shrink-0">
-                  <RefreshCw size={14} />
-                </Button>
+            
+            <div>
+              <div className="flex items-center h-14 rounded-2xl bg-gray-50/80 border border-gray-100 px-4 transition-all duration-300 focus-within:bg-white focus-within:border-emerald-500 focus-within:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]">
+                <input type={showPassword ? 'text' : 'password'} placeholder="비밀번호 확인" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} required minLength={8} maxLength={20} className="flex-1 h-full bg-transparent outline-none border-none focus:ring-0 text-[15px] font-medium text-gray-900 placeholder:text-gray-400 w-full" />
               </div>
             </div>
-            <div className="space-y-1.5">
-              <Label>전화번호 <span className="text-gray-400 text-xs">(선택)</span></Label>
-              <Input
-                type="tel"
-                placeholder="010-0000-0000"
-                maxLength={13}
-                value={phone}
-                onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
-                className="h-12 text-base border-gray-200 focus:border-emerald-500"
-              />
+
+            <div className="flex gap-2">
+              <div className="flex-1 flex items-center h-14 rounded-2xl bg-gray-50/80 border border-gray-100 px-4 transition-all duration-300 focus-within:bg-white focus-within:border-emerald-500 focus-within:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]">
+                <input type="text" placeholder="닉네임" value={nickname} onChange={(e) => setNickname(e.target.value)} minLength={2} maxLength={15} required className="flex-1 h-full bg-transparent outline-none border-none focus:ring-0 text-[15px] font-medium text-gray-900 placeholder:text-gray-400 w-full" />
+              </div>
+              <Button type="button" variant="outline" size="icon" onClick={handleRandomNickname} title="랜덤 닉네임" className="h-14 w-14 rounded-2xl flex-shrink-0 border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700">
+                <RefreshCw size={18} />
+              </Button>
             </div>
-            <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-12 text-base font-semibold mt-2" disabled={loading}>
-              {loading ? <Loader2 size={16} className="animate-spin" /> : '가입 완료'}
+
+            <div>
+              <div className="flex items-center h-14 rounded-2xl bg-gray-50/80 border border-gray-100 px-4 transition-all duration-300 focus-within:bg-white focus-within:border-emerald-500 focus-within:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]">
+                <input
+                  type="tel"
+                  placeholder="전화번호 (선택)"
+                  maxLength={13}
+                  value={phone}
+                  onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
+                  className="flex-1 h-full bg-transparent outline-none border-none focus:ring-0 text-[15px] font-medium text-gray-900 placeholder:text-gray-400 w-full"
+                />
+              </div>
+            </div>
+
+            <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white h-14 rounded-2xl text-[16px] font-bold transition-all duration-200 mt-4 shadow-sm hover:shadow-md hover:-translate-y-[1px]" disabled={loading}>
+              {loading ? <Loader2 size={18} className="animate-spin" /> : '가입 완료'}
             </Button>
           </form>
         )}
