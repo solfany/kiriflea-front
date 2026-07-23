@@ -633,7 +633,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                 const top3 = uniqueBids[2];
 
                 return (
-                  <div className="bg-white rounded-2xl p-4 mb-4 border border-gray-100 shadow-2xs space-y-3">
+                  <div className="bg-white rounded-2xl mb-4  shadow-2xs space-y-3">
                     {/* Header */}
                     <div className="flex items-center justify-between text-xs pb-1 border-b border-gray-100">
                       <span className="font-bold text-gray-800 flex items-center gap-1.5 text-sm">
@@ -735,55 +735,83 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                       </div>
 
                       {/* 우측: 1위부터 전체 입찰자 순위 리스트 (1위, 2위, 3위 포함) */}
-                      <div className="md:col-span-6 space-y-1.5 max-h-52 overflow-y-auto no-scrollbar pt-1 md:pt-0">
-                        {uniqueBids.map((bid, idx) => {
-                          const rank = idx + 1;
-                          const isTop1 = rank === 1;
-                          const isTop2 = rank === 2;
-                          const isTop3 = rank === 3;
+                      <div className="md:col-span-6 flex flex-col h-52">
+                        <div className="space-y-1.5 flex-1 overflow-y-auto no-scrollbar pt-1 md:pt-0">
+                          {uniqueBids.map((bid, idx) => {
+                            const rank = idx + 1;
+                            const isTop1 = rank === 1;
+                            const isTop2 = rank === 2;
+                            const isTop3 = rank === 3;
 
-                          return (
-                            <div
-                              key={bid.id}
-                              className={cn(
-                                "flex items-center justify-between rounded-xl px-2.5 py-2 border transition-all text-xs",
-                                isTop1 ? "bg-amber-50/80 border-amber-200/80" :
-                                  isTop2 ? "bg-slate-50 border-slate-200/60" :
-                                    isTop3 ? "bg-amber-900/5 border-amber-900/10" : "bg-gray-50/60 border-gray-100"
-                              )}
-                            >
-                              <div className="flex items-center gap-2 min-w-0">
-                                <div
-                                  className={cn(
-                                    "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 shadow-2xs",
-                                    isTop1 ? "bg-amber-500 text-white" :
-                                      isTop2 ? "bg-slate-400 text-white" :
-                                        isTop3 ? "bg-amber-800/70 text-white" : "bg-gray-200 text-gray-600"
-                                  )}
-                                >
-                                  {rank}
+                            return (
+                              <div
+                                key={bid.id}
+                                className={cn(
+                                  "flex items-center justify-between rounded-xl px-2.5 py-2 border transition-all text-xs",
+                                  isTop1 ? "bg-amber-50/80 border-amber-200/80" :
+                                    isTop2 ? "bg-slate-50 border-slate-200/60" :
+                                      isTop3 ? "bg-amber-900/5 border-amber-900/10" : "bg-gray-50/60 border-gray-100"
+                                )}
+                              >
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <div
+                                    className={cn(
+                                      "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 shadow-2xs",
+                                      isTop1 ? "bg-amber-500 text-white" :
+                                        isTop2 ? "bg-slate-400 text-white" :
+                                          isTop3 ? "bg-amber-800/70 text-white" : "bg-gray-200 text-gray-600"
+                                    )}
+                                  >
+                                    {rank}
+                                  </div>
+                                  <Link
+                                    href={`/users/${bid.bidder.id}`}
+                                    className="flex items-center gap-1.5 min-w-0 hover:opacity-85 transition-opacity group cursor-pointer"
+                                  >
+                                    <Avatar className="w-5.5 h-5.5 border border-gray-200/60 shrink-0">
+                                      <AvatarImage src={bid.bidder.profileImage || undefined} alt={bid.bidder.nickname} />
+                                      <AvatarFallback className="text-[9px] bg-gray-100 text-gray-700 font-bold">
+                                        {bid.bidder.nickname ? bid.bidder.nickname.slice(0, 1) : 'U'}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <span className={cn("truncate group-hover:underline", isTop1 ? "font-bold text-gray-900" : "font-medium text-gray-700")}>
+                                      {bid.bidder.nickname}
+                                    </span>
+                                  </Link>
                                 </div>
-                                <Link
-                                  href={`/users/${bid.bidder.id}`}
-                                  className="flex items-center gap-1.5 min-w-0 hover:opacity-85 transition-opacity group cursor-pointer"
-                                >
-                                  <Avatar className="w-5.5 h-5.5 border border-gray-200/60 shrink-0">
-                                    <AvatarImage src={bid.bidder.profileImage} alt={bid.bidder.nickname} />
-                                    <AvatarFallback className="text-[9px] bg-gray-100 text-gray-700 font-bold">
-                                      {bid.bidder.nickname ? bid.bidder.nickname.slice(0, 1) : 'U'}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <span className={cn("truncate group-hover:underline", isTop1 ? "font-bold text-gray-900" : "font-medium text-gray-700")}>
-                                    {bid.bidder.nickname}
-                                  </span>
-                                </Link>
+                                <span className={cn("font-bold tracking-tight shrink-0", isTop1 ? "text-nook-brown font-black" : "text-gray-800")}>
+                                  {bid.amount.toLocaleString()}원
+                                </span>
                               </div>
-                              <span className={cn("font-bold tracking-tight shrink-0", isTop1 ? "text-nook-brown font-black" : "text-gray-800")}>
-                                {bid.amount.toLocaleString()}원
-                              </span>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+
+                        </div>
+
+                        {/* 입찰 입력폼 (리더보드 스크롤 바깥, 항상 맨 아래 고정) */}
+                        {!(product.isDeleted || (product as any).deleted) && user && !isSeller && (product.status === 'SALE' || product.status === 'AUCTION') && product.auctionStatus === 'ACTIVE' && timeLeft !== '마감됨' && (
+                          <div className="flex items-center gap-2 rounded-xl px-2.5 py-1.5 border border-emerald-200 bg-emerald-50/50 mt-2 shrink-0">
+                            <span className="font-bold text-emerald-800 text-xs shrink-0 ml-1">입찰 금액</span>
+                            <input
+                              type="text"
+                              value={bidAmount ? Number(bidAmount).toLocaleString() : ''}
+                              onChange={(e) => {
+                                const val = e.target.value.replace(/[^\d]/g, '');
+                                if (!val || Number(val) <= 1000000000) setBidAmount(val);
+                              }}
+                              maxLength={13}
+                              placeholder={`${((product.currentBid ?? product.price) + 1000).toLocaleString()}원 이상`}
+                              className="flex-1 min-w-0 bg-white border border-emerald-200/60 rounded-md px-2 py-1.5 text-xs font-bold text-emerald-900 focus:outline-none focus:ring-1 focus:ring-emerald-500 placeholder:font-normal placeholder:text-emerald-300"
+                            />
+                            <button
+                              onClick={() => bidMutation.mutate()}
+                              disabled={!bidAmount || Number(bidAmount) < ((product.currentBid ?? product.price) + 1000) || bidMutation.isPending}
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shrink-0 transition-colors disabled:opacity-50 shadow-sm"
+                            >
+                              입찰
+                            </button>
+                          </div>
+                        )}
                       </div>
 
                     </div>
@@ -791,29 +819,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                 );
               })()}
 
-              {/* 입찰 입력폼 */}
-              {!(product.isDeleted || (product as any).deleted) && user && !isSeller && product.status === 'SALE' && product.auctionStatus === 'ACTIVE' && timeLeft !== '마감됨' && (
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={bidAmount ? Number(bidAmount).toLocaleString() : ''}
-                    onChange={(e) => {
-                      const val = e.target.value.replace(/[^\d]/g, '');
-                      if (!val || Number(val) <= 1000000000) setBidAmount(val);
-                    }}
-                    maxLength={13}
-                    placeholder={`${((product.currentBid ?? product.price) + 1000).toLocaleString()}원 이상`}
-                    className="flex-1 border border-nook-brown-border/60 rounded-xl px-3.5 h-11 text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-nook-brown/20 focus:border-nook-brown bg-white placeholder:font-normal placeholder:text-gray-400"
-                  />
-                  <Button
-                    onClick={() => bidMutation.mutate()}
-                    disabled={!bidAmount || Number(bidAmount) < ((product.currentBid ?? product.price) + 1000) || bidMutation.isPending}
-                    className="bg-nook-brown hover:bg-nook-brown-dark text-sm font-bold h-11 px-5 rounded-xl text-white shadow-sm active:scale-95 transition-all disabled:opacity-50"
-                  >
-                    입찰하기
-                  </Button>
-                </div>
-              )}
+              {/* 기존 단독 입찰 폼 제거됨 (리더보드 안으로 통합) */}
             </div>
           </>
         )}
@@ -947,8 +953,11 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
       {showExtendModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-white rounded-2xl p-5 w-full max-w-sm">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">경매 마감시간 연장</h3>
-            <p className="text-sm text-gray-500 mb-4">현재 마감시간에서 며칠을 더 연장하시겠습니까?</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">경매 마감시간 연장</h3>
+            <p className="text-sm text-gray-500 mb-2">현재 마감시간에서 며칠을 더 연장하시겠습니까?</p>
+            <p className="text-xs text-amber-600 bg-amber-50 p-2.5 rounded-lg mb-4 leading-relaxed font-medium">
+              ※ 경매는 전체 진행 기간이 생성일 기준 <strong>최대 7일</strong>을 초과할 수 없습니다.
+            </p>
             <div className="flex gap-2 mb-6">
               {[1, 3, 7].map(days => (
                 <button
@@ -1039,7 +1048,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
 
           {isSeller && product.status === 'RESERVED' && product.isAuction && product.buyerId && (
             <Button
-              className="flex-1 bg-nook-brown hover:bg-nook-brown-dark h-12 text-base font-semibold text-white shadow-sm"
+              className="flex-1 bg-emerald-600 hover:bg-emerald-700 h-12 text-base font-semibold text-white shadow-sm"
               onClick={() => sellerChatMutation.mutate()}
               disabled={sellerChatMutation.isPending}
             >
@@ -1083,7 +1092,7 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
             </div>
           )}
 
-          {isSeller && product.isAuction && product.status === 'SALE' && product.auctionStatus !== 'CANCELLED' && (
+          {isSeller && product.isAuction && (product.status === 'SALE' || product.status === 'AUCTION') && product.auctionStatus !== 'CANCELLED' && (
             <div className="flex gap-2 w-full">
               <Button
                 variant="outline"
@@ -1093,9 +1102,9 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                 시간 연장
               </Button>
               <Button
-                className="flex-1 bg-red-500 hover:bg-red-600 h-12 text-base font-semibold text-white"
+                className="flex-1 h-12 text-base font-semibold bg-gray-800 hover:bg-gray-900 text-white shadow-sm"
                 onClick={() => {
-                  if (product.bidCount === 0) {
+                  if (bids.length === 0) {
                     toast.error('입찰자가 없어 조기 낙찰할 수 없습니다.');
                     return;
                   }
@@ -1107,9 +1116,9 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                     }
                   });
                 }}
-                disabled={product.bidCount === 0 || closeAuctionEarlyMutation.isPending}
+                disabled={bids.length === 0 || closeAuctionEarlyMutation.isPending}
               >
-                {product.bidCount === 0 ? '입찰자 없음' : '조기 낙찰'}
+                {bids.length === 0 ? '입찰자 없음' : '조기 낙찰'}
               </Button>
             </div>
           )}
@@ -1126,10 +1135,10 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
                 >
                   다시 경매 시작
                 </Button>
-                {product.auctionStatus !== 'CANCELLED' && (product.bidCount ?? 0) > 0 ? (
+                {product.auctionStatus !== 'CANCELLED' && (bids.length) > 0 ? (
                   <Button
                     variant="outline"
-                    className="flex-1 h-12 text-base font-semibold border-red-200 text-red-500 hover:bg-red-50"
+                    className="flex-1 h-12 text-base font-semibold border-gray-200 text-gray-600 hover:bg-gray-50"
                     onClick={() => {
                       openConfirm({
                         title: '최고 입찰 내역을 취소하시겠습니까?\n(차순위 입찰가로 변경되며, 차순위가 없으면 원래 판매 상태로 돌아갑니다.)',

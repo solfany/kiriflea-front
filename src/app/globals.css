@@ -127,6 +127,12 @@
   * {
     border-color: var(--border);
   }
+  /* 운영 환경에서 아이콘/SVG가 거대하게 노출되는 현상 방지 */
+  svg {
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 100%;
+  }
   body {
     background-color: var(--background);
     color: var(--foreground);

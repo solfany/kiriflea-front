@@ -13,6 +13,7 @@ import { useAuthStore } from '@/store/auth';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ReviewModal } from '@/components/market/ReviewModal';
+
 import { ChevronLeft, Send, Loader2, Handshake, Plus, MoreVertical, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn, getWebSocketHttpUrl, getMannerRank } from '@/lib/utils';
@@ -102,6 +103,7 @@ function formatTime(iso: string) {
 }
 
 const renderMessageContent = (content: string, isMine: boolean = true) => {
+
   if (content.startsWith('[안내]')) {
     const text = content.replace(/^\[안내\]\s*(🎉|🤝|🔄)?\s*/, '');
     const parts = text.split(/(\*\*.*?\*\*)/g);
@@ -124,6 +126,7 @@ const renderMessageContent = (content: string, isMine: boolean = true) => {
   return content;
 };
 
+
 export default function ChatRoomPage({ params }: { params: { roomId: string } }) {
 
 
@@ -138,10 +141,33 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
   const [connected, setConnected] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [isActionOpen, setIsActionOpen] = useState(false);
   const stompRef = useRef<Client | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [prevScrollHeight, setPrevScrollHeight] = useState(0);
+
+  // Prevent iOS Safari body scroll & layout shift when keyboard appears
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    document.body.style.height = '100%';
+    document.body.style.overflow = 'hidden';
+    document.body.style.overscrollBehavior = 'none';
+    
+    return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+      document.body.style.overflow = '';
+      document.body.style.overscrollBehavior = '';
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
 
   const { data: room } = useQuery({
     queryKey: ['chatRoom', roomIdNum],
@@ -239,12 +265,16 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
   });
 
 
+
+
   const deleteRoomMutation = useMutation({
     mutationFn: () => api.delete(`/api/chat/rooms/${roomIdNum}`),
     onSuccess: () => {
       toast.success('채팅방이 삭제되었습니다.');
       router.replace('/chat');
       qc.invalidateQueries({ queryKey: ['chatRooms'] });
+      qc.removeQueries({ queryKey: ['chatMessages', roomIdNum] });
+      qc.removeQueries({ queryKey: ['chatRoom', roomIdNum] });
     },
     onError: () => toast.error('채팅방 삭제에 실패했습니다.'),
   });
@@ -396,7 +426,7 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
   );
 
   return (
-    <div className="flex flex-col h-screen bg-white max-w-screen-md mx-auto relative border-x border-gray-50">
+    <div className="fixed inset-0 flex flex-col bg-white max-w-screen-md mx-auto border-x border-gray-50 overflow-hidden overscroll-none z-50">
       {/* 헤더 */}
       <header className="flex-shrink-0 flex items-center justify-between px-4 h-14 border-b border-gray-100 bg-white relative">
         <div className="flex items-center z-10">
@@ -570,9 +600,14 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
 
       {/* 메시지 목록 */}
       <div
-        className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
+        className="flex-1 overflow-y-auto overscroll-y-none px-4 py-4 space-y-3"
         ref={scrollRef}
         onScroll={handleScroll}
+        onClick={() => {
+          if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+          }
+        }}
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {(isLoading || isFetchingNextPage) && (
@@ -614,16 +649,21 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
                   )}
                   <div
                     className={cn(
-                      'px-3.5 py-2.5 rounded-2xl text-[14px] leading-relaxed overflow-hidden whitespace-pre-wrap',
-                      isMine
-                        ? 'bg-emerald-600 text-white rounded-br-sm'
-                        : 'bg-gray-100 text-gray-800 rounded-bl-sm',
-                      msg.type === 'IMAGE' && 'p-0 bg-transparent'
+                      'rounded-2xl text-[14px] leading-relaxed overflow-hidden whitespace-pre-wrap relative',
+                      msg.content.startsWith('[ACCOUNT_CARD]')
+                        ? 'p-0 bg-transparent'
+                        : cn(
+                            'px-3.5 py-2.5',
+                            isMine
+                              ? 'bg-emerald-600 text-white rounded-br-sm'
+                              : 'bg-gray-100 text-gray-800 rounded-bl-sm'
+                          ),
+                      msg.type === 'IMAGE' && 'p-0 bg-transparent ring-1 ring-inset ring-black/10'
                     )}
                   >
                     {msg.type === 'IMAGE' ? (
                       <div
-                        className="relative w-48 h-48 rounded-xl overflow-hidden border border-gray-200 cursor-pointer"
+                        className="relative w-48 h-48 cursor-pointer isolate"
                         onClick={() => setSelectedImage(msg.content)}
                       >
                         <Image src={msg.content} alt="전송된 이미지" fill className="object-cover" />
@@ -632,6 +672,7 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
                       renderMessageContent(msg.content, isMine)
                     )}
                   </div>
+
                   <div className={cn("flex items-center gap-1 px-1", isMine ? "justify-end" : "justify-start")}>
                     {isMine && !msg.isRead && (
                       <span className="text-[10px] font-bold text-emerald-600">1</span>
@@ -682,11 +723,14 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
       )}
 
       {/* 입력창 */}
-      <div className="flex-shrink-0 bg-white px-4 py-3 flex items-end gap-2">
-        <label className={cn("flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full transition-colors", room?.productIsDeleted ? "text-gray-300 cursor-not-allowed" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100 cursor-pointer")}>
-          <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={room?.productIsDeleted} />
-          <Plus size={22} />
-        </label>
+      <div className="flex-shrink-0 bg-white px-4 py-3 flex items-end gap-2 touch-none">
+        <button 
+          onClick={() => setIsActionOpen(!isActionOpen)}
+          disabled={room?.productIsDeleted}
+          className={cn("flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl transition-colors", room?.productIsDeleted ? "text-gray-300 cursor-not-allowed" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100 cursor-pointer")}
+        >
+          <Plus size={24} className={cn("transition-transform duration-200", isActionOpen && "rotate-45")} />
+        </button>
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -695,17 +739,38 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
           disabled={room?.productIsDeleted}
           maxLength={2000}
           rows={1}
-          className="flex-1 resize-none border border-gray-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 max-h-32 overflow-y-auto disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
-          style={{ lineHeight: '1.5' }}
+          className="flex-1 resize-none border border-gray-200 rounded-2xl px-4 py-[11px] text-[15px] leading-[20px] focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 min-h-[44px] max-h-32 overflow-y-auto disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed touch-pan-y"
         />
         <Button
+          onMouseDown={(e) => e.preventDefault()}
+          onTouchStart={(e) => e.preventDefault()}
           onClick={handleSend}
           disabled={!input.trim() || !connected || room?.productIsDeleted}
-          className="flex-shrink-0 w-10 h-10 p-0 bg-emerald-600 hover:bg-emerald-700 rounded-full disabled:opacity-40 text-white"
+          className="flex-shrink-0 w-11 h-11 p-0 bg-emerald-600 hover:bg-emerald-700 rounded-xl disabled:opacity-40 text-white"
         >
-          <Send size={16} />
+          <Send size={18} />
         </Button>
       </div>
+
+      {/* 액션 서랍 */}
+      {isActionOpen && !room?.productIsDeleted && (
+        <div className="bg-gray-50 border-t border-gray-200 px-6 py-5 flex gap-6 touch-none">
+          <label className="flex flex-col items-center gap-2 cursor-pointer group">
+            <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-sm border border-gray-100 text-gray-700 group-hover:bg-gray-100 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+            </div>
+            <span className="text-xs font-medium text-gray-600">앨범</span>
+            <input type="file" accept="image/*" className="hidden" onChange={(e) => { setIsActionOpen(false); handleImageUpload(e); }} />
+          </label>
+          <label className="flex flex-col items-center gap-2 cursor-pointer group">
+            <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-sm border border-gray-100 text-gray-700 group-hover:bg-gray-100 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+            </div>
+            <span className="text-xs font-medium text-gray-600">카메라</span>
+            <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => { setIsActionOpen(false); handleImageUpload(e); }} />
+          </label>
+        </div>
+      )}
 
       {/* 이미지 크게 보기 모달 */}
       {selectedImage && (
@@ -738,6 +803,8 @@ export default function ChatRoomPage({ params }: { params: { roomId: string } })
           onSuccess={() => setShowReviewModal(false)}
         />
       )}
+
+
     </div>
   );
 }

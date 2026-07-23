@@ -62,7 +62,7 @@ export default function BottomNav() {
             >
               <div className="relative">
                 {active ? (
-                  <Image src="/images/logo/raccoon-mascot-logo-sm.png" alt={label} width={24} height={24} className="w-auto h-auto object-contain" />
+                  <Image src="/images/logo/raccoon-mascot-logo-sm.png" alt={label} width={24} height={24} className="object-contain shrink-0" />
                 ) : (
                   <Icon size={21} strokeWidth={1.8} />
                 )}

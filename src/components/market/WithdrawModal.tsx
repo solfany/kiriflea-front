@@ -52,7 +52,7 @@ export default function WithdrawModal({ onClose }: WithdrawModalProps) {
         </div>
 
         <div className="p-4 pt-6 flex flex-col items-center text-center">
-          <Image src="/images/logo/raccoon-mascot-face.png" alt="sad-raccoon" width={60} height={60} className="w-auto h-auto object-contain mb-4 opacity-80 grayscale" />
+          <Image src="/images/logo/raccoon-mascot-face.png" alt="sad-raccoon" width={60} height={60} className="object-contain shrink-0 mb-4 opacity-80 grayscale" />
           <h3 className="text-red-500 font-bold mb-2 font-sans tracking-normal text-lg">정말로 떠나시겠습니까구리...?</h3>
           <p className="text-sm text-gray-600 mb-6 px-2 leading-relaxed">
             탈퇴 시 24시간의 유예 기간을 가지며,<br /> 해당 기간 동안 같은 이메일로 재가입이 제한됩니다.<br />

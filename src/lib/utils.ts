@@ -37,12 +37,11 @@ export function getWebSocketHttpUrl(): string {
     return process.env.NEXT_PUBLIC_WS_URL;
   }
   
-  // 로컬 개발 환경 (backend는 10005 포트로 매핑됨)
+  // 로컬 개발 환경: 백엔드를 직접 로컬(8080)에 띄우는 경우가 많으므로 8080을 기본값으로 사용
   if (process.env.NODE_ENV === 'development') {
-    return 'http://localhost:10005/ws';
+    return 'http://localhost:8080/ws';
   }
   
-  // 운영 환경: Next.js 프록시가 SockJS/WS를 제대로 처리하지 못하는 경우가 있으므로,
-  // 프론트 도메인에서 포트만 10005(백엔드 노출 포트)로 바꿔서 직접 연결
+  // 운영 환경: 백엔드 도커 매핑 포트(10005)를 사용 (Next.js 프록시 이슈 우회)
   return `http://${window.location.hostname}:10005/ws`;
 }

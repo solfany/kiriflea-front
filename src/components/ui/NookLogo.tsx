@@ -44,13 +44,14 @@ export function NookLogo({
   return (
     <span className={`inline-flex items-center select-none ${className}`}>
       {/* Raccoon Logo Image */}
-      <span className="relative shrink-0 inline-flex items-center justify-center">
+      <span className="relative shrink-0 inline-flex items-center justify-center" style={{ width: `${width}px`, height: `${height}px` }}>
         <Image
           src={imageSrcs[variant]}
           alt="너굴상점 로고"
           width={width}
           height={height}
-          className="object-contain hover:scale-105 transition-transform"
+          style={{ width: `${width}px`, height: `${height}px` }}
+          className="object-contain hover:scale-105 transition-transform shrink-0"
           priority
         />
       </span>
